@@ -7,7 +7,7 @@ import { Mutex } from 'async-mutex';
  */
 
 const instance = axiosClient.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://localhost:3000',
   withCredentials: true,
 });
 
