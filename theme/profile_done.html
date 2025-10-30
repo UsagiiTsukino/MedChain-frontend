@@ -1,0 +1,383 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VaxChain User Profile</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .dashboard-shadow {
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      }
+      .active-tab { 
+        border-bottom: 3px solid #3b82f6;
+        color: #3b82f6;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100" alt="User Profile">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar Navigation -->
+      <div class="hidden md:flex md:flex-shrink-0">
+        <div class="flex flex-col w-64 bg-white border-r border-gray-200" alt="Navigation Sidebar">
+          <div class="flex items-center justify-center h-16 px-4 bg-blue-600" alt="Brand Logo">
+            <i class="fas fa-shield-virus text-white text-2xl mr-2"></i>
+            <span class="text-white font-bold text-xl">VaxChain</span>
+          </div>
+          <div class="flex flex-col flex-grow px-4 py-4 overflow-y-auto">
+            <div class="space-y-1">
+              <a href="#" class="flex items-center px-2 py-3 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900" alt="Dashboard">
+                <i class="fas fa-tachometer-alt mr-3 text-gray-400"></i>
+                Dashboard
+              </a>
+              <a href="#" class="flex items-center px-2 py-3 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900" alt="Vaccine Inventory">
+                <i class="fas fa-syringe mr-3 text-gray-400"></i>
+                Vaccine Inventory
+              </a>
+              <a href="#" class="flex items-center px-2 py-3 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900" alt="Recipients">
+                <i class="fas fa-users mr-3 text-gray-400"></i>
+                Recipients
+              </a>
+              <a href="#" class="flex items-center px-2 py-3 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900" alt="Regional Data">
+                <i class="fas fa-map-marked-alt mr-3 text-gray-400"></i>
+                Regional Data
+              </a>
+              <a href="#" class="flex items-center px-2 py-3 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900" alt="Blockchain Explorer">
+                <i class="fas fa-link mr-3 text-gray-400"></i>
+                Blockchain Explorer
+              </a>
+              <a href="#" class="flex items-center px-2 py-3 text-sm font-medium rounded-md bg-blue-50 text-blue-700" alt="Profile">
+                <i class="fas fa-user-circle mr-3 text-blue-600"></i>
+                Profile
+              </a>
+            </div>
+          </div>
+          <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center">
+              <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center" alt="User Avatar">
+                <i class="fas fa-user text-blue-600"></i>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-700">Admin User</p>
+                <p class="text-xs text-gray-500">Public Health Agency</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Main Content -->
+      <div class="flex flex-col flex-1 overflow-hidden">
+        <!-- Top Navigation -->
+        <div class="flex items-center justify-between h-16 bg-white border-b border-gray-200 px-4" alt="Top Navigation">
+          <div class="flex items-center md:hidden">
+            <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" alt="Mobile Menu">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <div class="flex-1 flex justify-between items-center">
+            <div class="relative max-w-xs w-full">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400"></i>
+              </div>
+              <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Search..." alt="Background image">
+            </div>
+            <div class="ml-4 flex items-center md:ml-6">
+              <button type="button" class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Notifications">
+                <i class="fas fa-bell"></i>
+              </button>
+              <div class="ml-3 relative">
+                <div>
+                  <button type="button" class="max-w-xs flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu" aria-expanded="false" aria-haspopup="true" alt="User Menu">
+                    <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center" alt="User Avatar">
+                      <i class="fas fa-user text-blue-600"></i>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Profile Content -->
+        <div class="flex-1 overflow-auto p-4 md:p-6 bg-gray-100" alt="User Profile">
+          <!-- Page Header -->
+          <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">User Profile</h1>
+            <p class="mt-1 text-sm text-gray-500">Manage your account and vaccination information</p>
+          </div>
+  
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Profile Card -->
+            <div class="lg:col-span-1">
+              <div class="bg-white shadow rounded-lg overflow-hidden" alt="User Information">
+                <div class="px-4 py-5 sm:px-6 bg-blue-600" alt="Personal Information">
+                  <h3 class="text-lg font-medium text-white">Personal Information</h3>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                  <div class="flex flex-col items-center">
+                    <div class="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center mb-4" alt="User Avatar">
+                      <i class="fas fa-user text-blue-600 text-4xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900">Dr. Sarah Johnson</h3>
+                    <p class="text-sm text-gray-500">Public Health Administrator</p>
+                  </div>
+                  <div class="mt-6 space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Email</label>
+                      <p class="mt-1 text-sm text-gray-900"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="52213320333a7c383d3a3c213d3c123a37333e263a7c353d24">[email&#160;protected]</a></p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Organization</label>
+                      <p class="mt-1 text-sm text-gray-900">National Health Department</p>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Account Type</label>
+                      <p class="mt-1 text-sm">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800" alt="Admin Account">
+                          Admin Account
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- Digital Wallet -->
+              <div class="mt-6 bg-white shadow rounded-lg overflow-hidden" alt="Digital Wallet">
+                <div class="px-4 py-5 sm:px-6 bg-purple-600" alt="Digital Wallet">
+                  <h3 class="text-lg font-medium text-white">Digital Wallet</h3>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                  <div class="flex items-center justify-center mb-4">
+                    <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center" alt="Wallet Icon">
+                      <i class="fas fa-wallet text-purple-600 text-xl"></i>
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <p class="text-sm text-gray-500 break-all">0x4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5</p>
+                    <button class="mt-4 inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" alt="Copy Address">
+                      <i class="fas fa-copy mr-2"></i> Copy Address
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+              <!-- Vaccination Status -->
+              <div class="bg-white shadow rounded-lg overflow-hidden" alt="Vaccination Status">
+                <div class="px-4 py-5 sm:px-6 bg-green-600" alt="Vaccination Status">
+                  <h3 class="text-lg font-medium text-white">Vaccination Status</h3>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="border rounded-lg p-4 text-center" alt="Dose 1">
+                      <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-3" alt="Dose Icon">
+                        <i class="fas fa-syringe text-green-600 text-xl"></i>
+                      </div>
+                      <h4 class="text-sm font-medium text-gray-900">First Dose</h4>
+                      <p class="mt-1 text-sm text-gray-500">Completed</p>
+                      <p class="mt-1 text-xs text-gray-500">12 Mar 2025</p>
+                    </div>
+                    <div class="border rounded-lg p-4 text-center" alt="Dose 2">
+                      <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3" alt="Dose Icon">
+                        <i class="fas fa-syringe text-blue-600 text-xl"></i>
+                      </div>
+                      <h4 class="text-sm font-medium text-gray-900">Second Dose</h4>
+                      <p class="mt-1 text-sm text-gray-500">Completed</p>
+                      <p class="mt-1 text-xs text-gray-500">02 Apr 2025</p>
+                    </div>
+                    <div class="border rounded-lg p-4 text-center" alt="Booster">
+                      <div class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-3" alt="Booster Icon">
+                        <i class="fas fa-plus-circle text-yellow-600 text-xl"></i>
+                      </div>
+                      <h4 class="text-sm font-medium text-gray-900">Booster</h4>
+                      <p class="mt-1 text-sm text-gray-500">Not Administered</p>
+                      <button class="mt-2 inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Schedule Now">
+                        Schedule Now
+                      </button>
+                    </div>
+                  </div>
+  
+                  <div class="border-t border-gray-200 pt-4">
+                    <h4 class="text-sm font-medium text-gray-900 mb-3">Vaccine Details</h4>
+                    <div class="overflow-x-auto">
+                      <table class="min-w-full divide-y divide-gray-200" alt="Vaccine Details">
+                        <thead class="bg-gray-50" alt="Vaccine Type
+                            Batch Number
+                        ">
+                          <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vaccine Type</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batch Number</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verification</th>
+                          </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" alt="Pfizer
+                            ABX12345
+   ">
+                          <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pfizer</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">ABX12345</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12 Mar 2025</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800" alt="Verified">
+                                <i class="fas fa-check-circle mr-1"></i> Verified
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pfizer</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">ABX12346</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">02 Apr 2025</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800" alt="Verified">
+                                <i class="fas fa-check-circle mr-1"></i> Verified
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+  
+              <!-- Security Settings -->
+              <div class="mt-6 bg-white shadow rounded-lg overflow-hidden" alt="Security Settings">
+                <div class="px-4 py-5 sm:px-6 bg-red-600" alt="Security Settings">
+                  <h3 class="text-lg font-medium text-white">Security Settings</h3>
+                </div>
+                <div class="px-4 py-5 sm:p-6">
+                  <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="text-sm font-medium text-gray-900">Two-Factor Authentication</h4>
+                        <p class="text-sm text-gray-500">Add an extra layer of security to your account</p>
+                      </div>
+                      <div>
+                        <span class="relative inline-block h-6 w-11 rounded-full bg-green-500" alt="Toggle Switch">
+                          <span class="inline-block h-4 w-4 rounded-full bg-white transform translate-x-1 translate-y-1" alt="Background image"></span>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="text-sm font-medium text-gray-900">Change Password</h4>
+                        <p class="text-sm text-gray-500">Last changed 3 months ago</p>
+                      </div>
+                      <button class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Change Password">
+                        Update
+                      </button>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h4 class="text-sm font-medium text-gray-900">Session Management</h4>
+                        <p class="text-sm text-gray-500">View and manage active sessions</p>
+                      </div>
+                      <button class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Manage Sessions">
+                        Manage
+                      </button>
+                    </div>
+                    <div class="border-t border-gray-200 pt-4">
+                      <h4 class="text-sm font-medium text-gray-900 mb-3">Account Actions</h4>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-blue-700 bg-blue-50 hover:bg-blue-100" alt="Export Data">
+                          <i class="fas fa-download mr-2"></i> Export Data
+                        </button>
+                        <button class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-red-700 bg-red-50 hover:bg-red-100" alt="Delete Account">
+                          <i class="fas fa-trash-alt mr-2"></i> Delete Account
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+      // Vaccination Rate Chart
+      const rateCtx = document.getElementById('vaccinationRateChart')?.getContext('2d');
+      if (rateCtx) {
+        const vaccinationRateChart = new Chart(rateCtx, {
+          type: 'line',
+          data: {
+            labels: Array.from({length: 30}, (_, i) => `Day ${i+1}`),
+            datasets: [{
+              label: 'Daily Vaccinations',
+              data: Array.from({length: 30}, () => Math.floor(Math.random() * 50000) + 20000),
+              backgroundColor: 'rgba(59, 130, 246, 0.05)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 2,
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  drawBorder: false
+                }
+              },
+              x: {
+                grid: {
+                  display: false
+                }
+              }
+            }
+          }
+        });
+      }
+  
+      // Vaccine Distribution Chart
+      const distCtx = document.getElementById('vaccineDistributionChart')?.getContext('2d');
+      if (distCtx) {
+        const vaccineDistributionChart = new Chart(distCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Moderna', 'Pfizer', 'AstraZeneca', 'Johnson & Johnson', 'Other'],
+            datasets: [{
+              data: [35, 40, 15, 7, 3],
+              backgroundColor: [
+                'rgba(59, 130, 246, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(139, 92, 246, 0.8)',
+                'rgba(156, 163, 175, 0.8)'
+              ],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right'
+              }
+            },
+            cutout: '70%'
+          }
+        });
+      }
+    </script>
+  </body></html>

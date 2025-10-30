@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.05) 0%,
+    rgba(5, 150, 105, 0.05) 100%
+  );
+}
+
+.blockchain-bg {
+  background-image: radial-gradient(
+      circle at 10% 20%,
+      rgba(37, 99, 235, 0.03) 0%,
+      transparent 20%
+    ),
+    radial-gradient(
+      circle at 90% 80%,
+      rgba(5, 150, 105, 0.03) 0%,
+      transparent 20%
+    );
+}
+
+/* Home */
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.trust-badge {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Market */
+
+.vaccine-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.trust-badge {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.filter-chip:hover {
+  background-color: #f3f4f6;
+}
+
+.filter-chip.active {
+  background-color: #2563eb;
+  color: white;
+}
+
+.leaflet-container {
+  height: 300px;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+.certificate-border {
+  border: 20px solid transparent;
+  border-image: linear-gradient(135deg, #3b82f6, #10b981) 1;
+}
+
+/* Calendar Styles */
+
+.calendar-header {
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.calendar-cell-content {
+  cursor: pointer;
+  padding: 4px;
+  transition: all 0.3s;
+}
+
+.calendar-cell-content:hover {
+  background: #f0f7ff;
+  border-radius: 4px;
+}
+
+.appointment-summary {
+  font-size: 12px;
+}
+
+.total-text {
+  display: block;
+  margin-bottom: 4px;
+  color: #1890ff;
+}
+
+.status-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+/* Week View Styles */
+
+.week-view {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.week-day {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  min-height: 400px;
+}
+
+.week-day.today {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.week-day-header {
+  padding: 12px;
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.week-day-date {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.week-day-content {
+  padding: 8px;
+}
+
+.week-appointment {
+  padding: 8px !important;
+  margin-bottom: 8px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.week-appointment:hover {
+  background: #f0f7ff;
+  border-color: #1890ff;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.week-time {
+  color: #1890ff;
+}
+
+.week-patient,
+.week-vaccine {
+  font-size: 12px;
+}
+
+.no-appointments {
+  display: block;
+  text-align: center;
+  padding: 20px;
+  color: #bfbfbf;
+}
+
+/* Day View Styles */
+
+.appointment-item {
+  padding: 16px !important;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.3s;
+}
+
+.appointment-item:hover {
+  background: #f0f7ff;
+  border-color: #1890ff;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.appointment-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: #f0f7ff;
+  border-radius: 8px;
+  min-width: 80px;
+}
+
+@media (max-width: 1200px) {
+  .week-view {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .week-view {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .calendar-header {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .week-view {
+    grid-template-columns: 1fr;
+  }
+}

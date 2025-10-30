@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VaxChain - Secure Vaccine Management</title>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#2563eb',
+                            secondary: '#059669',
+                            light: '#f0fdfa'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
+        }
+
+        .blockchain-bg {
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(5, 150, 105, 0.03) 0%, transparent 20%);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .trust-badge {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+    </style>
+</head>
+
+<body class="bg-white" alt="Vaccine Management">
+    <!-- Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50" alt="Page Header">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div class="flex items-center">
+                <i class="fas fa-shield-virus text-brand-primary text-2xl mr-2"></i>
+                <span class="text-xl font-bold text-gray-900">VaxChain</span>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Home</a>
+                <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Features</a>
+                <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Verify</a>
+                <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Providers</a>
+                <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">About</a>
+            </nav>
+            <div class="hidden md:block">
+                <a href="#"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    alt="Login Button">
+                    <i class="fas fa-user-circle mr-2"></i> Login
+                </a>
+            </div>
+            <button class="md:hidden text-gray-500 hover:text-gray-600" alt="Mobile Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient blockchain-bg" alt="Hero Section">
+        <div class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-4">Secure Vaccine
+                        Management Powered by Blockchain</h1>
+                    <p class="text-lg text-gray-600 mb-8">Immutable, tamper-proof records for your health security.
+                        Verify vaccination status instantly with decentralized technology.</p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#"
+                            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-brand-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            alt="Check Status">
+                            <i class="fas fa-shield-alt mr-2"></i> Check My Vaccine Status
+                        </a>
+                        <a href="#"
+                            class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            alt="Book Appointment">
+                            <i class="fas fa-calendar-check mr-2"></i> Book Appointment
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-100" alt="Vaccine Card">
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Vaccination Certificate</h3>
+                                <p class="text-sm text-gray-500">Digital ID: VX-••••-••••-••••</p>
+                            </div>
+                            <div class="h-10 w-10 rounded-full bg-brand-light flex items-center justify-center"
+                                alt="Verified Badge">
+                                <i class="fas fa-check-circle text-brand-secondary"></i>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <p class="text-xs text-gray-500">Patient Name</p>
+                                <p class="text-sm font-medium">John D.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Date of Birth</p>
+                                <p class="text-sm font-medium">••/••/1985</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Vaccine</p>
+                                <p class="text-sm font-medium">COVID-19</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500">Doses</p>
+                                <p class="text-sm font-medium">2 of 2</p>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-3 rounded-lg flex items-center justify-between" alt="QR Code">
+                            <div class="bg-gray-200 rounded p-2" alt="QR Placeholder">
+                                <i class="fas fa-qrcode text-gray-400 text-2xl"></i>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-500">Blockchain Hash</p>
+                                <p class="text-xs font-mono text-gray-600 truncate">0x1a2b...f8e9</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-xl shadow-lg border border-gray-100 w-32"
+                        alt="Trust Badge">
+                        <div class="flex flex-col items-center">
+                            <div class="h-8 w-8 rounded-full bg-brand-light flex items-center justify-center mb-1"
+                                alt="Shield Icon">
+                                <i class="fas fa-shield-alt text-brand-secondary text-sm"></i>
+                            </div>
+                            <p class="text-xs font-medium text-center">Blockchain Verified</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Badges -->
+    <section class="bg-white py-8" alt="Trust Partners">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500 mb-6">Trusted by leading healthcare providers worldwide</p>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 items-center justify-center">
+                <div class="flex justify-center">
+                    <div class="h-12 flex items-center" alt="Hospital Logo">
+                        <i class="fas fa-hospital text-3xl text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <div class="h-12 flex items-center" alt="Clinic Logo">
+                        <i class="fas fa-clinic-medical text-3xl text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <div class="h-12 flex items-center" alt="Pharmacy Logo">
+                        <i class="fas fa-prescription-bottle-alt text-3xl text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <div class="h-12 flex items-center" alt="Government Logo">
+                        <i class="fas fa-landmark text-3xl text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <div class="h-12 flex items-center" alt="Research Logo">
+                        <i class="fas fa-microscope text-3xl text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="bg-brand-light blockchain-bg py-16" alt="How It Works">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">How Blockchain Secures Your Records</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Our decentralized system ensures your vaccination
+                    data remains private yet verifiable by authorized parties.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm transition-all duration-300 feature-card"
+                    alt="Immutable Records">
+                    <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mb-4"
+                        alt="Lock Icon">
+                        <i class="fas fa-lock text-brand-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Immutable Records</h3>
+                    <p class="text-gray-600">Once recorded on the blockchain, your vaccination data cannot be altered or
+                        deleted, preventing fraud.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm transition-all duration-300 feature-card"
+                    alt="Instant Verification">
+                    <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mb-4"
+                        alt="Check Icon">
+                        <i class="fas fa-bolt text-brand-secondary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Instant Verification</h3>
+                    <p class="text-gray-600">Authorized parties can verify your vaccination status in seconds without
+                        compromising your privacy.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm transition-all duration-300 feature-card"
+                    alt="Global Access">
+                    <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4"
+                        alt="Globe Icon">
+                        <i class="fas fa-globe text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Global Access</h3>
+                    <p class="text-gray-600">Your digital vaccine passport works anywhere, recognized across borders and
+                        healthcare systems.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-16 bg-white" alt="User Testimonials">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Trusted by Healthcare Professionals</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">What medical experts say about our blockchain
+                    solution.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-brand-light p-6 rounded-xl" alt="Doctor Testimonial">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mr-4"
+                            alt="Doctor Photo">
+                            <i class="fas fa-user-md text-brand-primary"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Dr. Sarah Johnson</h4>
+                            <p class="text-sm text-gray-500">Chief Medical Officer</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"VaxChain has revolutionized how we track vaccinations in our health
+                        system. The immutable records give us confidence in the data's accuracy."</p>
+                </div>
+                <div class="bg-brand-light p-6 rounded-xl" alt="Nurse Testimonial">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center mr-4"
+                            alt="Nurse Photo">
+                            <i class="fas fa-user-nurse text-brand-secondary"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Nurse Michael Chen</h4>
+                            <p class="text-sm text-gray-500">Public Health Nurse</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"The instant verification saves hours of administrative work.
+                        Patients love having control over their vaccine records through the secure portal."</p>
+                </div>
+                <div class="bg-brand-light p-6 rounded-xl" alt="Researcher Testimonial">
+                    <div class="flex items-center mb-4">
+                        <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mr-4"
+                            alt="Researcher Photo">
+                            <i class="fas fa-flask text-purple-600"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Dr. Emily Rodriguez</h4>
+                            <p class="text-sm text-gray-500">Epidemiology Researcher</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"For public health research, having verifiable vaccine data is
+                        invaluable. VaxChain provides the perfect balance of privacy and transparency."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-brand-primary py-16" alt="Call To Action">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-white mb-4">Ready to Secure Your Vaccination Records?</h2>
+                <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">Join thousands who trust blockchain technology
+                    for their health data security.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#"
+                        class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-brand-primary bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+                        alt="Get Started">
+                        <i class="fas fa-rocket mr-2"></i> Get Started
+                    </a>
+                    <a href="#"
+                        class="inline-flex items-center justify-center px-6 py-3 border border-white text-base font-medium rounded-md shadow-sm text-white bg-transparent hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+                        alt="Learn More">
+                        <i class="fas fa-book mr-2"></i> Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50" alt="Page Footer">
+        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center">
+                        <i class="fas fa-shield-virus text-brand-primary text-xl mr-2"></i>
+                        <span class="text-lg font-bold text-gray-900">VaxChain</span>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-500">Securing global health through blockchain technology.</p>
+                    <div class="mt-4 flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-gray-500" alt="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-gray-500" alt="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-gray-500" alt="Github">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Solutions</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Individuals</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Healthcare</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Government</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Travel</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Resources</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Documentation</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">API</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Blog</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Company</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">About Us</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Careers</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Privacy</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Terms</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm text-gray-500">© 2025 VaxChain. All rights reserved.</p>
+                <div class="mt-4 md:mt-0">
+                    <p class="text-xs text-gray-500">Blockchain-powered health security</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VaxChain - Secure Login</title>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4" alt="VaxChain
+        
+        Secure Vaccine Tracking Syst">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg overflow-hidden" alt="VaxChain
+        
+        Secure Vaccine Tracking Syst">
+        <div class="bg-blue-600 py-6 px-8 text-white" alt="VaxChain
+        
+        Secure Vaccine Tracking Syst">
+            <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-shield-virus text-3xl mr-3"></i>
+                <h1 class="text-2xl font-bold">VaxChain</h1>
+            </div>
+            <p class="text-center text-blue-100">Secure Vaccine Tracking System</p>
+        </div>
+
+        <div class="p-8">
+            <div class="flex items-center justify-center mb-6">
+                <div class="bg-blue-100 p-3 rounded-full" alt="Background image">
+                    <i class="fas fa-lock text-blue-600 text-xl"></i>
+                </div>
+            </div>
+
+            <form class="space-y-4">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input id="email" name="email" type="email" required=""
+                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="your@email.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-key text-gray-400"></i>
+                        </div>
+                        <input id="password" name="password" type="password" required=""
+                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember" name="remember" type="checkbox"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        alt="Sign In">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500" alt="Or continue with">Or continue with</span>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <button id="wallet-connect"
+                        class="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        alt="Connect Wallet">
+                        <i class="fab fa-ethereum text-blue-500 mr-2"></i>
+                        Connect Wallet
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 px-8 py-4 border-t border-gray-200" alt="© 2025 VaxChain. All rights reserved.">
+            <p class="text-xs text-gray-500 text-center">
+                © 2025 VaxChain. All rights reserved. <i class="fas fa-link text-blue-500 ml-1"></i>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('wallet-connect').addEventListener('click', function () {
+            alert('Connecting to your blockchain wallet...');
+            // Actual wallet connection logic would go here
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VaxChain - Vaccine Marketplace</title>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                primary: '#2563eb',
+                secondary: '#059669',
+                light: '#f0fdfa'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .hero-gradient {
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
+      }
+      .blockchain-bg {
+        background-image: 
+          radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.03) 0%, transparent 20%),
+          radial-gradient(circle at 90% 80%, rgba(5, 150, 105, 0.03) 0%, transparent 20%);
+      }
+      .vaccine-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+      .trust-badge {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      }
+      .filter-chip:hover {
+        background-color: #f3f4f6;
+      }
+      .filter-chip.active {
+        background-color: #2563eb;
+        color: white;
+      }
+    </style>
+  </head>
+  <body class="bg-white" alt="Vaccine Marketplace">
+    <!-- Navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50" alt="Page Header">
+      <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+        <div class="flex items-center">
+          <i class="fas fa-shield-virus text-brand-primary text-2xl mr-2"></i>
+          <span class="text-xl font-bold text-gray-900">VaxChain</span>
+        </div>
+        <nav class="hidden md:flex space-x-8">
+          <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Home</a>
+          <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Vaccines</a>
+          <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Verify</a>
+          <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">Providers</a>
+          <a href="#" class="text-gray-500 hover:text-brand-primary text-sm font-medium">About</a>
+        </nav>
+        <div class="hidden md:block">
+          <a href="#" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Login Button">
+            <i class="fas fa-user-circle mr-2"></i> Login
+          </a>
+        </div>
+        <button class="md:hidden text-gray-500 hover:text-gray-600" alt="Mobile Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+  
+    <!-- Vaccine Marketplace Section -->
+    <section class="py-12 blockchain-bg" alt="Vaccine Marketplace">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-10">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Vaccine Marketplace</h1>
+          <p class="text-lg text-gray-600">Browse and verify blockchain-certified vaccines available near you</p>
+        </div>
+  
+        <!-- Filters Section -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8" alt="Filters Section">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Vaccine Type Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Vaccine Type</label>
+              <div class="relative">
+                <select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary rounded-md" alt="Vaccine Type">
+                  <option>All Types</option>
+                  <option>COVID-19</option>
+                  <option>Influenza</option>
+                  <option>HPV</option>
+                  <option>Hepatitis</option>
+                  <option>MMR</option>
+                </select>
+              </div>
+            </div>
+  
+            <!-- Manufacturer Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Manufacturer</label>
+              <div class="relative">
+                <select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary rounded-md" alt="Manufacturer">
+                  <option>All Manufacturers</option>
+                  <option>Pfizer</option>
+                  <option>Moderna</option>
+                  <option>Johnson &amp; Johnson</option>
+                  <option>AstraZeneca</option>
+                  <option>Novavax</option>
+                </select>
+              </div>
+            </div>
+  
+            <!-- Dose Interval Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Dose Interval</label>
+              <div class="relative">
+                <select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary rounded-md" alt="Dose Interval">
+                  <option>Any Interval</option>
+                  <option>Single Dose</option>
+                  <option>2 Doses (3-4 weeks)</option>
+                  <option>2 Doses (6-8 weeks)</option>
+                  <option>3 Doses (0-1-6 months)</option>
+                </select>
+              </div>
+            </div>
+  
+            <!-- Location Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <div class="relative">
+                <select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-primary focus:border-brand-primary rounded-md" alt="Location">
+                  <option>All Locations</option>
+                  <option>New York</option>
+                  <option>California</option>
+                  <option>Texas</option>
+                  <option>Florida</option>
+                  <option>Illinois</option>
+                </select>
+              </div>
+            </div>
+          </div>
+  
+          <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Quick Filters</label>
+            <div class="flex flex-wrap gap-2">
+              <button class="filter-chip px-3 py-1 rounded-full text-sm border border-gray-200 text-gray-700" alt="Blockchain Verified">
+                <i class="fas fa-link mr-1"></i> Blockchain Verified
+              </button>
+              <button class="filter-chip px-3 py-1 rounded-full text-sm border border-gray-200 text-gray-700" alt="Available Today">
+                <i class="fas fa-calendar-day mr-1"></i> Available Today
+              </button>
+              <button class="filter-chip px-3 py-1 rounded-full text-sm border border-gray-200 text-gray-700" alt="Free Vaccines">
+                <i class="fas fa-dollar-sign mr-1"></i> Free Vaccines
+              </button>
+              <button class="filter-chip px-3 py-1 rounded-full text-sm border border-gray-200 text-gray-700" alt="Pediatric">
+                <i class="fas fa-baby mr-1"></i> Pediatric
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Vaccine Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Vaccine Card 1 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 vaccine-card" alt="COVID Vaccine">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="h-12 w-12 rounded-lg bg-blue-50 flex items-center justify-center" alt="Vaccine Icon">
+                  <i class="fas fa-syringe text-brand-primary text-xl"></i>
+                </div>
+                <div class="flex items-center bg-green-50 px-2 py-1 rounded-full" alt="Blockchain Tag">
+                  <i class="fas fa-link text-green-500 text-xs mr-1"></i>
+                  <span class="text-xs font-medium text-green-700">Blockchain Certified</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">Pfizer-BioNTech COVID-19</h3>
+              <p class="text-gray-600 text-sm mb-4">mRNA vaccine for prevention of COVID-19 in individuals 12 years and older.</p>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500">Manufacturer</p>
+                  <p class="text-sm font-medium">Pfizer Inc.</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Dose Schedule</p>
+                  <p class="text-sm font-medium">2 doses, 3 weeks</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Efficacy</p>
+                  <p class="text-sm font-medium">95%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Available At</p>
+                  <p class="text-sm font-medium">12 locations</p>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs text-gray-500">Blockchain Hash</p>
+                  <p class="text-xs font-mono text-gray-600 truncate">0x4f8a...d3e2</p>
+                </div>
+                <a href="#" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-brand-primary hover:bg-blue-700" alt="View Details">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Vaccine Card 2 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 vaccine-card" alt="Flu Vaccine">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="h-12 w-12 rounded-lg bg-green-50 flex items-center justify-center" alt="Vaccine Icon">
+                  <i class="fas fa-head-side-mask text-green-500 text-xl"></i>
+                </div>
+                <div class="flex items-center bg-green-50 px-2 py-1 rounded-full" alt="Blockchain Tag">
+                  <i class="fas fa-link text-green-500 text-xs mr-1"></i>
+                  <span class="text-xs font-medium text-green-700">Blockchain Certified</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">Influenza Quadrivalent</h3>
+              <p class="text-gray-600 text-sm mb-4">Seasonal flu vaccine protecting against four flu virus strains.</p>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500">Manufacturer</p>
+                  <p class="text-sm font-medium">Sanofi Pasteur</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Dose Schedule</p>
+                  <p class="text-sm font-medium">Annual dose</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Efficacy</p>
+                  <p class="text-sm font-medium">40-60%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Available At</p>
+                  <p class="text-sm font-medium">28 locations</p>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs text-gray-500">Blockchain Hash</p>
+                  <p class="text-xs font-mono text-gray-600 truncate">0x7b2f...e5c1</p>
+                </div>
+                <a href="#" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-brand-primary hover:bg-blue-700" alt="View Details">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Vaccine Card 3 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 vaccine-card" alt="HPV Vaccine">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="h-12 w-12 rounded-lg bg-purple-50 flex items-center justify-center" alt="Vaccine Icon">
+                  <i class="fas fa-dna text-purple-500 text-xl"></i>
+                </div>
+                <div class="flex items-center bg-green-50 px-2 py-1 rounded-full" alt="Blockchain Tag">
+                  <i class="fas fa-link text-green-500 text-xs mr-1"></i>
+                  <span class="text-xs font-medium text-green-700">Blockchain Certified</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">Gardasil 9 (HPV)</h3>
+              <p class="text-gray-600 text-sm mb-4">HPV vaccine protecting against 9 types of human papillomavirus.</p>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500">Manufacturer</p>
+                  <p class="text-sm font-medium">Merck</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Dose Schedule</p>
+                  <p class="text-sm font-medium">2-3 doses</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Efficacy</p>
+                  <p class="text-sm font-medium">90%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Available At</p>
+                  <p class="text-sm font-medium">15 locations</p>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs text-gray-500">Blockchain Hash</p>
+                  <p class="text-xs font-mono text-gray-600 truncate">0x9e3d...f7a2</p>
+                </div>
+                <a href="#" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-brand-primary hover:bg-blue-700" alt="View Details">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Vaccine Card 4 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 vaccine-card" alt="MMR Vaccine">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="h-12 w-12 rounded-lg bg-yellow-50 flex items-center justify-center" alt="Vaccine Icon">
+                  <i class="fas fa-virus-slash text-yellow-500 text-xl"></i>
+                </div>
+                <div class="flex items-center bg-green-50 px-2 py-1 rounded-full" alt="Blockchain Tag">
+                  <i class="fas fa-link text-green-500 text-xs mr-1"></i>
+                  <span class="text-xs font-medium text-green-700">Blockchain Certified</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">MMR II</h3>
+              <p class="text-gray-600 text-sm mb-4">Measles, mumps, and rubella virus vaccine for children and adults.</p>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500">Manufacturer</p>
+                  <p class="text-sm font-medium">Merck</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Dose Schedule</p>
+                  <p class="text-sm font-medium">2 doses</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Efficacy</p>
+                  <p class="text-sm font-medium">97%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Available At</p>
+                  <p class="text-sm font-medium">22 locations</p>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs text-gray-500">Blockchain Hash</p>
+                  <p class="text-xs font-mono text-gray-600 truncate">0x5c1d...b8a3</p>
+                </div>
+                <a href="#" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-brand-primary hover:bg-blue-700" alt="View Details">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Vaccine Card 5 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 vaccine-card" alt="Hepatitis Vaccine">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="h-12 w-12 rounded-lg bg-red-50 flex items-center justify-center" alt="Vaccine Icon">
+                  <i class="fas fa-lungs-virus text-red-500 text-xl"></i>
+                </div>
+                <div class="flex items-center bg-green-50 px-2 py-1 rounded-full" alt="Blockchain Tag">
+                  <i class="fas fa-link text-green-500 text-xs mr-1"></i>
+                  <span class="text-xs font-medium text-green-700">Blockchain Certified</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">Hepatitis B</h3>
+              <p class="text-gray-600 text-sm mb-4">Vaccine to prevent hepatitis B virus infection.</p>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500">Manufacturer</p>
+                  <p class="text-sm font-medium">GSK</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Dose Schedule</p>
+                  <p class="text-sm font-medium">3 doses</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Efficacy</p>
+                  <p class="text-sm font-medium">95%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Available At</p>
+                  <p class="text-sm font-medium">18 locations</p>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs text-gray-500">Blockchain Hash</p>
+                  <p class="text-xs font-mono text-gray-600 truncate">0x3e9f...c4d5</p>
+                </div>
+                <a href="#" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-brand-primary hover:bg-blue-700" alt="View Details">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Vaccine Card 6 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 vaccine-card" alt="Tetanus Vaccine">
+            <div class="p-6">
+              <div class="flex justify-between items-start mb-4">
+                <div class="h-12 w-12 rounded-lg bg-indigo-50 flex items-center justify-center" alt="Vaccine Icon">
+                  <i class="fas fa-bacterium text-indigo-500 text-xl"></i>
+                </div>
+                <div class="flex items-center bg-gray-100 px-2 py-1 rounded-full" alt="Pending Tag">
+                  <i class="fas fa-hourglass-half text-gray-500 text-xs mr-1"></i>
+                  <span class="text-xs font-medium text-gray-700">Verification Pending</span>
+                </div>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900 mb-2">Tdap (Tetanus)</h3>
+              <p class="text-gray-600 text-sm mb-4">Tetanus, diphtheria, and acellular pertussis vaccine booster.</p>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500">Manufacturer</p>
+                  <p class="text-sm font-medium">Sanofi Pasteur</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Dose Schedule</p>
+                  <p class="text-sm font-medium">Every 10 years</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Efficacy</p>
+                  <p class="text-sm font-medium">100%</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Available At</p>
+                  <p class="text-sm font-medium">25 locations</p>
+                </div>
+              </div>
+              
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs text-gray-500">Status</p>
+                  <p class="text-xs font-medium text-gray-600">Awaiting verification</p>
+                </div>
+                <a href="#" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-full shadow-sm text-white bg-gray-400" alt="View Details">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Pagination -->
+        <div class="mt-10 flex items-center justify-between">
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                Showing <span class="font-medium">1</span> to <span class="font-medium">6</span> of <span class="font-medium">12</span> vaccines
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" alt="Previous Page">
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+                <a href="#" aria-current="page" class="z-10 bg-brand-primary border-brand-primary text-white relative inline-flex items-center px-4 py-2 border text-sm font-medium" alt="Page 1">
+                  1
+                </a>
+                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium" alt="Page 2">
+                  2
+                </a>
+                <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium" alt="Page 3">
+                  3
+                </a>
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" alt="Next Page">
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Newsletter Section -->
+    <section class="bg-brand-light py-16" alt="Newsletter">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-xl shadow-sm p-8" alt="Stay Updated on New Vaccines
+              Get notif">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900 mb-2">Stay Updated on New Vaccines</h2>
+              <p class="text-gray-600">Get notified when new blockchain-verified vaccines become available in your area.</p>
+            </div>
+            <div>
+              <form class="sm:flex">
+                <label for="email-address" class="sr-only">Email address</label>
+                <input id="email-address" name="email" type="email" autocomplete="email" required="" class="w-full px-5 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:ring-brand-primary focus:border-brand-primary block w-full sm:text-sm rounded-md" placeholder="Enter your email" alt="Email Input">
+                <div class="mt-3 sm:mt-0 sm:ml-3">
+                  <button type="submit" class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Subscribe Button">
+                    Subscribe
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  
+    <!-- Footer -->
+    <footer class="bg-gray-50" alt="Page Footer">
+      <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center">
+              <i class="fas fa-shield-virus text-brand-primary text-xl mr-2"></i>
+              <span class="text-lg font-bold text-gray-900">VaxChain</span>
+            </div>
+            <p class="mt-4 text-sm text-gray-500">Securing global health through blockchain technology.</p>
+            <div class="mt-4 flex space-x-4">
+              <a href="#" class="text-gray-400 hover:text-gray-500" alt="Twitter">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-gray-500" alt="LinkedIn">
+                <i class="fab fa-linkedin"></i>
+              </a>
+              <a href="#" class="text-gray-400 hover:text-gray-500" alt="Github">
+                <i class="fab fa-github"></i>
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Solutions</h3>
+            <ul class="mt-4 space-y-2">
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Individuals</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Healthcare</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Government</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">For Travel</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Resources</h3>
+            <ul class="mt-4 space-y-2">
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Documentation</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">API</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Blog</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Support</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Company</h3>
+            <ul class="mt-4 space-y-2">
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">About Us</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Careers</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Privacy</a></li>
+              <li><a href="#" class="text-sm text-gray-500 hover:text-brand-primary">Terms</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
+          <p class="text-sm text-gray-500">© 2025 VaxChain. All rights reserved.</p>
+          <div class="mt-4 md:mt-0">
+            <p class="text-xs text-gray-500">Blockchain-powered health security</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+  
+    <script>
+      // Add active state to filter chips
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+          this.classList.toggle('active');
+        });
+      });
+    </script>
+  </body></html>

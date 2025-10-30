@@ -1,0 +1,210 @@
+<!DOCTYPE html><html lang="vi"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VaxChain - Chứng Nhận Tiêm Chủng</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .certificate-border {
+        border: 20px solid transparent;
+        border-image: linear-gradient(135deg, #3b82f6, #10b981) 1;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50" alt="Trang Chứng Nhận">
+    <div class="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto">
+        <!-- Certificate Container -->
+        <div class="bg-white certificate-border shadow-xl rounded-lg overflow-hidden" alt="Chứng Nhận Tiêm Chủng Số">
+          <!-- Certificate Header -->
+          <div class="bg-gradient-to-r from-blue-600 to-green-500 p-6 text-white" alt="Chứng Nhận Tiêm Chủng Số">
+            <div class="flex justify-between items-center">
+              <div>
+                <h1 class="text-2xl sm:text-3xl font-bold">Chứng Nhận Tiêm Chủng Số</h1>
+                <p class="mt-1">Được cấp qua Mạng Blockchain VaxChain</p>
+              </div>
+              <div class="h-12 w-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center" alt="Nền Logo">
+                <i class="fas fa-shield-virus text-white text-xl"></i>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Certificate Body -->
+          <div class="p-6 sm:p-8">
+            <!-- Recipient Info -->
+            <div class="mb-8">
+              <h2 class="text-xl font-semibold text-gray-800 mb-4">Thông Tin Người Nhận</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-gray-500">Họ Tên</p>
+                  <p class="font-medium">Nguyễn Văn A</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Ngày Sinh</p>
+                  <p class="font-medium">15/05/1985</p>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Vaccine Details -->
+            <div class="mb-8">
+              <h2 class="text-xl font-semibold text-gray-800 mb-4">Chi Tiết Vaccine</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <p class="text-sm text-gray-500">Loại Vaccine</p>
+                  <p class="font-medium">COVID-19 (Moderna)</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Ngày Đặt Lịch</p>
+                  <p class="font-medium">20/11/2023</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Giờ Đặt Lịch</p>
+                  <p class="font-medium">09:00</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <p class="text-sm text-gray-500">Trung Tâm</p>
+                  <p class="font-medium">Trung tâm Hà Nội</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Xác Thực</p>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" alt="Đã Xác Thực">
+                    <i class="fas fa-check-circle mr-1"></i> Đã Xác Thực
+                  </span>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Cơ Sở Cấp</p>
+                  <p class="font-medium">Trung Tâm Y Tế Thành Phố</p>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Verification Section -->
+            <div class="border-t border-gray-200 pt-6">
+              <h2 class="text-xl font-semibold text-gray-800 mb-4">Xác Thực Blockchain</h2>
+              <div class="flex flex-col sm:flex-row gap-6">
+                <!-- QR Code -->
+                <div class="sm:w-1/3">
+                  <div class="bg-gray-100 p-4 rounded-lg flex flex-col items-center" alt="Nền QR">
+                    <div class="h-40 w-40 bg-white p-2 rounded flex items-center justify-center mb-2" alt="Mã QR">
+                      <i class="fas fa-qrcode text-gray-400 text-6xl"></i>
+                    </div>
+                    <p class="text-xs text-center text-gray-600">Quét để xác thực chứng nhận</p>
+                    <p class="text-xs text-center text-gray-500 mt-1">vaxchain.io/verify/abc123</p>
+                  </div>
+                </div>
+  
+                <!-- Blockchain Info -->
+                <div class="sm:w-2/3">
+                  <div class="space-y-4">
+                    <div>
+                      <p class="text-sm text-gray-500">Mã Xác Thực Lịch Hẹn Blockchain</p>
+                      <div class="flex items-center mt-1">
+                        <p class="font-mono text-sm text-blue-600 truncate">0x4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4a3b2</p>
+                        <button class="ml-2 text-blue-500 hover:text-blue-700">
+                          <i class="far fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500">Thời Gian</p>
+                      <p class="font-medium">10/06/2023 14:23 UTC</p>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500">Mã Giao Dịch</p>
+                      <div class="flex items-center mt-1">
+                        <p class="font-mono text-sm text-green-600 truncate">a1b2c3d4e5f67890abc123def456ghi789jkl012mno345pqr</p>
+                        <button class="ml-2 text-green-500 hover:text-green-700">
+                          <i class="far fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4" alt="Ghi Chú Xác Thực">
+                      <div class="flex">
+                        <div class="flex-shrink-0">
+                          <i class="fas fa-shield-alt text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                          <p class="text-sm text-blue-700">
+                            Chứng nhận này được ký điện tử và lưu trữ bất biến trên blockchain Ethereum.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <!-- Security Badges -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+              <div class="flex flex-wrap justify-center gap-4">
+                <div class="flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center mr-2" alt="Huy Hiệu Bảo Mật">
+                    <i class="fas fa-lock text-green-600"></i>
+                  </div>
+                  <span class="text-xs font-medium">Xác Thực Blockchain</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-2" alt="Huy Hiệu Bảo Mật">
+                    <i class="fas fa-fingerprint text-blue-600"></i>
+                  </div>
+                  <span class="text-xs font-medium">Ký Điện Tử</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center mr-2" alt="Huy Hiệu Bảo Mật">
+                    <i class="fas fa-link text-purple-600"></i>
+                  </div>
+                  <span class="text-xs font-medium">Hồ Sơ Bất Biến</span>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Certificate Footer -->
+          <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center" alt="VaxChain © 2025">
+            <div class="flex items-center mb-3 sm:mb-0">
+              <i class="fas fa-shield-virus text-blue-600 mr-2"></i>
+              <span class="text-sm font-medium text-gray-600">VaxChain © 2025</span>
+            </div>
+            <div class="flex space-x-3">
+              <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Tải PDF">
+                <i class="fas fa-file-pdf mr-2"></i> Tải PDF
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Verification Instructions -->
+        <div class="mt-8 bg-white shadow rounded-lg overflow-hidden" alt="Cách Xác Thực Chứng Nhận Này">
+          <div class="p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Cách Xác Thực Chứng Nhận Này</h3>
+            <ol class="list-decimal list-inside space-y-3 text-sm text-gray-700">
+              <li>Quét mã QR bằng bất kỳ ứng dụng quét QR hoặc camera điện thoại</li>
+              <li>Truy cập cổng xác thực VaxChain tại vaxchain.io/verify</li>
+              <li>Nhập mã hash chứng nhận hoặc ID giao dịch</li>
+              <li>So sánh thông tin trên blockchain với chi tiết chứng nhận này</li>
+            </ol>
+            <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4" alt="Ghi Chú Xác Thực">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-yellow-700">
+                    Vì lý do an ninh, luôn xác thực chứng nhận thông qua các kênh chính thức. Không chỉ dựa vào việc kiểm tra trực quan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body></html>

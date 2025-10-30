@@ -1,0 +1,700 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>VaxChain - Book Appointment</title>
+    <style>
+      .leaflet-container {
+        height: 300px;
+        width: 100%;
+        border-radius: 0.5rem;
+      }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css">
+  </head>
+  <body class="bg-blue-50 min-h-screen" alt="VaxChain Appointment">
+    <div class="flex flex-col md:flex-row h-full">
+      <!-- Sidebar -->
+      <div class="w-full md:w-64 bg-white shadow-lg" alt="VaxChain Sidebar">
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex items-center">
+            <i class="fas fa-shield-virus text-blue-600 text-2xl mr-3"></i>
+            <h1 class="text-xl font-bold text-blue-800">VaxChain</h1>
+          </div>
+        </div>
+        <nav class="p-4">
+          <div class="mb-6">
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Main</h3>
+            <ul class="mt-2 space-y-1">
+              <li>
+                <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg" alt="Dashboard">
+                  <i class="fas fa-tachometer-alt mr-3"></i>
+                  Dashboard
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg" alt="Vaccines">
+                  <i class="fas fa-syringe mr-3"></i>
+                  Vaccines
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg" alt="Appointments">
+                  <i class="fas fa-calendar-check mr-3"></i>
+                  Appointments
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg" alt="Certificates">
+                  <i class="fas fa-certificate mr-3"></i>
+                  Certificates
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Account</h3>
+            <ul class="mt-2 space-y-1">
+              <li>
+                <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg" alt="Profile">
+                  <i class="fas fa-user mr-3"></i>
+                  Profile
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg" alt="Wallet">
+                  <i class="fas fa-wallet mr-3"></i>
+                  Wallet
+                </a>
+              </li>
+              <li>
+                <a href="#" class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg" alt="Logout">
+                  <i class="fas fa-sign-out-alt mr-3"></i>
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+  
+      <!-- Main Content -->
+      <div class="flex-1 overflow-auto">
+        <!-- Header -->
+        <header class="bg-white shadow-sm" alt="Dashboard Header">
+          <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-800">Book New Appointment</h2>
+            <div class="flex items-center space-x-4">
+              <button class="p-2 text-gray-500 hover:text-blue-600 focus:outline-none">
+                <i class="fas fa-bell"></i>
+              </button>
+              <div class="flex items-center">
+                <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center" alt="User Profile">
+                  <i class="fas fa-user text-blue-600"></i>
+                </div>
+                <span class="ml-2 text-sm font-medium text-gray-700">John Doe</span>
+              </div>
+            </div>
+          </div>
+        </header>
+  
+        <!-- Main Content -->
+        <main class="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+          <!-- Booking Steps -->
+          <div class="mb-6">
+            <ol class="flex items-center w-full">
+              <li class="flex items-center text-blue-600">
+                <span class="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full mr-2" alt="1">
+                  <span class="text-sm font-medium">1</span>
+                </span>
+                Personal Info
+              </li>
+              <li class="flex items-center ml-2">
+                <span class="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full mr-2" alt="2">
+                  <span class="text-sm font-medium text-gray-500">2</span>
+                </span>
+                Vaccine Selection
+              </li>
+              <li class="flex items-center ml-2">
+                <span class="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full mr-2" alt="3">
+                  <span class="text-sm font-medium text-gray-500">3</span>
+                </span>
+                Payment Method
+              </li>
+              <li class="flex items-center ml-2">
+                <span class="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full mr-2" alt="4">
+                  <span class="text-sm font-medium text-gray-500">4</span>
+                </span>
+                Confirmation
+              </li>
+            </ol>
+          </div>
+  
+          <!-- Booking Form -->
+          <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8" alt="Appointment Form">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Personal Information</h3>
+              <p class="mt-1 text-sm text-gray-500">Verify your details before booking.</p>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+              <form>
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                  <div class="sm:col-span-3">
+                    <label for="first-name" class="block text-sm font-medium text-gray-700">First name</label>
+                    <div class="mt-1">
+                      <input type="text" name="first-name" id="first-name" autocomplete="given-name" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-3">
+                    <label for="last-name" class="block text-sm font-medium text-gray-700">Last name</label>
+                    <div class="mt-1">
+                      <input type="text" name="last-name" id="last-name" autocomplete="family-name" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                    <div class="mt-1">
+                      <input id="email" name="email" type="email" autocomplete="email" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-2">
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                    <div class="mt-1">
+                      <input type="text" name="phone" id="phone" autocomplete="tel" ,="" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-3">
+                    <label for="date-of-birth" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+                    <div class="mt-1">
+                      <input type="date" name="date-of-birth" ,="" id="date-of-birth" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-3">
+                    <label for="insurance" class="block text-sm font-medium text-gray-700">Insurance Provider</label>
+                    <div class="mt-1">
+                      <select id="insurance" ,="" name="insurance" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                        <option>Select insurance</option>
+                        <option>UnitedHealthcare</option>
+                        <option>Aetna</option>
+                        <option>Cigna</option>
+                        <option>Blue Cross Blue Shield</option>
+                        <option>None</option>
+                      </select>
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-6">
+                    <label for="address" class="block text-sm font-medium text-gray-700">Street address</label>
+                    <div class="mt-1">
+                      <input type="text" ,="" name="address" id="address" autocomplete="street-address" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-2">
+                    <label for="city" class="block text-sm font-medium text-gray-700">City</label>
+                    <div class="mt-1">
+                      <input type="text" ,="" name="city" id="city" autocomplete="address-level2" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-2">
+                    <label for="state" class="block text-sm font-medium text-gray-700">State</label>
+                    <div class="mt-1">
+                      <select id="state" ,="" name="state" autocomplete="address-level1" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                        <option>Select state</option>
+                        <option>Alabama</option>
+                        <option>Alaska</option>
+                        <option>Arizona</option>
+                        <!-- More states would be listed here -->
+                      </select>
+                    </div>
+                  </div>
+  
+                  <div class="sm:col-span-2">
+                    <label for="zip" class="block text-sm font-medium text-gray-700">ZIP / Postal code</label>
+                    <div class="mt-1">
+                      <input type="text" ,="" name="zip" id="zip" autocomplete="postal-code" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+  
+          <!-- Vaccine Selection -->
+          <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8" alt="Vaccine Selection">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Vaccine Selection</h3>
+              <p class="mt-1 text-sm text-gray-500">Choose the vaccine you want to receive.</p>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Vaccine Card 1 -->
+                <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectVaccine(this, 'covid')" alt="Vaccine Card">
+                  <div class="flex items-start">
+                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                      <i class="fas fa-virus text-blue-600"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-medium text-gray-900">COVID-19 Vaccine</h4>
+                      <p class="text-sm text-gray-500 mt-1">Moderna or Pfizer mRNA vaccine</p>
+                      <div class="mt-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" alt="Available">
+                          <i class="fas fa-check-circle mr-1"></i> Available
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- Vaccine Card 2 -->
+                <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectVaccine(this, 'flu')" alt="Vaccine Card">
+                  <div class="flex items-start">
+                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                      <i class="fas fa-head-side-cough text-blue-600"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-medium text-gray-900">Influenza (Flu)</h4>
+                      <p class="text-sm text-gray-500 mt-1">Seasonal influenza vaccine</p>
+                      <div class="mt-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" alt="Available">
+                          <i class="fas fa-check-circle mr-1"></i> Available
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- Vaccine Card 3 -->
+                <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectVaccine(this, 'tdap')" alt="Vaccine Card">
+                  <div class="flex items-start">
+                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                      <i class="fas fa-bacteria text-blue-600"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-medium text-gray-900">Tdap</h4>
+                      <p class="text-sm text-gray-500 mt-1">Tetanus, diphtheria, pertussis</p>
+                      <div class="mt-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" alt="Available">
+                          <i class="fas fa-check-circle mr-1"></i> Available
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+  
+                <!-- Vaccine Card 4 -->
+                <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectVaccine(this, 'hpv')" alt="Vaccine Card">
+                  <div class="flex items-start">
+                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                      <i class="fas fa-dna text-blue-600"></i>
+                    </div>
+                    <div>
+                      <h4 class="font-medium text-gray-900">HPV Vaccine</h4>
+                      <p class="text-sm text-gray-500 mt-1">Human papillomavirus vaccine</p>
+                      <div class="mt-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" alt="Available">
+                          <i class="fas fa-check-circle mr-1"></i> Available
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Payment Method Section -->
+          <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8" alt="Payment Method">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Payment Method</h3>
+              <p class="mt-1 text-sm text-gray-500">Select your preferred payment option.</p>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+              <div class="space-y-4">
+                <!-- Traditional Payment Options -->
+                <div>
+                  <h4 class="text-md font-medium mb-3 text-gray-800">Traditional Payment</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Credit Card -->
+                    <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectPaymentMethod(this, 'credit-card')" alt="Credit Card">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                          <i class="fas fa-credit-card text-blue-600"></i>
+                        </div>
+                        <div>
+                          <h5 class="font-medium">Credit/Debit Card</h5>
+                          <p class="text-xs text-gray-500">Visa, Mastercard, AMEX</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Bank Transfer -->
+                    <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectPaymentMethod(this, 'bank-transfer')" alt="Bank Transfer">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                          <i class="fas fa-university text-blue-600"></i>
+                        </div>
+                        <div>
+                          <h5 class="font-medium">Bank Transfer</h5>
+                          <p class="text-xs text-gray-500">Direct from your bank</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Crypto Payment Options -->
+                <div>
+                  <h4 class="text-md font-medium mb-3 text-gray-800">Crypto Payments</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Ethereum -->
+                    <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectPaymentMethod(this, 'ethereum')" alt="Ethereum">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                          <i class="fab fa-ethereum text-blue-600"></i>
+                        </div>
+                        <div>
+                          <h5 class="font-medium">Ethereum</h5>
+                          <p class="text-xs text-gray-500">ETH</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Bitcoin -->
+                    <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectPaymentMethod(this, 'bitcoin')" alt="Bitcoin">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                          <i class="fab fa-bitcoin text-blue-600"></i>
+                        </div>
+                        <div>
+                          <h5 class="font-medium">Bitcoin</h5>
+                          <p class="text-xs text-gray-500">BTC</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- MetaMask -->
+                    <div class="border rounded-lg p-4 hover:border-blue-300 cursor-pointer" onclick="selectPaymentMethod(this, 'metamask')" alt="MetaMask">
+                      <div class="flex items-center">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-4" alt="Background image">
+                          <i class="fas fa-wallet text-blue-600"></i>
+                        </div>
+                        <div>
+                          <h5 class="font-medium">MetaMask</h5>
+                          <p class="text-xs text-gray-500">Web3 Wallet</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Payment Details -->
+                <div id="payment-details" class="hidden mt-6 p-4 bg-gray-50 rounded-lg" alt="Payment Details">
+                  <h5 class="font-medium mb-3">Payment Details</h5>
+                  <div class="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-6">
+                    <div class="sm:col-span-6">
+                      <label class="block text-sm font-medium text-gray-700">Card Number</label>
+                      <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border" placeholder="1234 5678 9012 3456">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <i class="fas fa-credit-card text-gray-400"></i>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="sm:col-span-3">
+                      <label class="block text-sm font-medium text-gray-700">Expiration Date</label>
+                      <div class="mt-1">
+                        <input type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border" placeholder="MM/YY">
+                      </div>
+                    </div>
+                    
+                    <div class="sm:col-span-3">
+                      <label class="block text-sm font-medium text-gray-700">Security Code</label>
+                      <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border" placeholder="CVC">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Crypto Payment Details -->
+                <div id="crypto-details" class="hidden mt-6 p-4 bg-gray-50 rounded-lg" alt="Crypto Details">
+                  <h5 class="font-medium mb-3">Send Crypto Payment</h5>
+                  <div class="flex items-center justify-between p-3 bg-blue-50 rounded-md mb-4" alt="Total Amount
+                      $49.99 USD
+        ">
+                    <div>
+                      <p class="text-sm font-medium">Total Amount</p>
+                      <p class="text-lg font-bold">$49.99 USD</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-sm font-medium">Equivalent in ETH</p>
+                      <p class="text-lg font-bold">0.025 ETH</p>
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-6">
+                    <div class="sm:col-span-6">
+                      <label class="block text-sm font-medium text-gray-700">Wallet Address</label>
+                      <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border font-mono" value="0x4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d" readonly="">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                          <button class="text-blue-600 hover:text-blue-800">
+                            <i class="far fa-copy"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">Send exact amount to this address</p>
+                    </div>
+                    
+                    <div class="sm:col-span-6">
+                      <div class="bg-green-50 border-l-4 border-green-400 p-4" alt="Payments on blockchain are secure and immutable. Y">
+                        <div class="flex">
+                          <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-green-400"></i>
+                          </div>
+                          <div class="ml-3">
+                            <p class="text-sm text-green-700">
+                              Payments on blockchain are secure and immutable. Your transaction will be verified within minutes.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Date & Location Selection -->
+          <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8" alt="Date Location">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Date &amp; Location</h3>
+              <p class="mt-1 text-sm text-gray-500">Select your preferred date and clinic.</p>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Date Picker -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                  <div class="relative">
+                    <input type="date" id="appointment-date" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                  </div>
+                  
+                  <div class="mt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Time</label>
+                    <div class="grid grid-cols-3 gap-2">
+                      <button class="py-2 px-3 border rounded-md text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500" alt="9:00 AM">9:00 AM</button>
+                      <button class="py-2 px-3 border rounded-md text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500" alt="10:00 AM">10:00 AM</button>
+                      <button class="py-2 px-3 border rounded-md text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500" alt="11:00 AM">11:00 AM</button>
+                      <button class="py-2 px-3 border rounded-md text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500" alt="1:00 PM">1:00 PM</button>
+                      <button class="py-2 px-3 border rounded-md text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500" alt="2:00 PM">2:00 PM</button>
+                      <button class="py-2 px-3 border rounded-md text-sm font-medium hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500" alt="3:00 PM">3:00 PM</button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Location Map -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nearby Clinics</label>
+                  <div id="map" class="leaflet-container"></div>
+                  <div class="mt-4">
+                    <select id="clinic" name="clinic" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                      <option>Select clinic</option>
+                      <option>City Health Center (0.5 miles)</option>
+                      <option>Metro Medical Clinic (1.2 miles)</option>
+                      <option>University Hospital (2.1 miles)</option>
+                      <option>Downtown Pharmacy (2.5 miles)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Blockchain Confirmation (Hidden by default) -->
+          <div id="confirmation-section" class="hidden bg-white shadow overflow-hidden sm:rounded-lg" alt="Confirmation Section">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Blockchain Confirmation</h3>
+              <p class="mt-1 text-sm text-gray-500">Your appointment is being recorded on the blockchain.</p>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+              <div class="flex flex-col items-center text-center">
+                <div class="relative w-full max-w-md">
+                  <!-- Blockchain animation steps -->
+                  <div class="flex justify-between mb-8">
+                    <div class="flex flex-col items-center">
+                      <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-2" alt="Background image">
+                        <i class="fas fa-file-alt text-blue-600"></i>
+                      </div>
+                      <span class="text-xs font-medium">Appointment Created</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-2" alt="Background image">
+                        <i class="fas fa-lock text-blue-600"></i>
+                      </div>
+                      <span class="text-xs font-medium">Encrypted</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-2" alt="Background image">
+                        <i class="fas fa-link text-blue-600"></i>
+                      </div>
+                      <span class="text-xs font-medium">Blockchain TX</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mb-2" alt="Background image">
+                        <i class="fas fa-check-circle text-blue-600"></i>
+                      </div>
+                      <span class="text-xs font-medium">Confirmed</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Progress bar -->
+                  <div class="relative pt-1 mb-8">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <span class="text-xs font-semibold inline-block text-blue-600">
+                          75% Complete
+                        </span>
+                      </div>
+                    </div>
+                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200" alt="Background image">
+                      <div style="width:75%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600" alt="Background image"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Transaction info -->
+                  <div class="bg-gray-50 p-4 rounded-md" alt="Transaction Hash:
+                      0x4a3b2c1d0e">
+                    <div class="flex justify-between text-sm mb-2">
+                      <span class="text-gray-500">Transaction Hash:</span>
+                      <span class="font-mono text-blue-600">0x4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d</span>
+                    </div>
+                    <div class="flex justify-between text-sm mb-2">
+                      <span class="text-gray-500">Block Number:</span>
+                      <span class="font-mono">15438291</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-500">Network:</span>
+                      <span>Ethereum Mainnet</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Success message -->
+                  <div class="mt-6 p-4 bg-green-50 rounded-md hidden" id="success-message" alt="Appointment confirmed and recorded on blockchain!
+  ">
+                    <div class="flex items-center">
+                      <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                      </div>
+                      <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800">Appointment confirmed and recorded on blockchain!</h3>
+                        <div class="mt-2 text-sm text-green-700">
+                          <p>You'll receive an email confirmation shortly. Your vaccine record will be immutable and verifiable.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Action Buttons -->
+          <div class="flex justify-between">
+            <button class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Cancel">
+              Cancel
+            </button>
+            <button onclick="submitAppointment()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" alt="Book Appointment">
+              Book Appointment
+            </button>
+          </div>
+        </main>
+      </div>
+    </div>
+  
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+      // Initialize map
+      function initMap() {
+        const map = L.map('map').setView([40.7128, -74.0060], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add markers for clinics
+        const clinicIcon = L.divIcon({
+          html: '<i class="fas fa-clinic-medical text-blue-600"></i>',
+          iconSize: [24, 24],
+          className: 'text-2xl'
+        });
+        
+        L.marker([40.7128, -74.0060], {icon: clinicIcon}).addTo(map)
+          .bindPopup('City Health Center');
+        
+        L.marker([40.7150, -74.0030], {icon: clinicIcon}).addTo(map)
+          .bindPopup('Metro Medical Clinic');
+        
+        L.marker([40.7100, -74.0100], {icon: clinicIcon}).addTo(map)
+          .bindPopup('University Hospital');
+        
+        L.marker([40.7180, -74.0080], {icon: clinicIcon}).addTo(map)
+          .bindPopup('Downtown Pharmacy');
+      }
+      
+      // Initialize map when page loads
+      document.addEventListener('DOMContentLoaded', initMap);
+      
+      // Vaccine selection
+      function selectVaccine(element, type) {
+        document.querySelectorAll('[onclick^="selectVaccine"]').forEach(el => {
+          el.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+        element.classList.add('border-blue-500', 'bg-blue-50');
+        document.getElementById('selected-vaccine').value = type;
+      }
+      
+      // Payment method selection
+      function selectPaymentMethod(element, type) {
+        document.querySelectorAll('[onclick^="selectPaymentMethod"]').forEach(el => {
+          el.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+        element.classList.add('border-blue-500', 'bg-blue-50');
+        
+        // Show appropriate details
+        document.getElementById('payment-details').classList.add('hidden');
+        document.getElementById('crypto-details').classList.add('hidden');
+        
+        if (type === 'credit-card' || type === 'bank-transfer') {
+          document.getElementById('payment-details').classList.remove('hidden');
+        } else if (type === 'ethereum' || type === 'bitcoin' || type === 'metamask') {
+          document.getElementById('crypto-details').classList.remove('hidden');
+        }
+      }
+      
+      // Form submission
+      function submitAppointment() {
+        // Show confirmation section
+        document.getElementById('confirmation-section').classList.remove('hidden');
+        
+        // Scroll to confirmation
+        document.getElementById('confirmation-section').scrollIntoView({ behavior: 'smooth' });
+        
+        // Simulate blockchain confirmation
+        setTimeout(() => {
+          document.getElementById('success-message').classList.remove('hidden');
+        }, 3000);
+      }
+    </script>
+  </body></html>
