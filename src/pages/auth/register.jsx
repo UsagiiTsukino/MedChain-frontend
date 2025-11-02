@@ -21,15 +21,19 @@ const RegisterPage = () => {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
-  
+
   const handleSubmit = async (values) => {
     const { fullName, email, password } = values;
     const response = await callRegister(fullName, email, password);
-    if (response && response.data) {
-      message.success('Đăng ký thành công');
+    console.log('[Register] Response:', response);
+    if (response && response.walletAddress) {
+      message.success('Đăng ký thành công!');
       navigate('/login');
     } else {
-      message.error('Đăng ký thất bại ' + response.error);
+      message.error(
+        'Đăng ký thất bại: ' +
+          (response?.error || response?.message || 'Unknown error')
+      );
     }
   };
   return (

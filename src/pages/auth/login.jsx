@@ -30,9 +30,9 @@ const LoginPage = () => {
     setLoading(true);
     const { email, password } = values;
     const response = await callLoginWithPassword(email, password);
-    if (response && response.data) {
-      localStorage.setItem('access_token', response.data.accessToken);
-      dispatch(setUserLoginInfo(response.data.user));
+    if (response && response.accessToken) {
+      localStorage.setItem('access_token', response.accessToken);
+      dispatch(setUserLoginInfo(response.user));
       message.success('Đăng nhập thành công!');
       navigate('/');
     } else {
@@ -57,8 +57,9 @@ const LoginPage = () => {
         // Send token to backend for verification and login
         const res = await callLoginWithGoogle(googleToken);
 
-        if (res?.data) {
-          dispatch(setUserLoginInfo(res.data?.user));
+        if (res && res.user) {
+          localStorage.setItem('access_token', res.accessToken);
+          dispatch(setUserLoginInfo(res.user));
           message.success('Đăng nhập Google thành công!');
           navigate('/');
         } else {

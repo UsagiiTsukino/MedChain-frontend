@@ -34,14 +34,19 @@ export const vaccineSlice = createSlice({
         state.isFetching = false;
       })
       .addCase(fetchVaccine.fulfilled, (state, action) => {
-        if (action.payload && action.payload.data) {
+        if (action.payload && action.payload.result) {
           state.isFetching = false;
-          state.meta = action.payload.data.meta;
-          state.result = action.payload.data.result;
+          state.meta = action.payload.meta;
+          state.result = action.payload.result;
+        } else {
+          state.isFetching = false;
+          console.warn(
+            '[VaccineSlice] Invalid response format:',
+            action.payload
+          );
         }
       });
   },
 });
 
 export default vaccineSlice.reducer;
-
