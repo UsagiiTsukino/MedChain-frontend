@@ -56,7 +56,8 @@ const PermissionPage = () => {
       width: 50,
       align: 'center',
       render: (text, record, index) => {
-        return <>{index + 1 + (meta.page - 1) * meta.pageSize}</>;
+        // Backend returns 0-based page, so use meta.page directly
+        return <>{index + 1 + (meta.page || 0) * (meta.pageSize || 20)}</>;
       },
       hideInSearch: true,
     },
@@ -146,24 +147,22 @@ const PermissionPage = () => {
 
   const buildQuery = (params, sort) => {
     const clone = { ...params };
-    const q = {
-      page: params.current,
-      size: params.pageSize,
-      filter: '',
-    };
+    const q = {};
 
-    if (clone.apiPath) q.filter = `${sfLike('apiPath', clone.apiPath)}`;
+    // Backend permission API uses q and module parameters, no pagination
+    if (clone.apiPath) {
+      q.q = clone.apiPath; // Use q for search
+    }
     if (clone.module) {
-      q.filter = clone.apiPath
-        ? q.filter + ' and ' + `${sfLike('module', clone.module)}`
-        : `${sfLike('module', clone.module)}`;
+      q.module = clone.module;
     }
     if (clone.method) {
-      q.filter = clone.apiPath
-        ? q.filter + ' and ' + `${sfLike('method', clone.method)}`
-        : `${sfLike('method', clone.method)}`;
+      // If method is provided, we might need to add it to filter
+      // But backend only supports q and module, so we'll use q for method search
+      if (!q.q) {
+        q.q = clone.method;
+      }
     }
-    if (!q.filter) delete q.filter;
 
     let temp = queryString.stringify(q);
 
@@ -173,7 +172,10 @@ const PermissionPage = () => {
         sort.apiPath === 'ascend' ? 'sort=apiPath,asc' : 'sort=apiPath,desc';
     }
 
-    temp = `${temp}&${sortBy}`;
+    // Only append sortBy if it's not empty
+    if (sortBy) {
+      temp = `${temp}&${sortBy}`;
+    }
 
     return temp;
   };
@@ -186,17 +188,36 @@ const PermissionPage = () => {
         rowKey="id"
         loading={isFetching}
         columns={columns}
-        dataSource={permissions}
         request={async (params, sort, filter) => {
           const query = buildQuery(params, sort, filter);
-          dispatch(fetchPermission({ query }));
+          console.log('[PermissionPage] Request params:', params);
+          console.log('[PermissionPage] Built query:', query);
+          // Dispatch and wait for result
+          const resultAction = await dispatch(fetchPermission({ query }));
+          console.log('[PermissionPage] Result action:', resultAction);
+          // Get the fulfilled action result
+          if (resultAction.type === 'permission/fetchPermission/fulfilled') {
+            const payload = resultAction.payload?.data || resultAction.payload;
+            console.log('[PermissionPage] Payload:', payload);
+            // Backend returns { items, total } format
+            const result = {
+              data: payload?.items || payload?.result || [],
+              success: true,
+              total: payload?.total || payload?.meta?.total || 0,
+            };
+            console.log('[PermissionPage] Returning result:', result);
+            return result;
+          }
+          console.warn('[PermissionPage] Request not fulfilled:', resultAction);
+          return {
+            data: [],
+            success: false,
+            total: 0,
+          };
         }}
         scroll={{ x: true }}
         pagination={{
-          current: meta.page,
-          pageSize: meta.pageSize,
           showSizeChanger: true,
-          total: meta.total,
           showTotal: (total, range) => {
             return (
               <div>

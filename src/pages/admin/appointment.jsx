@@ -49,7 +49,13 @@ const AppointmentManagementPage = () => {
   } = useLoadingData(
     async () => {
       const response = await callAllBookings();
-      return response.data || [];
+      console.log('[AppointmentPage] API response:', response);
+      // Response format: { message: "success", data: { result: [...], meta: {...} } }
+      // Or direct: { result: [...], meta: {...} }
+      const data = response?.data?.data || response?.data || response;
+      const result = data?.result || data || [];
+      console.log('[AppointmentPage] Parsed appointments:', result);
+      return result;
     },
     {
       errorMessage: 'Không thể tải danh sách lịch hẹn',

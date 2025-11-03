@@ -98,7 +98,8 @@ const BookingManager = () => {
       align: 'center',
       hideInSearch: true,
       render: (text, record, index) => {
-        return <>{index + 1 + (meta.page - 1) * meta.pageSize}</>;
+        // Backend returns 0-based page, so use meta.page directly
+        return <>{index + 1 + (meta.page || 0) * (meta.pageSize || 20)}</>;
       },
     },
     {
