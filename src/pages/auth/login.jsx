@@ -5,7 +5,7 @@ import {
 } from '../../config/api.auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Form, Input, message, Divider } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { setUserLoginInfo } from '../../redux/slice/accountSlide';
 import { useEffect, useState } from 'react';
 import { LockOutlined, GoogleOutlined, MailOutlined } from '@ant-design/icons';
@@ -15,16 +15,65 @@ import { triggerGoogleLogin, decodeGoogleToken } from '../../utils/googleAuth';
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [form] = Form.useForm();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/');
+  // Get redirect path from location state or query params
+  const from =
+    location.state?.from?.pathname ||
+    location.search?.split('redirect=')[1] ||
+    null;
+
+  const user = useSelector((state) => state.account.user);
+
+  // Helper function to normalize role (handle both number ID and string name)
+  const normalizeRole = (role) => {
+    if (!role) return null;
+
+    // If it's already a string, return as is
+    if (typeof role === 'string') {
+      return role;
     }
-  }, [isAuthenticated]);
+
+    // If it's a number, map to role name
+    const roleMap = {
+      1: 'ADMIN',
+      2: 'PATIENT',
+      3: 'DOCTOR',
+      4: 'CASHIER',
+    };
+
+    return roleMap[role] || null;
+  };
+
+  // Helper function to determine redirect path based on role
+  const getRedirectPath = (role, savedPath) => {
+    if (savedPath) {
+      return savedPath;
+    }
+
+    const normalizedRole = normalizeRole(role);
+
+    switch (normalizedRole) {
+      case 'ADMIN':
+        return '/admin/dashboard';
+      case 'DOCTOR':
+      case 'CASHIER':
+        return '/staff/dashboard';
+      default:
+        return '/';
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && user?.role) {
+      const redirectPath = getRedirectPath(user.role, from);
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isAuthenticated, user?.role, from, navigate]);
 
   const handlePasswordLogin = async (values) => {
     setLoading(true);
@@ -34,7 +83,10 @@ const LoginPage = () => {
       localStorage.setItem('access_token', response.accessToken);
       dispatch(setUserLoginInfo(response.user));
       message.success('Đăng nhập thành công!');
-      navigate('/');
+
+      // Redirect based on role or saved path
+      const redirectPath = getRedirectPath(response.user?.role, from);
+      navigate(redirectPath);
     } else {
       message.error('Email hoặc mật khẩu không đúng!');
     }
@@ -61,7 +113,10 @@ const LoginPage = () => {
           localStorage.setItem('access_token', res.accessToken);
           dispatch(setUserLoginInfo(res.user));
           message.success('Đăng nhập Google thành công!');
-          navigate('/');
+
+          // Redirect based on role or saved path
+          const redirectPath = getRedirectPath(res.user?.role, from);
+          navigate(redirectPath);
         } else {
           message.error('Không thể đăng nhập với tài khoản Google này!');
         }

@@ -2,6 +2,7 @@ import {
   createBrowserRouter,
   RouterProvider,
   useNavigate,
+  Navigate,
 } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -97,6 +98,9 @@ const App = () => {
       children: [
         {
           index: true,
+          element: <Navigate to="/admin/dashboard" replace />,
+        },
+        {
           path: 'dashboard',
           element: <DashboardPage />,
         },

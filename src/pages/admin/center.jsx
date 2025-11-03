@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import queryString from 'query-string';
 import { sfLike } from 'spring-filter-query-builder';
 import { Button, message, notification, Popconfirm, Space } from 'antd';
@@ -24,6 +24,16 @@ const CenterPage = () => {
   const centers = useSelector((state) => state.center.result);
   const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[CenterPage] State updated:', {
+      isFetching,
+      meta,
+      centersCount: centers?.length,
+      centers: centers,
+    });
+  }, [isFetching, meta, centers]);
 
   const handleDeleteCompany = async (id) => {
     if (id) {
@@ -58,7 +68,7 @@ const CenterPage = () => {
       render: (text) => (
         <img
           src={'http://localhost:8080/storage/center/' + text}
-          alt='center'
+          alt="center"
           style={{
             width: '50px',
             height: 'auto',
@@ -112,12 +122,12 @@ const CenterPage = () => {
           />
 
           <Popconfirm
-            placement='leftTop'
-            title='Xác nhận xóa cơ sở'
-            description='Bạn có chắc chắn muốn xóa cơ sở tiêm chủng này?'
+            placement="leftTop"
+            title="Xác nhận xóa cơ sở"
+            description="Bạn có chắc chắn muốn xóa cơ sở tiêm chủng này?"
             onConfirm={() => handleDeleteCompany(entity.centerId)}
-            okText='Xác nhận'
-            cancelText='Hủy'
+            okText="Xác nhận"
+            cancelText="Hủy"
           >
             <span style={{ cursor: 'pointer', margin: '0 10px' }}>
               <DeleteOutlined
@@ -136,8 +146,8 @@ const CenterPage = () => {
   const buildQuery = (params, sort) => {
     const clone = { ...params };
     const q = {
-      page: params.current,
-      size: params.pageSize,
+      page: (params.current || 1) - 1, // Backend expects 0-based page
+      size: params.pageSize || 10,
       filter: '',
     };
 
@@ -164,7 +174,11 @@ const CenterPage = () => {
       sortBy =
         sort.capacity === 'ascend' ? 'sort=capacity,asc' : 'sort=capacity,desc';
     }
-    temp = `${temp}&${sortBy}`;
+
+    // Only append sortBy if it's not empty
+    if (sortBy) {
+      temp = `${temp}&${sortBy}`;
+    }
 
     return temp;
   };
@@ -173,21 +187,39 @@ const CenterPage = () => {
     <>
       <DataTable
         actionRef={tableRef}
-        headerTitle='Danh sách cơ sở tiêm chủng'
-        rowKey='centerId'
+        headerTitle="Danh sách cơ sở tiêm chủng"
+        rowKey="centerId"
         loading={isFetching}
         columns={columns}
-        dataSource={centers}
         request={async (params, sort, filter) => {
           const query = buildQuery(params, sort, filter);
-          dispatch(fetchCenter({ query }));
+          console.log('[CenterPage] Request params:', params);
+          console.log('[CenterPage] Built query:', query);
+          // Dispatch and wait for result
+          const resultAction = await dispatch(fetchCenter({ query }));
+          console.log('[CenterPage] Result action:', resultAction);
+          // Get the fulfilled action result
+          if (resultAction.type === 'center/fetchCenter/fulfilled') {
+            const payload = resultAction.payload?.data || resultAction.payload;
+            console.log('[CenterPage] Payload:', payload);
+            const result = {
+              data: payload?.result || [],
+              success: true,
+              total: payload?.meta?.total || 0,
+            };
+            console.log('[CenterPage] Returning result:', result);
+            return result;
+          }
+          console.warn('[CenterPage] Request not fulfilled:', resultAction);
+          return {
+            data: [],
+            success: false,
+            total: 0,
+          };
         }}
         scroll={{ x: true }}
         pagination={{
-          current: meta.page,
-          pageSize: meta.pageSize,
           showSizeChanger: true,
-          total: meta.total,
           showTotal: (total, range) => {
             return (
               <div>
@@ -201,7 +233,7 @@ const CenterPage = () => {
           return (
             <Button
               icon={<PlusOutlined />}
-              type='primary'
+              type="primary"
               onClick={() => setOpenModal(true)}
             >
               Thêm mới

@@ -30,16 +30,32 @@ export const userSlice = createSlice({
       .addCase(fetchUser.pending, (state) => {
         state.isFetching = true;
       })
-      .addCase(fetchUser.rejected, (state) => {
+      .addCase(fetchUser.rejected, (state, action) => {
         state.isFetching = false;
+        console.error('[UserSlice] Fetch error:', action.error);
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
-        if (action.payload && action.payload.result) {
-          state.isFetching = false;
-          state.meta = action.payload.meta;
-          state.result = action.payload.result;
+        state.isFetching = false;
+        console.log('[UserSlice] Full response:', action.payload);
+        // Handle response format: { result, meta } or { data: { result, meta } }
+        const payload = action.payload?.data || action.payload;
+        console.log('[UserSlice] Parsed payload:', payload);
+        if (payload && payload.result) {
+          state.meta = payload.meta;
+          state.result = payload.result;
+          console.log(
+            '[UserSlice] Updated state - meta:',
+            payload.meta,
+            'result count:',
+            payload.result.length
+          );
         } else {
-          state.isFetching = false;
+          console.warn(
+            '[UserSlice] Invalid response format:',
+            action.payload,
+            'Payload keys:',
+            payload ? Object.keys(payload) : 'no payload'
+          );
         }
       });
   },

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
@@ -8,11 +8,31 @@ import Loading from '../loading';
 
 import NotPermitted from './not-permitted';
 
+// Helper function to normalize role (handle both number ID and string name)
+const normalizeRole = (role) => {
+  if (!role) return null;
+
+  // If it's already a string, return as is
+  if (typeof role === 'string') {
+    return role;
+  }
+
+  // If it's a number, map to role name
+  const roleMap = {
+    1: 'ADMIN',
+    2: 'PATIENT',
+    3: 'DOCTOR',
+    4: 'CASHIER',
+  };
+
+  return roleMap[role] || null;
+};
+
 const RoleBaseRoute = (props) => {
   const user = useSelector((state) => state.account.user);
+  const role = normalizeRole(user?.role);
 
-  if (
-    user.role === 'ADMIN') {
+  if (role === 'ADMIN') {
     return <>{props.children}</>;
   } else {
     return <NotPermitted />;
@@ -20,6 +40,7 @@ const RoleBaseRoute = (props) => {
 };
 
 const ProtectedRoute = (props) => {
+  const location = useLocation();
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const isLoading = useSelector((state) => state.account.isLoading);
 
@@ -36,7 +57,7 @@ const ProtectedRoute = (props) => {
   }, [isLoading]);
 
   if (redirectToLogin) {
-    return <Navigate to='/login' replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return (
@@ -50,7 +71,7 @@ const ProtectedRoute = (props) => {
               <RoleBaseRoute>{props.children}</RoleBaseRoute>
             </>
           ) : (
-            <Navigate to='/login' replace />
+            <Navigate to="/login" state={{ from: location }} replace />
           )}
         </>
       )}

@@ -1,5 +1,5 @@
 import { Badge, Button, message, notification, Popconfirm, Space } from 'antd';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { sfLike } from 'spring-filter-query-builder';
@@ -24,6 +24,16 @@ const UserPage = () => {
   const dispatch = useDispatch();
 
   const [openModal, setOpenModal] = useState(false);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[UserPage] State updated:', {
+      isFetching,
+      meta,
+      usersCount: users?.length,
+      users: users,
+    });
+  }, [isFetching, meta, users]);
 
   const handleDeleteUser = async (id) => {
     if (id) {
@@ -126,12 +136,12 @@ const UserPage = () => {
           />
 
           <Popconfirm
-            placement='leftTop'
-            title='Xác nhận xóa người dùng'
-            description='Bạn có chắc chắn muốn xóa người dùng này?'
+            placement="leftTop"
+            title="Xác nhận xóa người dùng"
+            description="Bạn có chắc chắn muốn xóa người dùng này?"
             onConfirm={() => handleDeleteUser(entity.userId)}
-            okText='Xác nhận'
-            cancelText='Hủy'
+            okText="Xác nhận"
+            cancelText="Hủy"
           >
             <span style={{ cursor: 'pointer', margin: '0 10px' }}>
               <DeleteOutlined
@@ -150,8 +160,8 @@ const UserPage = () => {
   const buildQuery = (params, sort) => {
     const clone = { ...params };
     const q = {
-      page: params.current,
-      size: params.pageSize,
+      page: (params.current || 1) - 1, // Backend expects 0-based page
+      size: params.pageSize || 10,
       filter: '',
     };
 
@@ -180,9 +190,14 @@ const UserPage = () => {
       sortBy = sort.email === 'ascend' ? 'sort=email,asc' : 'sort=email,desc';
     }
     if (sort && sort.address) {
-      sortBy = sort.address === 'ascend' ? 'sort=address,asc' : 'sort=address,desc';
+      sortBy =
+        sort.address === 'ascend' ? 'sort=address,asc' : 'sort=address,desc';
     }
-    temp = `${temp}&${sortBy}`;
+
+    // Only append sortBy if it's not empty
+    if (sortBy) {
+      temp = `${temp}&${sortBy}`;
+    }
 
     return temp;
   };
@@ -191,21 +206,39 @@ const UserPage = () => {
     <>
       <DataTable
         actionRef={tableRef}
-        headerTitle='Danh sách người dùng'
-        rowKey='userId'
+        headerTitle="Danh sách người dùng"
+        rowKey="userId"
         loading={isFetching}
         columns={columns}
-        dataSource={users}
         request={async (params, sort, filter) => {
           const query = buildQuery(params, sort, filter);
-          dispatch(fetchUser({ query }));
+          console.log('[UserPage] Request params:', params);
+          console.log('[UserPage] Built query:', query);
+          // Dispatch and wait for result
+          const resultAction = await dispatch(fetchUser({ query }));
+          console.log('[UserPage] Result action:', resultAction);
+          // Get the fulfilled action result
+          if (resultAction.type === 'user/fetchUser/fulfilled') {
+            const payload = resultAction.payload?.data || resultAction.payload;
+            console.log('[UserPage] Payload:', payload);
+            const result = {
+              data: payload?.result || [],
+              success: true,
+              total: payload?.meta?.total || 0,
+            };
+            console.log('[UserPage] Returning result:', result);
+            return result;
+          }
+          console.warn('[UserPage] Request not fulfilled:', resultAction);
+          return {
+            data: [],
+            success: false,
+            total: 0,
+          };
         }}
         scroll={{ x: true }}
         pagination={{
-          current: meta.page,
-          pageSize: meta.pageSize,
           showSizeChanger: true,
-          total: meta.total,
           showTotal: (total, range) => {
             return (
               <div>
@@ -215,7 +248,6 @@ const UserPage = () => {
           },
         }}
         rowSelection={false}
-      
       />
       <ModalUser
         openModal={openModal}

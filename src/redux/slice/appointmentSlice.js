@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
-import { callFetchAppointmentOfCenter, callMySchedule } from '../../config/api.appointment';
+import {
+  callFetchAppointmentOfCenter,
+  callMySchedule,
+} from '../../config/api.appointment';
 
 export const fetchAppointmentOfCenter = createAsyncThunk(
   'appointment/fetchAppointmentOfCenter',
@@ -42,16 +45,16 @@ export const appointmentSlice = createSlice({
         state.isFetching = false;
       })
       .addCase(fetchAppointmentOfCenter.fulfilled, (state, action) => {
-        if (action.payload && action.payload.result) {
-          state.isFetching = false;
-          state.meta = action.payload.meta;
-          state.result = action.payload.result;
-        } else {
-          state.isFetching = false;
+        state.isFetching = false;
+        // Handle response format: { result, meta } or { data: { result, meta } }
+        const payload = action.payload?.data || action.payload;
+        if (payload && payload.result) {
+          state.meta = payload.meta;
+          state.result = payload.result;
         }
       });
 
-      builder
+    builder
       .addCase(fetchAppointmentOfDoctor.pending, (state) => {
         state.isFetching = true;
       })
@@ -59,12 +62,12 @@ export const appointmentSlice = createSlice({
         state.isFetching = false;
       })
       .addCase(fetchAppointmentOfDoctor.fulfilled, (state, action) => {
-        if (action.payload && action.payload.result) {
-          state.isFetching = false;
-          state.meta = action.payload.meta;
-          state.result = action.payload.result;
-        } else {
-          state.isFetching = false;
+        state.isFetching = false;
+        // Handle response format: { result, meta } or { data: { result, meta } }
+        const payload = action.payload?.data || action.payload;
+        if (payload && payload.result) {
+          state.meta = payload.meta;
+          state.result = payload.result;
         }
       });
   },
