@@ -8,6 +8,7 @@ import {
   Empty,
   Divider,
   Space,
+  message,
 } from 'antd';
 import {
   DeleteOutlined,
@@ -31,6 +32,24 @@ const CartPage = () => {
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const { items, total, itemCount } = useSelector((state) => state.cart);
 
+  // Format currency
+  const formatter = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  });
+
+  // Calculate cart total from items
+  const numericTotal = items.reduce((sum, item) => {
+    const itemPrice =
+      typeof item.price === 'string' ? parseInt(item.price) : item.price;
+    return sum + itemPrice * item.quantity;
+  }, 0);
+
+  // Calculate shipping and tax
+  const shippingFee = numericTotal > 500000 ? 0 : 30000;
+  const tax = Math.floor(numericTotal * 0.08); // Use floor to avoid floating point issues
+  const finalTotal = Math.floor(numericTotal + shippingFee + tax); // Ensure clean integer
+
   const handleQuantityChange = (vaccineId, quantity) => {
     if (quantity > 0) {
       dispatch(updateQuantity({ vaccineId, quantity }));
@@ -47,6 +66,7 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
+      message.warning('Vui lòng đăng nhập để thanh toán');
       navigate('/login');
       return;
     }
@@ -120,7 +140,7 @@ const CartPage = () => {
                   Total ({itemCount} items)
                 </Text>
                 <Title level={4} className="mb-0 text-blue-600">
-                  ${(total + (total > 50 ? 0 : 9.99) + total * 0.08).toFixed(2)}
+                  {formatter.format(finalTotal)}
                 </Title>
               </div>
               <Button
@@ -138,7 +158,7 @@ const CartPage = () => {
           <Col xs={24} lg={16}>
             <div className="mb-4 flex items-center justify-between">
               <Text strong className="text-base sm:text-lg">
-                Cart Items
+                Giỏ hàng của bạn
               </Text>
               <Button
                 type="text"
@@ -179,7 +199,7 @@ const CartPage = () => {
                         {item.category}
                       </Text>
                       <Text className="text-sm font-semibold text-blue-600">
-                        ${item.price}
+                        {formatter.format(item.price)}
                       </Text>
                     </div>
                     <Button
@@ -207,7 +227,7 @@ const CartPage = () => {
                       />
                     </div>
                     <Text className="text-lg font-semibold text-blue-600">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatter.format(item.price * item.quantity)}
                     </Text>
                   </div>
                 </div>
@@ -234,7 +254,7 @@ const CartPage = () => {
                       {item.description.slice(0, 50)}
                     </Text>
                     <Text className="text-lg font-semibold text-blue-600">
-                      ${item.price}
+                      {formatter.format(item.price)}
                     </Text>
                   </div>
 
@@ -263,7 +283,7 @@ const CartPage = () => {
                     </Space>
 
                     <Text className="text-lg font-semibold text-blue-600">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatter.format(item.price * item.quantity)}
                     </Text>
                   </div>
                 </div>
@@ -282,31 +302,32 @@ const CartPage = () => {
                   <Text className="text-gray-600">
                     Subtotal ({itemCount} items)
                   </Text>
-                  <Text className="font-medium">${total.toFixed(2)}</Text>
+                  <Text className="font-medium">
+                    {formatter.format(numericTotal)}
+                  </Text>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <Text className="text-gray-600">Shipping</Text>
                   <Text className="font-medium">
-                    {total > 50 ? (
-                      <span className="text-green-600">Free</span>
+                    {numericTotal > 500000 ? (
+                      <span className="text-green-600">Miễn phí</span>
                     ) : (
-                      '$9.99'
+                      formatter.format(shippingFee)
                     )}
                   </Text>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <Text className="text-gray-600">Tax (8%)</Text>
-                  <Text className="font-medium">
-                    ${(total * 0.08).toFixed(2)}
-                  </Text>
+                  <Text className="font-medium">{formatter.format(tax)}</Text>
                 </div>
 
-                {total > 50 && (
+                {numericTotal > 500000 && (
                   <div className="rounded-lg border border-green-200 bg-green-50 p-3">
                     <Text className="text-sm text-green-700">
-                      🎉 You saved $9.99 on shipping!
+                      🎉 Bạn đã tiết kiệm {formatter.format(30000)} phí vận
+                      chuyển!
                     </Text>
                   </div>
                 )}
@@ -318,10 +339,7 @@ const CartPage = () => {
                     Total
                   </Title>
                   <Title level={4} className="mb-0 text-blue-600">
-                    $
-                    {(total + (total > 50 ? 0 : 9.99) + total * 0.08).toFixed(
-                      2
-                    )}
+                    {formatter.format(finalTotal)}
                   </Title>
                 </div>
 
@@ -351,14 +369,9 @@ const CartPage = () => {
                     </Text>
                     <div className="flex items-center gap-2">
                       <Title level={4} className="mb-0 text-blue-600">
-                        $
-                        {(
-                          total +
-                          (total > 50 ? 0 : 9.99) +
-                          total * 0.08
-                        ).toFixed(2)}
+                        {formatter.format(finalTotal)}
                       </Title>
-                      {total > 50 && (
+                      {numericTotal > 500000 && (
                         <Text className="rounded bg-green-50 px-2 py-1 text-xs text-green-600">
                           Free shipping
                         </Text>
@@ -382,15 +395,19 @@ const CartPage = () => {
                   <div className="mt-2 space-y-2 border-t border-gray-100 pt-2">
                     <div className="flex justify-between">
                       <Text className="text-gray-600">Subtotal</Text>
-                      <Text>${total.toFixed(2)}</Text>
+                      <Text>{formatter.format(numericTotal)}</Text>
                     </div>
                     <div className="flex justify-between">
                       <Text className="text-gray-600">Shipping</Text>
-                      <Text>{total > 50 ? 'Free' : '$9.99'}</Text>
+                      <Text>
+                        {numericTotal > 500000
+                          ? 'Free'
+                          : formatter.format(shippingFee)}
+                      </Text>
                     </div>
                     <div className="flex justify-between">
                       <Text className="text-gray-600">Tax</Text>
-                      <Text>${(total * 0.08).toFixed(2)}</Text>
+                      <Text>{formatter.format(tax)}</Text>
                     </div>
                   </div>
                 </details>

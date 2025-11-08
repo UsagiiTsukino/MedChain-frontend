@@ -105,7 +105,12 @@ const MarketPage = () => {
   };
 
   const handleAddToCart = (vaccine) => {
+    if (!isAuthenticated) {
+      message.warning('Vui lòng đăng nhập để thêm vào giỏ hàng');
+      return;
+    }
     dispatch(addToCart(vaccine));
+    message.success('Đã thêm vào giỏ hàng thành công');
   };
 
   const handleBooking = (vaccine) => {

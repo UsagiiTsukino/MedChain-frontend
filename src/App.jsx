@@ -1,9 +1,9 @@
 import {
   createBrowserRouter,
   RouterProvider,
-  useNavigate,
   Navigate,
 } from 'react-router-dom';
+import LayoutApp from './components/share/layout.app';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 
@@ -62,7 +62,11 @@ const App = () => {
         { path: 'market', element: <MarketPage /> },
         {
           path: 'cart',
-          element: <CartPage />,
+          element: (
+            <LayoutApp>
+              <CartPage />
+            </LayoutApp>
+          ),
         },
         { path: 'booking', element: <BookingPage /> },
         { path: 'success', element: <SuccessPage /> },

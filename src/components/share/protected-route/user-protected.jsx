@@ -1,44 +1,44 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import Loading from '../loading';
 
-
 const ProtectedUserRoute = (props) => {
-    const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
-    const isLoading = useSelector((state) => state.account.isLoading);
-    const [redirectToLogin, setRedirectToLogin] = useState(false);
+  const location = useLocation();
+  const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
+  const isLoading = useSelector((state) => state.account.isLoading);
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            if (isLoading) {
-                setRedirectToLogin(true);
-            }
-        }, 1000);
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        setRedirectToLogin(true);
+      }
+    }, 1000);
 
-        return () => clearTimeout(timeout);
-    }, [isLoading]);
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
 
-    if (redirectToLogin) {
-        return <Navigate to='/login' replace />;
-    }
+  if (redirectToLogin) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-    return (
+  return (
+    <>
+      {isLoading === true ? (
+        <Loading />
+      ) : (
         <>
-            {isLoading === true ? (
-                <Loading />
-            ) : (
-                <>
-                    {isAuthenticated === true ? (
-                        props.children
-                    ) : (
-                        <Navigate to='/login' replace />
-                    )}
-                </>
-            )}
+          {isAuthenticated === true ? (
+            props.children
+          ) : (
+            <Navigate to="/login" state={{ from: location }} replace />
+          )}
         </>
-    )
-}
+      )}
+    </>
+  );
+};
 
-export default ProtectedUserRoute
+export default ProtectedUserRoute;

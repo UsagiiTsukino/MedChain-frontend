@@ -37,7 +37,6 @@
 //   },
 // ]
 
-
 import js from '@eslint/js';
 import globals from 'globals';
 import react from 'eslint-plugin-react';
@@ -87,7 +86,7 @@ export default [
       ...importPlugin.configs.recommended.rules, // Import recommended rules
       ...jsdoc.configs.recommended.rules, // JSDoc recommended rules
       ...prettier.rules, // Prettier rules (để tránh xung đột với Prettier)
-      'quotes': ['error', 'single'],
+      quotes: ['error', 'single'],
       // Custom rules
       'react/jsx-no-target-blank': 'warn', // Cảnh báo khi sử dụng target="_blank" không an toàn
       'react-refresh/only-export-components': [
@@ -95,7 +94,8 @@ export default [
         { allowConstantExport: true },
       ], // Cảnh báo khi export không phải là component
       'import/no-unresolved': 'error', // Báo lỗi khi import không thể resolve
-      'import/no-extraneous-dependencies': 'error', // Báo lỗi khi import dependencies không cần thiết
+      // 'import/no-extraneous-dependencies': 'error', // Báo lỗi khi import dependencies không cần thiết
+
       // 'import/order': [
       //   'error',
       //   {

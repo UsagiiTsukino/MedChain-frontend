@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
@@ -9,12 +9,12 @@ import NotPermitted from './not-permitted';
 // Helper function to normalize role (handle both number ID and string name)
 const normalizeRole = (role) => {
   if (!role) return null;
-  
+
   // If it's already a string, return as is
   if (typeof role === 'string') {
     return role;
   }
-  
+
   // If it's a number, map to role name
   const roleMap = {
     1: 'ADMIN',
@@ -22,7 +22,7 @@ const normalizeRole = (role) => {
     3: 'DOCTOR',
     4: 'CASHIER',
   };
-  
+
   return roleMap[role] || null;
 };
 
@@ -39,6 +39,7 @@ const StaffRoleRoute = (props) => {
 };
 
 const ProtectedStaffRoute = (props) => {
+  const location = useLocation();
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const isLoading = useSelector((state) => state.account.isLoading);
 
@@ -55,7 +56,7 @@ const ProtectedStaffRoute = (props) => {
   }, [isLoading]);
 
   if (redirectToLogin) {
-    return <Navigate to='/login' replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return (
@@ -69,7 +70,7 @@ const ProtectedStaffRoute = (props) => {
               <StaffRoleRoute>{props.children}</StaffRoleRoute>
             </>
           ) : (
-            <Navigate to='/login' replace />
+            <Navigate to="/login" state={{ from: location }} replace />
           )}
         </>
       )}
@@ -84,4 +85,4 @@ ProtectedStaffRoute.propTypes = {
   children: PropTypes.node,
 };
 
-export default ProtectedStaffRoute; 
+export default ProtectedStaffRoute;

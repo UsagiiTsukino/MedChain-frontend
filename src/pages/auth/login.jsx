@@ -70,8 +70,14 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated && user?.role) {
-      const redirectPath = getRedirectPath(user.role, from);
-      navigate(redirectPath, { replace: true });
+      if (from) {
+        // If came from a protected route, redirect back to it
+        const redirectPath = getRedirectPath(user.role, from);
+        navigate(redirectPath, { replace: true });
+      } else {
+        // If manually navigated to /login while authenticated, redirect to home
+        navigate('/', { replace: true });
+      }
     }
   }, [isAuthenticated, user?.role, from, navigate]);
 

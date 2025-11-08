@@ -22,18 +22,27 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-const persistConfig = {
-  key: 'root',
+const cartPersistConfig = {
+  key: 'cart',
   storage,
 };
 
-const persistedReducer = persistReducer(persistConfig, cartReducer);
+const accountPersistConfig = {
+  key: 'account',
+  storage,
+};
+
+const persistedCartReducer = persistReducer(cartPersistConfig, cartReducer);
+const persistedAccountReducer = persistReducer(
+  accountPersistConfig,
+  accountReducer
+);
 
 export const store = configureStore({
   reducer: {
-    account: accountReducer,
+    account: persistedAccountReducer,
     appointment: appointmentReducer,
-    cart: persistedReducer,
+    cart: persistedCartReducer,
     booking: bookingReducer,
     center: centerReducer,
     vaccine: vaccineReducer,
