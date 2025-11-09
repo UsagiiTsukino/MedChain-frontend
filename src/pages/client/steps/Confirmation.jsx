@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Card,
   Form,
@@ -8,14 +9,13 @@ import {
   Select,
   Row,
   Col,
-  message,
   Typography,
   Alert,
   Divider,
 } from 'antd';
 import { EnvironmentOutlined, CalendarOutlined } from '@ant-design/icons';
 import locale from 'antd/es/date-picker/locale/vi_VN';
-import { callFetchCenter } from '../../../config/api.center';
+import { fetchCenter as fetchCenterAction } from '../../../redux/slice/centerSlice';
 import queryString from 'query-string';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -26,15 +26,18 @@ const { Text } = Typography;
 
 const Confirmation = ({ form, bookingSummary }) => {
   const [doseForms, setDoseForms] = useState([]);
-  const [displayCenter, setDisplayCenter] = useState([]);
   const [firstDoseDate, setFirstDoseDate] = useState(null);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const [mapCenter, setMapCenter] = useState([16.047079, 108.20623]);
 
+  const dispatch = useDispatch();
+  const centers = useSelector((state) => state.center.result);
+  const isFetchingCenters = useSelector((state) => state.center.isFetching);
+
   useEffect(() => {
-    fetchCenter();
-  }, []);
+    loadCenters();
+  }, [dispatch]);
 
   // Tính toán lịch tiêm khi ngày đầu tiên thay đổi
   useEffect(() => {
@@ -95,27 +98,12 @@ const Confirmation = ({ form, bookingSummary }) => {
     return current && (current.day() === 0 || current.day() === 6);
   };
 
-  const fetchCenter = async () => {
-    try {
-      const query = queryString.stringify({
-        page: 1,
-        size: 100,
-        sort: 'name,asc',
-      });
-      const res = await callFetchCenter(query);
-      if (res && res.data) {
-        // Transform data to include coordinates
-        const centersWithCoords = res.data.result.map((center) => ({
-          ...center,
-          // If center doesn't have coordinates, use default ones based on address
-          latitude: center.latitude || getDefaultLatitude(center.address),
-          longitude: center.longitude || getDefaultLongitude(center.address),
-        }));
-        setDisplayCenter(centersWithCoords);
-      }
-    } catch (error) {
-      message.error('Không thể tải danh sách trung tâm. Vui lòng thử lại sau.');
-    }
+  const loadCenters = () => {
+    const query = queryString.stringify({
+      page: 0,
+      size: 100,
+    });
+    dispatch(fetchCenterAction({ query }));
   };
 
   const getDefaultLatitude = (address) => {
@@ -158,7 +146,7 @@ const Confirmation = ({ form, bookingSummary }) => {
     });
 
     // Add markers for each center
-    displayCenter.forEach((center) => {
+    centers.forEach((center) => {
       if (center.latitude && center.longitude) {
         const marker = L.marker([center.latitude, center.longitude], {
           icon: clinicIcon,
@@ -201,12 +189,10 @@ const Confirmation = ({ form, bookingSummary }) => {
         mapInstanceRef.current = null;
       }
     };
-  }, [displayCenter, form, mapCenter]);
+  }, [centers, form, mapCenter]);
 
   const handleCenterChange = (value) => {
-    const selectedCenter = displayCenter.find(
-      (center) => center.centerId === value
-    );
+    const selectedCenter = centers.find((center) => center.centerId === value);
     if (selectedCenter) {
       form.setFieldValue('centerInfo', selectedCenter);
       if (selectedCenter.latitude && selectedCenter.longitude) {
@@ -369,13 +355,18 @@ const Confirmation = ({ form, bookingSummary }) => {
             ]}
           >
             <Select
-              options={displayCenter.map((center) => ({
-                label: center.name,
+              options={centers?.map((center) => ({
+                label: center.name || 'Không có tên',
                 value: center.centerId,
+                disabled: !center.centerId,
               }))}
               placeholder="Chọn cơ sở tiêm chủng"
               suffixIcon={<EnvironmentOutlined />}
               onChange={handleCenterChange}
+              notFoundContent={
+                centers?.length === 0 ? 'Không có cơ sở nào' : null
+              }
+              loading={isFetchingCenters}
             />
           </Form.Item>
 
