@@ -1,4 +1,8 @@
-import { ModalForm, ProFormDatePicker, ProFormText } from '@ant-design/pro-components';
+import {
+  ModalForm,
+  ProFormDatePicker,
+  ProFormText,
+} from '@ant-design/pro-components';
 import { Col, Form, message, notification, Row } from 'antd';
 import { useState } from 'react';
 
@@ -12,27 +16,39 @@ const ModalProfile = (props) => {
   const [form] = Form.useForm();
 
   const updateProfile = async (valuesForm) => {
-    const { fullname, phone, birthday, address, email } = valuesForm;
+    const { fullName, phoneNumber, birthday, address, email } = valuesForm;
 
-    const res = await callUpdateUser(
-      user.walletAddress,
-      fullname,
-      email,
-      phone,
-      birthday,
-      address
-    );
+    try {
+      const res = await callUpdateUser(
+        user.walletAddress,
+        fullName,
+        email,
+        phoneNumber,
+        birthday,
+        address
+      );
 
-    if (res.data) {
-      message.success('User updated successfully');
-    } else {
+      // Response is already unwrapped by axios interceptor
+      if (res) {
+        message.success('Cập nhật thông tin thành công');
+        // Reload data FIRST to update UI
+        await reloadData();
+        // Small delay to ensure state is updated
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        // Then close modal
+        handleReset();
+      } else {
+        notification.error({
+          message: 'Có lỗi xảy ra',
+          description: 'Không thể cập nhật thông tin',
+        });
+      }
+    } catch (error) {
       notification.error({
-        message: 'An error occurred',
-        description: res.message,
+        message: 'Có lỗi xảy ra',
+        description: error?.message || 'Không thể cập nhật thông tin',
       });
     }
-    handleReset();
-    reloadData();
   };
 
   const handleReset = async () => {
@@ -77,28 +93,40 @@ const ModalProfile = (props) => {
             <Col span={12}>
               <ProFormText
                 label="Full Name"
-                name="fullname"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
+                name="fullName"
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
                 placeholder="Enter name ..."
               />
             </Col>
             <Col span={12}>
-              <ProFormText label="Email" name="email" rules={[{ required: true, message: 'Please do not leave blank' }]}
-                placeholder="Enter email ..." />
+              <ProFormText
+                label="Email"
+                name="email"
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
+                placeholder="Enter email ..."
+              />
             </Col>
             <Col span={12}>
               <ProFormText
                 label="Address"
                 name="address"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
                 placeholder="Enter address..."
               />
             </Col>
             <Col span={12}>
               <ProFormText
                 label="Phone Number"
-                name="phone"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
+                name="phoneNumber"
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
                 placeholder="Enter phone number..."
               />
             </Col>

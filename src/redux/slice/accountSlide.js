@@ -6,7 +6,9 @@ export const fetchAccount = createAsyncThunk(
   'account/fetchAccount',
   async () => {
     const response = await callFetchAccount();
-    return response.data;
+    console.log('[fetchAccount] Raw response:', response);
+    // Axios interceptor already unwrapped response.data, so response IS the data
+    return response;
   }
 );
 
@@ -20,6 +22,9 @@ const initialState = {
     role: '',
     walletAddress: '',
     centerName: '',
+    phoneNumber: '',
+    birthday: '',
+    address: '',
   },
 };
 
@@ -37,10 +42,24 @@ export const accountSlice = createSlice({
       state.user.role = action.payload.role;
       state.user.walletAddress = action.payload.walletAddress;
       state.user.centerName = action.payload.centerName;
+      state.user.phoneNumber = action.payload.phoneNumber;
+      state.user.birthday = action.payload.birthday;
+      state.user.address = action.payload.address;
     },
     setLogoutAction: (state) => {
       state.isAuthenticated = false;
-      state.user = {};
+      state.isLoading = false;
+      state.user = {
+        id: '',
+        fullName: '',
+        email: '',
+        role: '',
+        walletAddress: '',
+        centerName: '',
+        phoneNumber: '',
+        birthday: '',
+        address: '',
+      };
     },
   },
   extraReducers: (builder) => {
@@ -52,6 +71,7 @@ export const accountSlice = createSlice({
     });
 
     builder.addCase(fetchAccount.fulfilled, (state, action) => {
+      console.log('[AccountSlice] Fetch account fulfilled:', action.payload);
       if (action.payload) {
         state.isAuthenticated = true;
         state.isLoading = false;
@@ -61,6 +81,10 @@ export const accountSlice = createSlice({
         state.user.role = action.payload.role;
         state.user.walletAddress = action.payload.walletAddress;
         state.user.centerName = action.payload.centerName;
+        state.user.phoneNumber = action.payload.phoneNumber;
+        state.user.birthday = action.payload.birthday;
+        state.user.address = action.payload.address;
+        console.log('[AccountSlice] User state updated:', state.user);
       }
     });
 

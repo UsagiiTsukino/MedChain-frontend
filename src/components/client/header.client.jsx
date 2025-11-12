@@ -62,8 +62,7 @@ const Navbar = () => {
 
   const handleMobileUserMenuClick = async ({ key }) => {
     if (key === 'logout') {
-      navigate('/');
-      message.success('Logged out successfully!');
+      await handleLogout();
     } else {
       navigate(`/${key}`);
     }

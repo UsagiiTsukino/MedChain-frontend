@@ -23,6 +23,9 @@ const ProfilePage = () => {
   const user = useSelector((state) => state.account.user);
   const dispatch = useDispatch();
 
+  console.log('[ProfilePage] Current user from Redux:', user);
+  console.log('[ProfilePage] Wallet address from wagmi:', address);
+
   const [openModal, setOpenModal] = useState(false);
   const { data } = useBalance({ address });
   const formattedValue = data?.formatted ? Number(data.formatted) : 0;
@@ -43,9 +46,12 @@ const ProfilePage = () => {
     }
   );
 
-  const reloadData = () => {
-    if (user?.walletAddress && !user.walletAddress.includes(address)) {
-      dispatch(fetchAccount(address));
+  const reloadData = async () => {
+    // Always fetch the latest user data after update
+    try {
+      await dispatch(fetchAccount()).unwrap();
+    } catch (error) {
+      console.error('Failed to reload user data:', error);
     }
   };
 
