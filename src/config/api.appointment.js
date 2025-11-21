@@ -10,11 +10,11 @@ export const callGetAppointment = (hash) => {
 
 export const callCreateOrder = (orderData) => {
   return axios.post('/orders', orderData);
-}
+};
 
 export const callGetOrder = () => {
   return axios.get('/orders');
-}
+};
 
 export const callCreateBooking = (
   vaccineId,
@@ -34,6 +34,10 @@ export const callCreateBooking = (
     doseSchedules,
     method,
   });
+};
+
+export const callGetBooking = (bookingId) => {
+  return axios.get(`/bookings/${bookingId}`);
 };
 
 export const updatePaymentPaypal = (bookingId, paymentId) => {

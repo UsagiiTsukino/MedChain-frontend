@@ -60,7 +60,7 @@ const PaymentMethod = ({ selectedPayment, setSelectedPayment, form }) => {
     setSelectedPayment(value);
     // Update the form field value to sync with form validation
     form.setFieldsValue({ payment: value });
-    console.log(value)
+    console.log(value);
   };
 
   const renderPaymentSection = (title, methods) => (
@@ -95,7 +95,7 @@ const PaymentMethod = ({ selectedPayment, setSelectedPayment, form }) => {
 
   return (
     <Card title="Chọn phương thức thanh toán" className="mb-8">
-      {/* QUAN TRỌNG: Form.Item phải có name="payment" để kết nối với form chính */}
+      {/* Hidden input to store selected payment value */}
       <Form.Item
         name="payment"
         rules={[
@@ -105,212 +105,212 @@ const PaymentMethod = ({ selectedPayment, setSelectedPayment, form }) => {
           },
         ]}
       >
-        <div className="space-y-6">
-          {categorizedMethods.crypto.length > 0 &&
-            renderPaymentSection(
-              'Thanh toán tiền điện tử',
-              categorizedMethods.crypto
-            )}
-
-          {categorizedMethods.crypto.length > 0 &&
-            categorizedMethods.digital.length > 0 && (
-              <Divider className="my-2" />
-            )}
-
-          {categorizedMethods.digital.length > 0 &&
-            renderPaymentSection('Ví điện tử', categorizedMethods.digital)}
-
-          {categorizedMethods.digital.length > 0 &&
-            categorizedMethods.bank.length > 0 && <Divider className="my-2" />}
-
-          {categorizedMethods.bank.length > 0 &&
-            renderPaymentSection('Ngân hàng', categorizedMethods.bank)}
-
-          {categorizedMethods.bank.length > 0 &&
-            categorizedMethods.cash.length > 0 && <Divider className="my-2" />}
-
-          {categorizedMethods.cash.length > 0 &&
-            renderPaymentSection('Khác', categorizedMethods.cash)}
-
-          {/* Các phần hiển thị thông tin chi tiết cho từng phương thức */}
-          {selectedPayment === 'METAMASK' && (
-            <div className="mt-6 bg-gray-50 p-6 rounded-lg">
-              <Alert
-                message="Thanh toán tiền điện tử"
-                description="Gửi chính xác số tiền đến địa chỉ ví dưới đây. Giao dịch sẽ được xác thực trên blockchain."
-                type="info"
-                showIcon
-                className="mb-4"
-              />
-              <Form.Item label="Địa chỉ ví">
-                <Input.Search
-                  value="0x672DF7fDcf5dA93C30490C7d49bd6b5bF7B4D32C"
-                  readOnly
-                  enterButton={<CopyOutlined />}
-                  onSearch={() => {
-                    navigator.clipboard.writeText(
-                      '0x672DF7fDcf5dA93C30490C7d49bd6b5bF7B4D32C'
-                    );
-                    message.success('Đã sao chép địa chỉ ví');
-                  }}
-                />
-              </Form.Item>
-            </div>
-          )}
-
-          {selectedPayment === 'ATM' && (
-            <div className="mt-6 bg-gray-50 p-6 rounded-lg">
-              <Alert
-                message="Thanh toán bằng thẻ ATM"
-                description="Chọn ngân hàng và nhập thông tin thẻ ATM của bạn để thanh toán."
-                type="info"
-                showIcon
-                className="mb-4"
-              />
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Ngân hàng"
-                    name="bankName"
-                    rules={[
-                      {
-                        required: selectedPayment === 'ATM',
-                        message: 'Vui lòng chọn ngân hàng',
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Chọn ngân hàng" />
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Số thẻ"
-                    name="cardNumber"
-                    rules={[
-                      {
-                        required: selectedPayment === 'ATM',
-                        message: 'Vui lòng nhập số thẻ',
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Nhập số thẻ" />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Form.Item
-                    label="Tên chủ thẻ"
-                    name="cardHolder"
-                    rules={[
-                      {
-                        required: selectedPayment === 'ATM',
-                        message: 'Vui lòng nhập tên chủ thẻ',
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Nhập tên chủ thẻ" />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    label="Ngày hết hạn"
-                    name="expiryDate"
-                    rules={[
-                      {
-                        required: selectedPayment === 'ATM',
-                        message: 'Vui lòng nhập ngày hết hạn',
-                      },
-                      {
-                        pattern: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
-                        message: 'Định dạng phải là MM/YY',
-                      },
-                    ]}
-                  >
-                    <Input placeholder="MM/YY" />
-                  </Form.Item>
-                </Col>
-                <Col span={6}>
-                  <Form.Item
-                    label="CVV"
-                    name="cvv"
-                    rules={[
-                      {
-                        required: selectedPayment === 'ATM',
-                        message: 'Vui lòng nhập CVV',
-                      },
-                      {
-                        pattern: /^[0-9]{3,4}$/,
-                        message: 'CVV phải có 3-4 chữ số',
-                      },
-                    ]}
-                  >
-                    <Input placeholder="123" type="password" />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </div>
-          )}
-
-          {selectedPayment === 'BANK_TRANSFER' && (
-            <div className="mt-6 bg-gray-50 p-6 rounded-lg">
-              <Alert
-                message="Chuyển khoản ngân hàng"
-                description="Sử dụng thông tin sau để chuyển khoản. Giao dịch sẽ được xử lý trong vòng 24 giờ."
-                type="info"
-                showIcon
-                className="mb-4"
-              />
-              <Form.Item label="Số tài khoản">
-                <Input.Search
-                  value="1234567890"
-                  readOnly
-                  enterButton={<CopyOutlined />}
-                  onSearch={() => {
-                    navigator.clipboard.writeText('1234567890');
-                    message.success('Đã sao chép số tài khoản');
-                  }}
-                />
-              </Form.Item>
-              <Form.Item label="Chủ tài khoản">
-                <Input value="CÔNG TY TNHH THƯƠNG MẠI ABC" readOnly />
-              </Form.Item>
-              <Form.Item label="Ngân hàng">
-                <Input value="Vietcombank - Chi nhánh Hà Nội" readOnly />
-              </Form.Item>
-              <Form.Item label="Nội dung chuyển khoản">
-                <Input.Search
-                  value="Thanh toan don hang #12345"
-                  readOnly
-                  enterButton={<CopyOutlined />}
-                  onSearch={() => {
-                    navigator.clipboard.writeText('Thanh toan don hang #12345');
-                    message.success('Đã sao chép nội dung chuyển khoản');
-                  }}
-                />
-              </Form.Item>
-            </div>
-          )}
-
-          {selectedPayment === 'CASH' && (
-            <div className="mt-6 bg-gray-50 p-6 rounded-lg">
-              <Alert
-                message="Thanh toán tiền mặt"
-                description="Bạn sẽ thanh toán bằng tiền mặt khi đến tiêm. Vui lòng chuẩn bị đúng số tiền."
-                type="info"
-                showIcon
-                className="mb-4"
-              />
-              <Form.Item label="Ghi chú" name="cashNote">
-                <Input.TextArea
-                  placeholder="Ghi chú thêm cho nhân viên (nếu có)"
-                  rows={3}
-                />
-              </Form.Item>
-            </div>
-          )}
-        </div>
+        <input type="hidden" />
       </Form.Item>
+
+      <div className="space-y-6">
+        {categorizedMethods.crypto.length > 0 &&
+          renderPaymentSection(
+            'Thanh toán tiền điện tử',
+            categorizedMethods.crypto
+          )}
+
+        {categorizedMethods.crypto.length > 0 &&
+          categorizedMethods.digital.length > 0 && <Divider className="my-2" />}
+
+        {categorizedMethods.digital.length > 0 &&
+          renderPaymentSection('Ví điện tử', categorizedMethods.digital)}
+
+        {categorizedMethods.digital.length > 0 &&
+          categorizedMethods.bank.length > 0 && <Divider className="my-2" />}
+
+        {categorizedMethods.bank.length > 0 &&
+          renderPaymentSection('Ngân hàng', categorizedMethods.bank)}
+
+        {categorizedMethods.bank.length > 0 &&
+          categorizedMethods.cash.length > 0 && <Divider className="my-2" />}
+
+        {categorizedMethods.cash.length > 0 &&
+          renderPaymentSection('Khác', categorizedMethods.cash)}
+
+        {/* Các phần hiển thị thông tin chi tiết cho từng phương thức */}
+        {selectedPayment === 'METAMASK' && (
+          <div className="mt-6 bg-gray-50 p-6 rounded-lg">
+            <Alert
+              message="Thanh toán tiền điện tử"
+              description="Gửi chính xác số tiền đến địa chỉ ví dưới đây. Giao dịch sẽ được xác thực trên blockchain."
+              type="info"
+              showIcon
+              className="mb-4"
+            />
+            <Form.Item label="Địa chỉ ví">
+              <Input.Search
+                value="0x672DF7fDcf5dA93C30490C7d49bd6b5bF7B4D32C"
+                readOnly
+                enterButton={<CopyOutlined />}
+                onSearch={() => {
+                  navigator.clipboard.writeText(
+                    '0x672DF7fDcf5dA93C30490C7d49bd6b5bF7B4D32C'
+                  );
+                  message.success('Đã sao chép địa chỉ ví');
+                }}
+              />
+            </Form.Item>
+          </div>
+        )}
+
+        {selectedPayment === 'ATM' && (
+          <div className="mt-6 bg-gray-50 p-6 rounded-lg">
+            <Alert
+              message="Thanh toán bằng thẻ ATM"
+              description="Chọn ngân hàng và nhập thông tin thẻ ATM của bạn để thanh toán."
+              type="info"
+              showIcon
+              className="mb-4"
+            />
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label="Ngân hàng"
+                  name="bankName"
+                  rules={[
+                    {
+                      required: selectedPayment === 'ATM',
+                      message: 'Vui lòng chọn ngân hàng',
+                    },
+                  ]}
+                >
+                  <Input placeholder="Chọn ngân hàng" />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  label="Số thẻ"
+                  name="cardNumber"
+                  rules={[
+                    {
+                      required: selectedPayment === 'ATM',
+                      message: 'Vui lòng nhập số thẻ',
+                    },
+                  ]}
+                >
+                  <Input placeholder="Nhập số thẻ" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item
+                  label="Tên chủ thẻ"
+                  name="cardHolder"
+                  rules={[
+                    {
+                      required: selectedPayment === 'ATM',
+                      message: 'Vui lòng nhập tên chủ thẻ',
+                    },
+                  ]}
+                >
+                  <Input placeholder="Nhập tên chủ thẻ" />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item
+                  label="Ngày hết hạn"
+                  name="expiryDate"
+                  rules={[
+                    {
+                      required: selectedPayment === 'ATM',
+                      message: 'Vui lòng nhập ngày hết hạn',
+                    },
+                    {
+                      pattern: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
+                      message: 'Định dạng phải là MM/YY',
+                    },
+                  ]}
+                >
+                  <Input placeholder="MM/YY" />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item
+                  label="CVV"
+                  name="cvv"
+                  rules={[
+                    {
+                      required: selectedPayment === 'ATM',
+                      message: 'Vui lòng nhập CVV',
+                    },
+                    {
+                      pattern: /^[0-9]{3,4}$/,
+                      message: 'CVV phải có 3-4 chữ số',
+                    },
+                  ]}
+                >
+                  <Input placeholder="123" type="password" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </div>
+        )}
+
+        {selectedPayment === 'BANK_TRANSFER' && (
+          <div className="mt-6 bg-gray-50 p-6 rounded-lg">
+            <Alert
+              message="Chuyển khoản ngân hàng"
+              description="Sử dụng thông tin sau để chuyển khoản. Giao dịch sẽ được xử lý trong vòng 24 giờ."
+              type="info"
+              showIcon
+              className="mb-4"
+            />
+            <Form.Item label="Số tài khoản">
+              <Input.Search
+                value="1234567890"
+                readOnly
+                enterButton={<CopyOutlined />}
+                onSearch={() => {
+                  navigator.clipboard.writeText('1234567890');
+                  message.success('Đã sao chép số tài khoản');
+                }}
+              />
+            </Form.Item>
+            <Form.Item label="Chủ tài khoản">
+              <Input value="CÔNG TY TNHH THƯƠNG MẠI ABC" readOnly />
+            </Form.Item>
+            <Form.Item label="Ngân hàng">
+              <Input value="Vietcombank - Chi nhánh Hà Nội" readOnly />
+            </Form.Item>
+            <Form.Item label="Nội dung chuyển khoản">
+              <Input.Search
+                value="Thanh toan don hang #12345"
+                readOnly
+                enterButton={<CopyOutlined />}
+                onSearch={() => {
+                  navigator.clipboard.writeText('Thanh toan don hang #12345');
+                  message.success('Đã sao chép nội dung chuyển khoản');
+                }}
+              />
+            </Form.Item>
+          </div>
+        )}
+
+        {selectedPayment === 'CASH' && (
+          <div className="mt-6 bg-gray-50 p-6 rounded-lg">
+            <Alert
+              message="Thanh toán tiền mặt"
+              description="Bạn sẽ thanh toán bằng tiền mặt khi đến tiêm. Vui lòng chuẩn bị đúng số tiền."
+              type="info"
+              showIcon
+              className="mb-4"
+            />
+            <Form.Item label="Ghi chú" name="cashNote">
+              <Input.TextArea
+                placeholder="Ghi chú thêm cho nhân viên (nếu có)"
+                rows={3}
+              />
+            </Form.Item>
+          </div>
+        )}
+      </div>
     </Card>
   );
 };

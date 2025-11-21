@@ -69,7 +69,7 @@ const UserPage = () => {
     },
     {
       title: 'Họ tên',
-      dataIndex: 'fullname',
+      dataIndex: 'fullName',
       sorter: true,
     },
     {
@@ -166,9 +166,9 @@ const UserPage = () => {
       filter: '',
     };
 
-    if (clone.fullname) q.filter = `${sfLike('fullname', clone.fullname)}`;
+    if (clone.fullName) q.filter = `${sfLike('fullname', clone.fullName)}`;
     if (clone.email) {
-      q.filter = clone.fullname
+      q.filter = clone.fullName
         ? q.filter + ' and ' + `${sfLike('email', clone.email)}`
         : `${sfLike('email', clone.email)}`;
     }
@@ -183,9 +183,9 @@ const UserPage = () => {
     let temp = queryString.stringify(q);
 
     let sortBy = '';
-    if (sort && sort.fullname) {
+    if (sort && sort.fullName) {
       sortBy =
-        sort.fullname === 'ascend' ? 'sort=fullname,asc' : 'sort=fullname,desc';
+        sort.fullName === 'ascend' ? 'sort=fullname,asc' : 'sort=fullname,desc';
     }
     if (sort && sort.email) {
       sortBy = sort.email === 'ascend' ? 'sort=email,asc' : 'sort=email,desc';

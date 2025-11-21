@@ -35,6 +35,9 @@ const Confirmation = ({ form, bookingSummary }) => {
   const centers = useSelector((state) => state.center.result);
   const isFetchingCenters = useSelector((state) => state.center.isFetching);
 
+  // Define timeSlots at the top to avoid initialization errors
+  const timeSlots = ['08:00', '09:00', '10:00', '14:00', '15:00', '16:00'];
+
   useEffect(() => {
     loadCenters();
   }, [dispatch]);
@@ -42,6 +45,18 @@ const Confirmation = ({ form, bookingSummary }) => {
   // Tính toán lịch tiêm khi ngày đầu tiên thay đổi
   useEffect(() => {
     if (!firstDoseDate || !bookingSummary?.vaccine) return;
+
+    // Ensure firstDoseDate is a valid dayjs object
+    if (!dayjs.isDayjs(firstDoseDate) || !firstDoseDate.isValid()) {
+      // eslint-disable-next-line no-console
+      console.error(
+        '[Confirmation] firstDoseDate is not valid:',
+        firstDoseDate,
+        'isValid:',
+        firstDoseDate?.isValid()
+      );
+      return;
+    }
 
     const { dosage, duration } = bookingSummary.vaccine;
     const dates = [firstDoseDate];
@@ -59,43 +74,85 @@ const Confirmation = ({ form, bookingSummary }) => {
     }
 
     // Tạo form cho các mũi tiêm
+    const centerId = form.getFieldValue('centerId');
     const forms = [];
     for (let i = 1; i < dosage; i++) {
       forms.push({
         doseNumber: i + 1,
         date: dates[i],
         time: timeSlots[0], // Mặc định chọn khung giờ đầu tiên
+        centerId: centerId || null,
       });
     }
     setDoseForms(forms);
 
-    // Cập nhật giá trị form
-    form.setFieldsValue({
-      date: firstDoseDate,
-      doseSchedules: forms,
-    });
-  }, [firstDoseDate, bookingSummary]);
+    // Set giá trị cho form.List - chỉ set một lần khi khởi tạo
+    const currentSchedules = form.getFieldValue('doseSchedules');
+    if (!currentSchedules || currentSchedules.length === 0) {
+      const validForms = forms.map((f) => {
+        const isValid = dayjs.isDayjs(f.date) && f.date.isValid();
+        // eslint-disable-next-line no-console
+        console.log('[Confirmation] Setting dose form:', {
+          doseNumber: f.doseNumber,
+          date: f.date,
+          isValidDayjs: isValid,
+          formatted: isValid ? f.date.format('DD/MM/YYYY') : 'INVALID',
+        });
 
+        return {
+          date: isValid ? f.date : undefined,
+          time: f.time,
+          centerId: f.centerId,
+        };
+      });
+
+      form.setFieldsValue({
+        doseSchedules: validForms,
+      });
+    }
+  }, [firstDoseDate, bookingSummary, form, timeSlots]);
   const handleDoseDateChange = (index, value) => {
+    // Update local state
     const updatedForms = [...doseForms];
     updatedForms[index].date = value;
     setDoseForms(updatedForms);
+
+    // Get current form values and only update the specific field
+    const currentSchedules = form.getFieldValue('doseSchedules') || [];
+    const newSchedules = [...currentSchedules];
+    newSchedules[index] = {
+      ...newSchedules[index],
+      date: value,
+    };
+
     form.setFieldsValue({
-      doseSchedules: updatedForms,
+      doseSchedules: newSchedules,
     });
   };
 
   const handleDoseTimeChange = (index, value) => {
+    // Update local state
     const updatedForms = [...doseForms];
     updatedForms[index].time = value;
     setDoseForms(updatedForms);
+
+    // Get current form values and only update the specific field
+    const currentSchedules = form.getFieldValue('doseSchedules') || [];
+    const newSchedules = [...currentSchedules];
+    newSchedules[index] = {
+      ...newSchedules[index],
+      time: value,
+    };
+
     form.setFieldsValue({
-      doseSchedules: updatedForms,
+      doseSchedules: newSchedules,
     });
   };
 
   const disabledWeekendDate = (current) => {
-    return current && (current.day() === 0 || current.day() === 6);
+    const isPast = current && current < dayjs().startOf('day');
+    const isWeekend = current && (current.day() === 0 || current.day() === 6);
+    return isPast || isWeekend;
   };
 
   const loadCenters = () => {
@@ -191,21 +248,25 @@ const Confirmation = ({ form, bookingSummary }) => {
     };
   }, [centers, form, mapCenter]);
 
-  const handleCenterChange = (value) => {
-    const selectedCenter = centers.find((center) => center.centerId === value);
-    if (selectedCenter) {
-      form.setFieldValue('centerInfo', selectedCenter);
-      if (selectedCenter.latitude && selectedCenter.longitude) {
-        setMapCenter([selectedCenter.latitude, selectedCenter.longitude]);
-      }
-    }
-  };
-
   const handleFirstDoseDateChange = (date) => {
     setFirstDoseDate(date);
   };
 
-  const timeSlots = ['08:00', '09:00', '10:00', '14:00', '15:00', '16:00'];
+  const handleCenterChange = (centerId) => {
+    const selectedCenter = centers.find((c) => c.centerId === centerId);
+    if (selectedCenter) {
+      form.setFieldsValue({ centerInfo: selectedCenter });
+      // Update map position
+      const lat =
+        selectedCenter.latitude || getDefaultLatitude(selectedCenter.address);
+      const lng =
+        selectedCenter.longitude || getDefaultLongitude(selectedCenter.address);
+      setMapCenter([lat, lng]);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.setView([lat, lng], 15);
+      }
+    }
+  };
 
   const disabledDate = (current) => {
     const isPast = current && current < dayjs().startOf('day');
@@ -215,6 +276,11 @@ const Confirmation = ({ form, bookingSummary }) => {
 
   return (
     <Card title="Chọn thời gian và địa điểm" className="mb-8">
+      {/* Hidden field to store center info */}
+      <Form.Item name="centerInfo" hidden>
+        <input type="hidden" />
+      </Form.Item>
+
       <Row gutter={24}>
         <Col span={12}>
           {/* Hiển thị thông tin vaccine */}
@@ -243,6 +309,8 @@ const Confirmation = ({ form, bookingSummary }) => {
             <DatePicker
               className="w-full"
               locale={locale}
+              format="DD/MM/YYYY"
+              placeholder="Chọn ngày tiêm"
               disabledDate={disabledDate}
               onChange={handleFirstDoseDateChange}
               suffixIcon={<CalendarOutlined />}
@@ -268,82 +336,97 @@ const Confirmation = ({ form, bookingSummary }) => {
           </Form.Item>
 
           {/* Form cho các mũi tiêm tiếp theo */}
-          {doseForms.length > 0 && (
-            <div className="mt-6">
-              <Divider orientation="left">Lịch tiêm các mũi tiếp theo</Divider>
-              <Alert
-                message="Các mũi tiêm tiếp theo được đề xuất dựa trên khoảng cách giữa các mũi. Bạn có thể điều chỉnh nếu cần."
-                type="info"
-                className="mb-4"
-                showIcon
-              />
+          {doseForms.length > 0 &&
+            form.getFieldValue('doseSchedules')?.length > 0 && (
+              <div className="mt-6">
+                <Divider orientation="left">
+                  Lịch tiêm các mũi tiếp theo
+                </Divider>
+                <Alert
+                  message="Các mũi tiêm tiếp theo được đề xuất dựa trên khoảng cách giữa các mũi. Bạn có thể điều chỉnh nếu cần."
+                  type="info"
+                  className="mb-4"
+                  showIcon
+                />
 
-              <Form.List name="doseSchedules">
-                {(fields) => (
-                  <>
-                    {fields.map(({ key, name, fieldKey }, index) => (
-                      <Card
-                        key={key}
-                        size="small"
-                        title={`Mũi tiêm thứ ${doseForms[index].doseNumber}`}
-                        className="mb-4"
-                      >
-                        <Row gutter={16}>
-                          <Col span={12}>
-                            <Form.Item
-                              label="Ngày tiêm"
-                              name={[name, 'date']}
-                              fieldKey={[fieldKey, 'date']}
-                              rules={[
-                                {
-                                  required: true,
-                                  message: 'Vui lòng chọn ngày',
-                                },
-                              ]}
-                            >
-                              <DatePicker
-                                className="w-full"
-                                locale={locale}
-                                disabledDate={disabledWeekendDate}
-                                value={doseForms[index].date}
-                                onChange={(value) =>
-                                  handleDoseDateChange(index, value)
-                                }
-                              />
-                            </Form.Item>
-                          </Col>
-                          <Col span={12}>
-                            <Form.Item
-                              label="Giờ tiêm"
-                              name={[name, 'time']}
-                              fieldKey={[fieldKey, 'time']}
-                              rules={[
-                                {
-                                  required: true,
-                                  message: 'Vui lòng chọn giờ',
-                                },
-                              ]}
-                            >
-                              <Select
-                                options={timeSlots.map((time) => ({
-                                  value: time,
-                                  label: time,
-                                }))}
-                                value={doseForms[index].time}
-                                onChange={(value) =>
-                                  handleDoseTimeChange(index, value)
-                                }
-                              />
-                            </Form.Item>
-                          </Col>
-                        </Row>
-                      </Card>
-                    ))}
-                  </>
-                )}
-              </Form.List>
-            </div>
-          )}
+                <Form.List name="doseSchedules">
+                  {(fields) => (
+                    <>
+                      {fields.map(({ key, name }, index) => {
+                        // Safety check for doseForms array
+                        if (!doseForms[index]) return null;
+
+                        return (
+                          <Card
+                            key={key}
+                            size="small"
+                            title={`Mũi tiêm thứ ${doseForms[index].doseNumber}`}
+                            className="mb-4"
+                          >
+                            <Row gutter={16}>
+                              <Col span={12}>
+                                <Form.Item
+                                  label="Ngày tiêm"
+                                  name={[name, 'date']}
+                                  getValueProps={(value) => ({
+                                    value:
+                                      value &&
+                                      dayjs.isDayjs(value) &&
+                                      value.isValid()
+                                        ? value
+                                        : undefined,
+                                  })}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: 'Vui lòng chọn ngày',
+                                    },
+                                  ]}
+                                >
+                                  <DatePicker
+                                    className="w-full"
+                                    locale={locale}
+                                    format="DD/MM/YYYY"
+                                    placeholder="Chọn ngày tiêm"
+                                    disabledDate={disabledWeekendDate}
+                                    onChange={(value) =>
+                                      handleDoseDateChange(index, value)
+                                    }
+                                  />
+                                </Form.Item>
+                              </Col>
+                              <Col span={12}>
+                                <Form.Item
+                                  label="Giờ tiêm"
+                                  name={[name, 'time']}
+                                  rules={[
+                                    {
+                                      required: true,
+                                      message: 'Vui lòng chọn giờ',
+                                    },
+                                  ]}
+                                >
+                                  <Select
+                                    placeholder="Chọn giờ tiêm"
+                                    options={timeSlots.map((time) => ({
+                                      value: time,
+                                      label: time,
+                                    }))}
+                                    onChange={(value) =>
+                                      handleDoseTimeChange(index, value)
+                                    }
+                                  />
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          </Card>
+                        );
+                      })}
+                    </>
+                  )}
+                </Form.List>
+              </div>
+            )}
         </Col>
 
         <Col span={12}>

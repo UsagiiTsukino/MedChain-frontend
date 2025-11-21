@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Steps, Form, Button, message, Tag, Card, Descriptions } from 'antd';
 import queryString from 'query-string';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -20,13 +20,19 @@ import {
 } from '../../config/api.appointment';
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
-import Web3 from 'web3';
+import { Web3 } from 'web3';
 
 const BookingPage = () => {
   const user = useSelector((state) => state.account.user);
   const navigate = useNavigate();
   const location = useLocation();
-  const web3Instance = new Web3(window.ethereum);
+  // Create Web3 instance only once using useMemo
+  const web3Instance = useMemo(() => {
+    if (window.ethereum) {
+      return new Web3(window.ethereum);
+    }
+    return null;
+  }, []);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -49,6 +55,37 @@ const BookingPage = () => {
   const [paymentStatus, setPaymentStatus] = useState('');
   const [ethAmount, setEthAmount] = useState(null);
 
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Verify session with backend
+        const response = await fetch('http://localhost:3000/auth/account', {
+          credentials: 'include',
+        });
+        const data = await response.json();
+
+        if (!data || !data.walletAddress) {
+          message.warning({
+            content: 'Vui lòng đăng nhập để đặt lịch tiêm chủng',
+            duration: 3,
+            onClose: () => navigate('/login'),
+          });
+        }
+      } catch {
+        message.error({
+          content: 'Không thể xác thực. Vui lòng đăng nhập lại.',
+          duration: 3,
+          onClose: () => navigate('/login'),
+        });
+      }
+    };
+
+    if (!user || !user.walletAddress) {
+      checkAuth();
+    }
+  }, [user, navigate]);
+
   useEffect(() => {
     const params = queryString.parse(location.search);
     if (params.sku) {
@@ -57,6 +94,11 @@ const BookingPage = () => {
   }, [location.search]);
 
   const fetchVaccineBySku = async (sku) => {
+    if (!sku) {
+      console.warn('[Booking] No SKU provided');
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await callFetchVaccineBySku(sku);
@@ -326,15 +368,24 @@ const BookingPage = () => {
   const handleFinish = async () => {
     try {
       setLoading(true);
+      console.log('[Booking] Handle finish started');
 
       const isValid = await validateStep();
+      console.log('[Booking] Validation result:', isValid);
       if (!isValid) {
         setLoading(false);
         return;
       }
 
-      const { time, firstDoseDate, center, vaccine, doseSchedules, payment } =
+      // Get values directly from form to avoid stale state
+      const formValues = form.getFieldsValue();
+      const payment = formValues.payment || selectedPayment;
+
+      const { time, firstDoseDate, center, vaccine, doseSchedules } =
         bookingSummary;
+
+      console.log('[Booking] Booking summary:', bookingSummary);
+      console.log('[Booking] Payment from form:', payment);
 
       // Double check payment is not null
       if (!payment) {
@@ -343,44 +394,102 @@ const BookingPage = () => {
         return;
       }
 
+      // Format doseSchedules for API
+      const formattedSchedules = (doseSchedules || []).map((schedule) => ({
+        date: dayjs(schedule.date).format('YYYY-MM-DD'),
+        time: schedule.time,
+        centerId: center.centerId,
+      }));
+
+      console.log('[Booking] Calling API with:', {
+        vaccineId: vaccine.vaccineId,
+        centerId: center.centerId,
+        time,
+        date: dayjs(firstDoseDate).format('YYYY-MM-DD'),
+        amount: vaccine.price * vaccine.dosage,
+        schedules: formattedSchedules,
+        payment,
+      });
+
       const response = await callCreateBooking(
         vaccine.vaccineId,
         center.centerId,
         time,
-        firstDoseDate,
+        dayjs(firstDoseDate).format('YYYY-MM-DD'),
         vaccine.price * vaccine.dosage,
-        doseSchedules,
+        formattedSchedules,
         payment
       );
 
-      if (response && response.data) {
-        if (response.data.method === 'CASH') {
-          navigate('/success');
-        } else if (response.data.method === 'PAYPAL') {
-          window.location.href = response.data.paymentURL;
-        } else if (response.data.method === 'METAMASK') {
-          const transaction = await sendETH(response.data.amount);
+      console.log('[Booking] API Response:', response);
+
+      // Check if data is in response.data or directly in response
+      const responseData = response.data || response;
+
+      if (responseData && responseData.bookingId) {
+        console.log('[Booking] Payment method:', responseData.method);
+        console.log('[Booking] Booking ID:', responseData.bookingId);
+        console.log('[Booking] Payment ID:', responseData.paymentId);
+
+        const paymentMethod = responseData.method?.toUpperCase();
+
+        if (paymentMethod === 'CASH') {
+          // Navigate to success page with booking info
+          console.log('[Booking] Navigating to success page for CASH payment');
+          navigate(
+            `/success?booking=${responseData.bookingId}&payment=${responseData.paymentId}`
+          );
+        } else if (paymentMethod === 'PAYPAL') {
+          console.log('[Booking] Redirecting to PayPal');
+          window.location.href = responseData.paymentURL;
+        } else if (paymentMethod === 'METAMASK') {
+          console.log('[Booking] Processing MetaMask transaction');
+          const transaction = await sendETH(responseData.amount);
           if (transaction) {
             await updatePaymentMetaMask(
-              response.data.paymentId,
-              response.data.bookingId
+              responseData.paymentId,
+              responseData.bookingId
             );
             navigate(
               '/success?booking=' +
-                response.data.bookingId +
+                responseData.bookingId +
                 '&payment=' +
-                response.data.paymentId
+                responseData.paymentId
             );
           }
+        } else {
+          console.error('[Booking] Unknown payment method:', paymentMethod);
+          message.error('Phương thức thanh toán không hợp lệ');
         }
+      } else {
+        console.error('[Booking] Invalid response structure:', response);
+        message.error('Phản hồi từ server không hợp lệ');
       }
     } catch (error) {
+      console.error('[Booking] Error:', error);
+      console.error('[Booking] Error details:', error.response?.data);
       setPaymentStatus('error');
-      message.error({
-        content: 'Có lỗi xảy ra, vui lòng thử lại sau',
-        key: 'paymentMessage',
-        duration: 3,
-      });
+
+      // Check if it's authentication error
+      if (
+        error.message?.includes('not authenticated') ||
+        error.response?.data?.message?.includes('not authenticated')
+      ) {
+        message.error({
+          content: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+          key: 'paymentMessage',
+          duration: 3,
+          onClose: () => {
+            navigate('/login');
+          },
+        });
+      } else {
+        message.error({
+          content: error.message || 'Có lỗi xảy ra, vui lòng thử lại sau',
+          key: 'paymentMessage',
+          duration: 3,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -401,58 +510,58 @@ const BookingPage = () => {
   ];
 
   return (
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Đặt lịch tiêm chủng
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Chọn vaccine, phương thức thanh toán và thời gian tiêm phù hợp
-          </p>
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Đặt lịch tiêm chủng
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Chọn vaccine, phương thức thanh toán và thời gian tiêm phù hợp
+        </p>
+      </div>
+
+      {renderSummary()}
+
+      <Steps
+        current={current}
+        items={steps.map((item) => ({ key: item.title, title: item.title }))}
+        className="mb-8"
+      />
+
+      <Form form={form} layout="vertical">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          {renderStepContent(steps[current].content)}
         </div>
 
-        {renderSummary()}
-
-        <Steps
-          current={current}
-          items={steps.map((item) => ({ key: item.title, title: item.title }))}
-          className="mb-8"
-        />
-
-        <Form form={form} layout="vertical">
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            {renderStepContent(steps[current].content)}
-          </div>
-
-          <div className="flex justify-between">
-            {current > 0 && (
-              <Button size="large" onClick={prev} disabled={loading}>
-                Quay lại
-              </Button>
-            )}
-            {current < steps.length - 1 && (
-              <Button
-                type="primary"
-                size="large"
-                onClick={next}
-                disabled={loading}
-              >
-                Tiếp tục
-              </Button>
-            )}
-            {current === steps.length - 1 && (
-              <Button
-                type="primary"
-                size="large"
-                onClick={handleFinish}
-                loading={loading}
-              >
-                Hoàn tất đặt lịch
-              </Button>
-            )}
-          </div>
-        </Form>
-      </div>
+        <div className="flex justify-between">
+          {current > 0 && (
+            <Button size="large" onClick={prev} disabled={loading}>
+              Quay lại
+            </Button>
+          )}
+          {current < steps.length - 1 && (
+            <Button
+              type="primary"
+              size="large"
+              onClick={next}
+              disabled={loading}
+            >
+              Tiếp tục
+            </Button>
+          )}
+          {current === steps.length - 1 && (
+            <Button
+              type="primary"
+              size="large"
+              onClick={handleFinish}
+              loading={loading}
+            >
+              Hoàn tất đặt lịch
+            </Button>
+          )}
+        </div>
+      </Form>
+    </div>
   );
 };
 

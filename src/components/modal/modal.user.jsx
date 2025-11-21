@@ -27,11 +27,9 @@ const ModalUser = (props) => {
   const [displayCenter, setDisplayCenter] = useState(null);
   const [role, setRole] = useState();
 
-
   useEffect(() => {
     fetchCenter();
   }, []);
-
 
   const fetchCenter = async () => {
     const res = await callFetchCenter();
@@ -41,7 +39,8 @@ const ModalUser = (props) => {
   };
 
   const submitUser = async (valuesForm) => {
-    const { fullname, email, phoneNumber, birthday, address, centerName } = valuesForm;
+    const { fullname, email, phoneNumber, birthday, address, centerName } =
+      valuesForm;
 
     try {
       if (dataInit?.walletAddress) {
@@ -64,7 +63,7 @@ const ModalUser = (props) => {
             description: res.message,
           });
         }
-      } 
+      }
 
       handleReset();
       reloadTable();
@@ -86,7 +85,6 @@ const ModalUser = (props) => {
     setOpenModal(false);
     setAnimation('open');
   };
-
 
   return (
     <>
@@ -127,7 +125,9 @@ const ModalUser = (props) => {
               <ProFormText
                 label="User Name"
                 name="fullname"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
                 placeholder="Enter user name..."
               />
             </Col>
@@ -135,7 +135,9 @@ const ModalUser = (props) => {
               <ProFormText
                 label="Email"
                 name="email"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
                 placeholder="Enter email..."
               />
             </Col>
@@ -143,7 +145,9 @@ const ModalUser = (props) => {
               <ProFormText
                 label="Phone Number"
                 name="phoneNumber"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
                 placeholder="Enter phone number..."
               />
             </Col>
@@ -152,7 +156,11 @@ const ModalUser = (props) => {
                 name="birthday"
                 label="Birthday"
                 placeholder="Enter birthday..."
-                value={dataInit?.birthday ? dayjs(dataInit.birthday, dateFormat) : null}
+                value={
+                  dataInit?.birthday
+                    ? dayjs(dataInit.birthday, dateFormat)
+                    : null
+                }
                 width="100%"
               />
             </Col>
@@ -160,7 +168,9 @@ const ModalUser = (props) => {
               <ProFormTextArea
                 label="Address"
                 name="address"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
+                rules={[
+                  { required: true, message: 'Please do not leave blank' },
+                ]}
                 placeholder="Enter address..."
                 fieldProps={{
                   autoSize: { minRows: 4 },
@@ -180,12 +190,17 @@ const ModalUser = (props) => {
                   name="role"
                   label="Role"
                   placeholder="Select role..."
-                  rules={[{ required: true, message: 'Please do not leave blank' }]}
+                  rules={[
+                    { required: true, message: 'Please do not leave blank' },
+                  ]}
                 />
               )}
             </Col>
             <Col span={12}>
-              {role === 'DOCTOR' || role === 'CASHIER' || dataInit?.role === 'DOCTOR' || dataInit?.role === 'CASHIER' ? (
+              {role === 'DOCTOR' ||
+              role === 'CASHIER' ||
+              dataInit?.role === 'DOCTOR' ||
+              dataInit?.role === 'CASHIER' ? (
                 <ProFormSelect
                   width="100%"
                   options={
@@ -200,7 +215,9 @@ const ModalUser = (props) => {
                   name="centerName"
                   label="Select Working Center"
                   placeholder="Select role..."
-                  rules={[{ required: true, message: 'Please do not leave blank' }]}
+                  rules={[
+                    { required: true, message: 'Please do not leave blank' },
+                  ]}
                 />
               ) : null}
             </Col>
