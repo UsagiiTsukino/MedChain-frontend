@@ -94,21 +94,30 @@ const BookingPage = () => {
   }, [location.search]);
 
   const fetchVaccineBySku = async (sku) => {
-    if (!sku) {
-      console.warn('[Booking] No SKU provided');
+    if (!sku || sku === 'undefined' || sku === 'null') {
+      console.warn('[Booking] Invalid SKU provided:', sku);
+      message.error('Không tìm thấy thông tin vaccine');
+      navigate('/market');
       return;
     }
 
     try {
       setLoading(true);
       const response = await callFetchVaccineBySku(sku);
+
+      if (!response?.data) {
+        throw new Error('No vaccine data received');
+      }
+
       setSelectedVaccine(response.data);
       setBookingSummary((prev) => ({ ...prev, vaccine: response.data }));
       form.setFieldsValue({
         vaccine: sku,
       });
     } catch (error) {
-      message.error('Không thể tải thông tin vaccine. Vui lòng thử lại sau.');
+      console.error('[Booking] Error fetching vaccine:', error);
+      message.error('Không thể tải thông tin vaccine. Vui lòng thử lại.');
+      navigate('/market');
     } finally {
       setLoading(false);
     }
@@ -386,6 +395,19 @@ const BookingPage = () => {
 
       console.log('[Booking] Booking summary:', bookingSummary);
       console.log('[Booking] Payment from form:', payment);
+
+      // Validate required fields
+      if (!vaccine || !vaccine.vaccineId) {
+        message.error('Thông tin vaccine không hợp lệ. Vui lòng chọn lại.');
+        setLoading(false);
+        return;
+      }
+
+      if (!center || !center.centerId) {
+        message.error('Thông tin trung tâm không hợp lệ. Vui lòng chọn lại.');
+        setLoading(false);
+        return;
+      }
 
       // Double check payment is not null
       if (!payment) {

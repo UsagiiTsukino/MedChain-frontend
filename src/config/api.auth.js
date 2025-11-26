@@ -33,6 +33,10 @@ export const callMyAppointments = () => {
   return axios.get('/auth/my-appointments');
 };
 
+export const callMyBookings = () => {
+  return axios.get('/bookings/my-history');
+};
+
 // export const callRefreshToken = () => {
 //   return axios.get('/auth/refresh');
 // };

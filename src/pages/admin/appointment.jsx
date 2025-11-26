@@ -257,7 +257,7 @@ const AppointmentManagementPage = () => {
               />
             </Tooltip>
           )}
-          {record.status === 'PENDING' && (
+          {(record.status === 'PENDING' || record.status === 'CONFIRMED') && (
             <Tooltip title="Hủy lịch">
               <Button
                 type="link"

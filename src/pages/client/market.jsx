@@ -15,7 +15,6 @@ import { UserOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchVaccine } from '../../redux/slice/vaccineSlice';
 import queryString from 'query-string';
-import { sfLike } from 'spring-filter-query-builder';
 import { Link, useNavigate } from 'react-router-dom';
 import { addToCart } from '../../redux/slice/cartSlice';
 
@@ -48,32 +47,11 @@ const MarketPage = () => {
   };
 
   const buildQuery = () => {
-    let filter = '';
-
-    if (filters.disease !== 'all') {
-      filter = `${sfLike('disease', filters.disease)}`;
-    }
-    if (filters.target !== 'all') {
-      filter = filter
-        ? `${filter} and ${sfLike('target', filters.target)}`
-        : `${sfLike('target', filters.target)}`;
-    }
-    if (filters.manufacturer !== 'all') {
-      filter = filter
-        ? `${filter} and ${sfLike('manufacturer', filters.manufacturer)}`
-        : `${sfLike('manufacturer', filters.manufacturer)}`;
-    }
-    if (filters.priceRange !== 'all') {
-      const [min, max] = filters.priceRange.split('-').map(Number);
-      filter = filter
-        ? `${filter} and (price >= ${min} and price < ${max})`
-        : `price >= ${min} and price < ${max}`;
-    }
-
+    // Backend only supports: page, size, q (search query)
+    // Filters need to be implemented on backend or filtered client-side
     const params = {
-      page: currentPage,
+      page: currentPage - 1, // Backend expects 0-indexed pages
       size: pageSize,
-      ...(filter && { filter }),
     };
 
     return queryString.stringify(params);
@@ -117,7 +95,19 @@ const MarketPage = () => {
     if (!isAuthenticated) {
       return message.warning('Đăng nhập để đặt lịch');
     }
-    return navigate(`/booking?sku=${vaccine.sku}`);
+    // Use vaccineId or id, fallback to vaccine.id for older data
+    const vaccineId = vaccine.vaccineId || vaccine.id;
+
+    // Debug log
+    // eslint-disable-next-line no-console
+    console.log('[Market] Vaccine data:', vaccine);
+    // eslint-disable-next-line no-console
+    console.log('[Market] Selected vaccine ID:', vaccineId);
+
+    if (!vaccineId) {
+      return message.error('Không tìm thấy ID vaccine');
+    }
+    return navigate(`/booking?sku=${vaccineId}`);
   };
 
   const diseases = [

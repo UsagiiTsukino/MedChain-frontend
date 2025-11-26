@@ -28,75 +28,103 @@ const AppointmentHistory = ({
   const navigate = useNavigate();
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 0:
-        return 'orange';
-      case 2:
-        return 'green';
-      case 3:
-        return 'red';
-      default:
-        return 'default';
-    }
+    const statusMap = {
+      PENDING: 'orange',
+      CONFIRMED: 'blue',
+      COMPLETED: 'green',
+      CANCELLED: 'red',
+    };
+    return statusMap[status] || 'default';
   };
 
   const getStatusText = (status) => {
-    switch (status) {
-      case 0:
-        return 'Chờ xác nhận';
-      case 1:
-        return 'Chờ tiêm';
-      case 2:
-        return 'Đã tiêm';
-      default:
-        return 'Đã hủy';
-    }
+    const statusMap = {
+      PENDING: 'Chờ thanh toán',
+      CONFIRMED: 'Đã xác nhận',
+      COMPLETED: 'Hoàn thành',
+      CANCELLED: 'Đã hủy',
+    };
+    return statusMap[status] || status;
   };
 
   const columns = [
     {
+      title: 'Mã đặt lịch',
+      dataIndex: 'bookingId',
+      key: 'bookingId',
+      width: 100,
+      render: (id) => <span className="font-mono text-blue-600">#{id}</span>,
+    },
+    {
       title: 'Vaccine',
-      dataIndex: 'vaccineName',
-      key: 'vaccineName',
-      render: (text) => (
-        <div className="flex items-center">
-          <MedicineBoxOutlined className="mr-2" />
-          {text}
+      key: 'vaccine',
+      render: (_, record) => (
+        <div>
+          <div className="flex items-center font-medium">
+            <MedicineBoxOutlined className="mr-2" />
+            {record.vaccine?.name || 'N/A'}
+          </div>
+          <div className="text-xs text-gray-500">{record.totalDoses} liều</div>
         </div>
       ),
     },
     {
-      title: 'Cơ sở tiêm chủng',
-      dataIndex: 'centerName',
-      key: 'centerName',
-      render: (text) => (
+      title: 'Trung tâm',
+      key: 'center',
+      render: (_, record) => (
         <div className="flex items-center">
           <EnvironmentOutlined className="mr-2" />
-          {text}
+          <div>
+            <div className="font-medium">{record.center?.name || 'N/A'}</div>
+            <div className="text-xs text-gray-500">
+              {record.center?.address}
+            </div>
+          </div>
         </div>
       ),
     },
     {
-      title: 'Ngày tiêm',
-      dataIndex: 'date',
-      key: 'date',
-      render: (text) => (
-        <div className="flex items-center">
-          <CalendarOutlined className="mr-2" />
-          {dayjs(text).format('DD/MM/YYYY')}
+      title: 'Lịch hẹn',
+      key: 'appointment',
+      render: (_, record) => (
+        <div>
+          <div className="flex items-center">
+            <CalendarOutlined className="mr-2" />
+            {dayjs(record.firstDoseDate).format('DD/MM/YYYY')}
+          </div>
+          <div className="flex items-center text-xs text-gray-500">
+            <ClockCircleOutlined className="mr-2" />
+            {record.firstDoseTime}
+          </div>
         </div>
       ),
     },
     {
-      title: 'Giờ tiêm',
-      dataIndex: 'time',
-      key: 'time',
-      render: (text) => (
-        <div className="flex items-center">
-          <ClockCircleOutlined className="mr-2" />
-          {text}
-        </div>
-      ),
+      title: 'Thanh toán',
+      key: 'payment',
+      render: (_, record) => {
+        const method = record.payment?.method;
+        const methodMap = {
+          CASH: { text: 'Tiền mặt', color: 'green' },
+          PAYPAL: { text: 'PayPal', color: 'blue' },
+          METAMASK: { text: 'MetaMask', color: 'purple' },
+        };
+        const info = methodMap[method] || {
+          text: method || 'N/A',
+          color: 'default',
+        };
+        return (
+          <div>
+            <Tag color={info.color}>{info.text}</Tag>
+            <div className="text-xs text-gray-600 mt-1">
+              {new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+              }).format(record.totalAmount || 0)}
+            </div>
+          </div>
+        );
+      },
     },
     {
       title: 'Trạng thái',
@@ -111,28 +139,22 @@ const AppointmentHistory = ({
       key: 'action',
       render: (_, record) => (
         <Space>
-          {record.status === 4 && <Tag color="green">Đã hoàn tiền</Tag>}
-          {record.status === 3 && <Tag color="red">Đợi hoàn tiền</Tag>}
-          {(record.status === 1 || record.status === 0) && (
+          <Button
+            type="link"
+            size="small"
+            icon={<InfoCircleOutlined />}
+            onClick={() => navigate(`/certificate/${record.bookingId}`)}
+          >
+            Chi tiết
+          </Button>
+          {record.status === 'COMPLETED' && (
             <Button
-              type="link"
-              danger
-              size="small"
-              onClick={() => handleCancel(record.appointmentId)}
-            >
-              Hủy
-            </Button>
-          )}
-          {record.status === 2 && (
-            <Button
-              type="link"
+              type="primary"
               size="small"
               icon={<DownloadOutlined />}
-              onClick={() =>
-                navigate(`/auth/certificate/${record.appointmentId}`)
-              }
+              onClick={() => navigate(`/certificate/${record.bookingId}`)}
             >
-              Chứng nhận
+              Xem chứng nhận
             </Button>
           )}
         </Space>
@@ -182,7 +204,7 @@ const AppointmentHistory = ({
                 pageSize: 5,
                 showTotal: (total) => `Tổng ${total} lịch hẹn`,
               }}
-              rowKey="appointmentId"
+              rowKey="bookingId"
             />
           </Card>
         </>

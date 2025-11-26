@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useAccount, useBalance } from 'wagmi';
 import ModalProfile from '../../components/modal/modal.profile';
 import { fetchAccount } from '../../redux/slice/accountSlide';
-import { callMyAppointments } from '../../config/api.auth';
+import { callMyBookings } from '../../config/api.auth';
 import { callCancelAppointment } from '../../config/api.appointment';
 
 import UserInfoCard from './profile/UserInfoCard';
@@ -37,8 +37,9 @@ const ProfilePage = () => {
     fetchData: fetchAppointments,
   } = useLoadingData(
     async () => {
-      const response = await callMyAppointments();
-      return response.data;
+      const response = await callMyBookings();
+      // Response is direct array of bookings
+      return response || [];
     },
     {
       errorMessage: 'Không thể tải lịch sử đăng ký',
