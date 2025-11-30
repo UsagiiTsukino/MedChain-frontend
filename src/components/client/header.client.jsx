@@ -1,20 +1,8 @@
 import { useState } from 'react';
-import {
-  Layout,
-  Menu,
-  Avatar,
-  Dropdown,
-  Button,
-  Drawer,
-  message,
-  Badge,
-  Space,
-} from 'antd';
+import { Layout, Avatar, Dropdown, Button, Drawer, message, Badge } from 'antd';
 import {
   UserOutlined,
-  HeartOutlined,
   MenuOutlined,
-  WechatWorkOutlined,
   SafetyCertificateOutlined,
   RobotOutlined,
   ShoppingCartOutlined,
@@ -25,7 +13,7 @@ import {
   LogoutOutlined,
   SearchOutlined,
 } from '@ant-design/icons';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { callLogout } from '../../config/api.auth';
@@ -56,25 +44,7 @@ const Navbar = () => {
     }
   };
 
-  const handleMenuClick = ({ key }) => {
-    navigate(key);
-  };
-
-  const handleMobileUserMenuClick = async ({ key }) => {
-    if (key === 'logout') {
-      await handleLogout();
-    } else {
-      navigate(`/${key}`);
-    }
-    setMobileMenuVisible(false);
-  };
-
   const handleMobileMenuClose = () => {
-    setMobileMenuVisible(false);
-  };
-
-  const handleMobileMenuItemClick = ({ key }) => {
-    navigate(key);
     setMobileMenuVisible(false);
   };
 
@@ -161,125 +131,157 @@ const Navbar = () => {
 
   return (
     <>
-      <AntHeader className="sticky top-0 z-50 bg-white px-4 shadow-sm md:px-6">
-        <div className="mx-auto flex h-full max-w-6xl items-center justify-between">
+      <AntHeader className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 shadow-sm md:px-6">
+        <div className="mx-auto flex h-full max-w-7xl items-center justify-between">
           {/* Logo và menu chính cho desktop */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-8">
             <div
-              className="mr-4 cursor-pointer text-xl font-bold text-blue-600 md:text-2xl"
+              className="cursor-pointer flex items-center gap-3 group"
               onClick={() => navigate('/')}
             >
-              <Link to="/" className="flex items-center gap-2">
-                <SafetyCertificateOutlined className="text-xl md:text-2xl text-brand-primary" />
-                <span className="hidden text-lg font-bold text-gray-900 sm:block md:text-xl">
+              <div className="relative">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <SafetyCertificateOutlined className="text-white text-xl" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
+              </div>
+              <div className="hidden md:block">
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   VaxChain
                 </span>
-              </Link>
+              </div>
             </div>
 
             {/* Menu desktop */}
-            <Menu
-              mode="horizontal"
-              selectedKeys={[location.pathname]}
-              items={menuItems}
-              onClick={handleMenuClick}
-              style={{ border: 'none', background: 'transparent' }}
-              className="hidden lg:flex"
-            />
+            <nav className="hidden lg:flex items-center gap-1">
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.key;
+                const hasChildren = item.children && item.children.length > 0;
+
+                if (hasChildren) {
+                  return (
+                    <Dropdown
+                      key={item.key}
+                      menu={{
+                        items: item.children.map((child) => ({
+                          key: child.key,
+                          label: child.label,
+                          onClick: () => navigate(child.key),
+                        })),
+                      }}
+                      placement="bottomLeft"
+                      trigger={['hover']}
+                    >
+                      <button className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 flex items-center gap-2">
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </button>
+                    </Dropdown>
+                  );
+                }
+
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => navigate(item.key)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                    }`}
+                  >
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
           {/* Phần bên phải: Tìm kiếm, nút action và user */}
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-3">
             {/* Thanh tìm kiếm cho desktop */}
-            <div className="hidden md:flex md:items-center">
-              <div className="relative">
+            <div className="hidden md:block">
+              <div className="relative group">
                 <input
                   type="text"
-                  placeholder="Tìm kiếm..."
+                  placeholder="Tìm kiếm vaccine..."
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-40 rounded-lg border border-gray-300 py-1.5 pl-3 pr-10 text-sm transition-all focus:w-52 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:w-52"
+                  className="w-48 lg:w-64 rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-11 pr-4 text-sm transition-all focus:w-56 lg:focus:w-72 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-blue-500"
                 />
-                <Button
-                  icon={<SearchOutlined />}
-                  type="text"
-                  onClick={handleSearch}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 transform"
-                />
+                <SearchOutlined className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
               </div>
             </div>
 
             {/* Các nút action */}
-            <Space.Compact className="hidden sm:flex">
-              <Button
-                icon={<HeartOutlined />}
-                size="middle"
-                onClick={() => navigate('/wishlist')}
-                className="hidden border-none shadow-none hover:bg-slate-100 md:flex"
-                title="Wishlist"
-              />
-              <Button
-                icon={<WechatWorkOutlined />}
-                size="middle"
-                onClick={() => navigate('/chat')}
-                className="hidden border-none shadow-none hover:bg-slate-100 md:flex"
-                title="Chat"
-              />
-              <Button
-                icon={<RobotOutlined />}
-                size="middle"
-                onClick={() => navigate('/chat/ai')}
-                className="hidden border-none shadow-none hover:bg-slate-100 md:flex"
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={() => navigate('/demo')}
+                className="p-2.5 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 relative group"
                 title="AI Chat"
-              />
-            </Space.Compact>
+              >
+                <RobotOutlined className="text-lg" />
+                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              </button>
+            </div>
 
-            <Badge count={itemCount} size="small" className="mr-1 md:mr-0">
-              <Button
-                icon={<ShoppingCartOutlined />}
-                size="middle"
+            <Badge count={itemCount} size="small" offset={[-5, 5]}>
+              <button
                 onClick={() => navigate('/cart')}
-                className="border-none shadow-none hover:bg-slate-100"
+                className="p-2.5 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                 title="Giỏ hàng"
-              />
+              >
+                <ShoppingCartOutlined className="text-lg" />
+              </button>
             </Badge>
 
             {/* Nút tìm kiếm cho mobile */}
-            <Button
-              icon={<SearchOutlined />}
-              size="middle"
+            <button
               onClick={() => setSearchVisible(true)}
-              className="flex border-none shadow-none hover:bg-slate-100 md:hidden"
+              className="flex md:hidden p-2.5 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
               title="Tìm kiếm"
-            />
+            >
+              <SearchOutlined className="text-lg" />
+            </button>
 
             {isAuthenticated ? (
-              <>
+              <div className="hidden md:flex items-center gap-3 pl-3 border-l border-gray-200">
                 <Dropdown
                   menu={{ items: userMenuItems }}
                   placement="bottomRight"
-                  className="hidden md:block"
+                  trigger={['click']}
                 >
-                  <Avatar
-                    src={
-                      user?.avatar ||
-                      'https://imgs.search.brave.com/kRzOEK2P26KHgRlY94E5DGE517Q4IJTULPg_lFWXLSU/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly90aHlw/aXguY29tL3dwLWNv/bnRlbnQvdXBsb2Fk/cy8yMDIxLzEwL2Fu/aW1lLWF2YXRhci1w/cm9maWxlLXBpY3R1/cmUtdGh5cGl4LTI0/LTcwMHg3MDAuanBn'
-                    }
-                    icon={<UserOutlined />}
-                    className="cursor-pointer"
-                    size="default"
-                  />
+                  <button className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
+                    <Avatar
+                      src={user?.avatar}
+                      icon={<UserOutlined />}
+                      className="border-2 border-gray-200 group-hover:border-blue-500 transition-all"
+                      size={36}
+                    />
+                    <div className="text-left hidden lg:block">
+                      <div className="text-sm font-medium text-gray-900 line-clamp-1 max-w-24">
+                        {user?.fullname || 'User'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {user?.role === 'ADMIN'
+                          ? 'Quản trị viên'
+                          : user?.role === 'DOCTOR'
+                          ? 'Bác sĩ'
+                          : user?.role === 'CASHIER'
+                          ? 'Thu ngân'
+                          : 'Người dùng'}
+                      </div>
+                    </div>
+                  </button>
                 </Dropdown>
-                <span className="ml-1 hidden text-sm font-medium text-gray-700 lg:block">
-                  {user?.name}
-                </span>
-              </>
+              </div>
             ) : (
-              <div className="hidden md:flex md:items-center md:gap-2">
+              <div className="hidden md:flex items-center gap-2 pl-3 border-l border-gray-200">
                 <Button
                   onClick={() => navigate('/login')}
-                  className="text-sm"
+                  className="rounded-lg font-medium"
                   size="middle"
                 >
                   Đăng nhập
@@ -287,7 +289,7 @@ const Navbar = () => {
                 <Button
                   type="primary"
                   onClick={() => navigate('/register')}
-                  className="bg-blue-600 text-sm hover:bg-blue-700"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300"
                   size="middle"
                 >
                   Đăng ký
@@ -296,39 +298,42 @@ const Navbar = () => {
             )}
 
             {/* Nút menu mobile */}
-            <Button
-              icon={<MenuOutlined />}
-              size="middle"
-              className="flex border-none shadow-none hover:bg-slate-100 lg:hidden"
+            <button
               onClick={() => setMobileMenuVisible(true)}
+              className="flex lg:hidden p-2.5 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
               title="Menu"
-            />
+            >
+              <MenuOutlined className="text-lg" />
+            </button>
           </div>
         </div>
 
         {/* Thanh tìm kiếm cho mobile (hiển thị khi click) */}
         {searchVisible && (
-          <div className="absolute left-0 top-full w-full border-t border-gray-200 bg-white p-3 shadow-md md:hidden">
-            <div className="mx-auto flex max-w-6xl items-center">
-              <input
-                type="text"
-                placeholder="Tìm kiếm..."
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-1 rounded-lg border border-gray-300 py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-              />
+          <div className="absolute left-0 top-full w-full bg-white/95 backdrop-blur-md border-b border-gray-100 p-4 shadow-lg md:hidden">
+            <div className="mx-auto flex max-w-7xl items-center gap-3">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm vaccine..."
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-blue-500"
+                  autoFocus
+                />
+                <SearchOutlined className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
               <Button
-                icon={<SearchOutlined />}
-                type="text"
+                type="primary"
                 onClick={handleSearch}
-                className="ml-2"
-              />
+                className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 border-0"
+              >
+                Tìm
+              </Button>
               <Button
-                type="text"
                 onClick={() => setSearchVisible(false)}
-                className="ml-1"
+                className="rounded-xl"
               >
                 Hủy
               </Button>
@@ -340,36 +345,52 @@ const Navbar = () => {
       {/* Mobile Menu Drawer */}
       <Drawer
         title={
-          <div className="flex items-center gap-2">
-            <SafetyCertificateOutlined className="text-brand-primary" />
-            <span className="font-bold">VaxChain</span>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
+              <SafetyCertificateOutlined className="text-white text-xl" />
+            </div>
+            <div>
+              <div className="font-bold text-gray-900">VaxChain</div>
+              <div className="text-xs text-gray-500">Blockchain Healthcare</div>
+            </div>
           </div>
         }
         placement="right"
         onClose={handleMobileMenuClose}
         open={mobileMenuVisible}
-        width={300}
+        width={320}
         className="md:hidden"
+        styles={{
+          header: { borderBottom: '1px solid #f0f0f0', padding: '20px' },
+          body: { padding: 0 },
+        }}
       >
         <div className="flex h-full flex-col">
           {/* User Section */}
-          <div className="border-b border-gray-200 pb-4">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <Avatar
-                  src={
-                    user?.avatar ||
-                    'https://imgs.search.brave.com/kRzOEK2P26KHgRlY94E5DGE517Q4IJTULPg_lFWXLSU/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly90aHlw/aXguY29tL3dwLWNv/bnRlbnQvdXBsb2Fk/cy8yMDIxLzEwL2Fu/aW1lLWF2YXRhci1w/cm9maWxlLXBpY3R1/cmUtdGh5cGl4LTI0/LTcwMHg3MDAuanBn'
-                  }
+                  src={user?.avatar}
                   icon={<UserOutlined />}
-                  size="large"
+                  size={56}
+                  className="border-4 border-white shadow-lg"
                 />
-                <div className="overflow-hidden">
-                  <div className="truncate font-medium">
-                    {user?.name || 'User'}
+                <div className="overflow-hidden flex-1">
+                  <div className="truncate font-semibold text-gray-900">
+                    {user?.fullname || 'User'}
                   </div>
-                  <div className="truncate text-sm text-gray-500">
+                  <div className="truncate text-sm text-gray-600">
                     {user?.email}
+                  </div>
+                  <div className="mt-1 inline-flex items-center gap-1 bg-white px-2 py-0.5 rounded-full text-xs font-medium text-blue-600">
+                    {user?.role === 'ADMIN'
+                      ? '👑 Quản trị viên'
+                      : user?.role === 'DOCTOR'
+                      ? '👨‍⚕️ Bác sĩ'
+                      : user?.role === 'CASHIER'
+                      ? '💼 Thu ngân'
+                      : '👤 Người dùng'}
                   </div>
                 </div>
               </div>
@@ -378,96 +399,165 @@ const Navbar = () => {
                 <Button
                   type="primary"
                   block
+                  size="large"
                   onClick={() => {
                     navigate('/login');
                     setMobileMenuVisible(false);
                   }}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0 rounded-xl font-semibold shadow-md h-12"
                 >
                   Đăng nhập
                 </Button>
                 <Button
                   block
+                  size="large"
                   onClick={() => {
                     navigate('/register');
                     setMobileMenuVisible(false);
                   }}
+                  className="rounded-xl font-semibold h-12"
                 >
-                  Đăng ký
+                  Đăng ký ngay
                 </Button>
               </div>
             )}
           </div>
 
           {/* Navigation Menu */}
-          <div className="flex-1 overflow-y-auto py-4">
-            <Menu
-              mode="vertical"
-              selectedKeys={[location.pathname]}
-              items={menuItems}
-              onClick={handleMobileMenuItemClick}
-              className="border-none"
-            />
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="mb-4">
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 mb-2">
+                Điều hướng
+              </div>
+              <div className="space-y-1">
+                {menuItems.map((item) => {
+                  const isActive = location.pathname === item.key;
+                  const hasChildren = item.children && item.children.length > 0;
+
+                  if (hasChildren) {
+                    return (
+                      <div key={item.key} className="space-y-1">
+                        <div className="px-3 py-2 text-sm font-medium text-gray-700 flex items-center gap-2">
+                          {item.icon}
+                          <span>{item.label}</span>
+                        </div>
+                        {item.children.map((child) => {
+                          const isChildActive = location.pathname === child.key;
+                          return (
+                            <button
+                              key={child.key}
+                              onClick={() => {
+                                navigate(child.key);
+                                setMobileMenuVisible(false);
+                              }}
+                              className={`w-full text-left px-3 py-2.5 pl-10 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                isChildActive
+                                  ? 'bg-blue-50 text-blue-600'
+                                  : 'text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              {child.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <button
+                      key={item.key}
+                      onClick={() => {
+                        navigate(item.key);
+                        setMobileMenuVisible(false);
+                      }}
+                      className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                        isActive
+                          ? 'bg-blue-50 text-blue-600'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* User Menu Items (if authenticated) */}
             {isAuthenticated && (
-              <>
-                <div className="my-4 border-t border-gray-200" />
-                <Menu
-                  mode="vertical"
-                  items={userMenuItems}
-                  onClick={handleMobileUserMenuClick}
-                  className="border-none"
-                />
-              </>
+              <div className="mt-6">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 mb-2">
+                  Tài khoản
+                </div>
+                <div className="space-y-1">
+                  {userMenuItems.map((item) => {
+                    if (item.type === 'divider')
+                      return (
+                        <div
+                          key="divider"
+                          className="my-2 border-t border-gray-200"
+                        />
+                      );
+
+                    return (
+                      <button
+                        key={item.key}
+                        onClick={() => {
+                          item.onClick && item.onClick();
+                          if (item.key !== 'logout') {
+                            setMobileMenuVisible(false);
+                          }
+                        }}
+                        className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                          item.danger
+                            ? 'text-red-600 hover:bg-red-50'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
 
           {/* Additional Mobile Actions */}
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-gray-200 p-4 bg-gray-50">
             <div className="grid grid-cols-2 gap-2">
-              <Button
-                icon={<HeartOutlined />}
+              <button
                 onClick={() => {
-                  navigate('/wishlist');
+                  navigate('/demo');
                   setMobileMenuVisible(false);
                 }}
-                block
+                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white hover:bg-blue-50 transition-all duration-200 border border-gray-100"
               >
-                Wishlist
-              </Button>
-              <Button
-                icon={<WechatWorkOutlined />}
-                onClick={() => {
-                  navigate('/chat');
-                  setMobileMenuVisible(false);
-                }}
-                block
-              >
-                Chat
-              </Button>
-              <Button
-                icon={<RobotOutlined />}
-                onClick={() => {
-                  navigate('/chat/ai');
-                  setMobileMenuVisible(false);
-                }}
-                block
-              >
-                AI Chat
-              </Button>
-              <Button
-                icon={<ShoppingCartOutlined />}
+                <RobotOutlined className="text-xl text-blue-600" />
+                <span className="text-xs font-medium text-gray-700">
+                  AI Chat
+                </span>
+              </button>
+              <button
                 onClick={() => {
                   navigate('/cart');
                   setMobileMenuVisible(false);
                 }}
-                block
+                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white hover:bg-blue-50 transition-all duration-200 border border-gray-100 relative"
               >
-                <Badge count={itemCount} size="small">
+                <ShoppingCartOutlined className="text-xl text-blue-600" />
+                <span className="text-xs font-medium text-gray-700">
                   Giỏ hàng
-                </Badge>
-              </Button>
+                </span>
+                {itemCount > 0 && (
+                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
+                    {itemCount}
+                  </div>
+                )}
+              </button>
             </div>
           </div>
         </div>
