@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckSquareOutlined } from '@ant-design/icons';
+import { SafetyOutlined, SaveOutlined } from '@ant-design/icons';
 import { Col, Form, message, notification, Row } from 'antd';
 import {
   FooterToolbar,
@@ -13,7 +13,8 @@ import ModuleApi from './module.api';
 import { callUpdateRole } from '../../config/api.role';
 
 const ModalRole = (props) => {
-  const { openModal, setOpenModal, listPermissions, singleRole, reloadTable } = props;
+  const { openModal, setOpenModal, listPermissions, singleRole, reloadTable } =
+    props;
   const [animation, setAnimation] = useState('open');
   const [form] = Form.useForm();
 
@@ -60,7 +61,21 @@ const ModalRole = (props) => {
     <>
       {openModal && (
         <ModalForm
-          title="Update Role"
+          title={
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
+                <SafetyOutlined className="text-white text-lg" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 m-0">
+                  Cập nhật Vai trò
+                </h3>
+                <p className="text-sm text-gray-500 m-0">
+                  Chỉnh sửa quyền hạn của vai trò
+                </p>
+              </div>
+            </div>
+          }
           open={openModal}
           modalProps={{
             onCancel: () => {
@@ -73,6 +88,10 @@ const ModalRole = (props) => {
             maskClosable: false,
             className: `modal-company ${animation}`,
             rootClassName: `modal-company-root ${animation}`,
+            width: 800,
+            styles: {
+              body: { paddingTop: 24 },
+            },
           }}
           scrollToFirstError
           onFinish={submitRole}
@@ -82,32 +101,48 @@ const ModalRole = (props) => {
           submitter={{
             render: (_, dom) => <FooterToolbar>{dom}</FooterToolbar>,
             submitButtonProps: {
-              icon: <CheckSquareOutlined />,
+              icon: <SaveOutlined />,
+              className:
+                'bg-gradient-to-r from-purple-600 to-pink-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg',
+            },
+            resetButtonProps: {
+              className: 'h-10 px-6 font-semibold',
             },
             searchConfig: {
-              resetText: 'Cancel',
-              submitText: 'Update',
+              resetText: 'Hủy',
+              submitText: 'Cập nhật',
             },
           }}
         >
-          <Row gutter={16}>
+          <Row gutter={[16, 16]}>
             <Col span={24}>
               <ProFormText
-                label="Role"
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Tên vai trò
+                  </span>
+                }
                 name="name"
-                rules={[{ required: true, message: 'Please do not leave blank' }]}
-                placeholder="Enter role name..."
+                rules={[
+                  { required: true, message: 'Vui lòng nhập tên vai trò' },
+                ]}
+                placeholder="Nhập tên vai trò..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
             <Col span={24}>
               <ProCard
-                title="Permissions"
-                subTitle="Permissions allowed for this role"
-                headStyle={{ color: '#d81921' }}
+                title="Quyền hạn"
+                subTitle="Các quyền được phép cho vai trò này"
+                headStyle={{ color: '#9333ea', fontWeight: 600 }}
                 style={{ marginBottom: 20 }}
                 headerBordered
                 size="small"
                 bordered
+                className="rounded-lg"
               >
                 <ModuleApi
                   form={form}

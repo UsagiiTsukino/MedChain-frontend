@@ -196,63 +196,67 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Hồ sơ cá nhân</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Quản lý thông tin và lịch sử tiêm chủng của bạn
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Column */}
-        <div className="lg:col-span-1 space-y-6">
-          <UserInfoCard
-            user={user}
-            onEdit={() => setOpenModal(true)}
-            getRole={getRole}
-          />
-          <WalletCard address={address} balance={formattedValue} />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Hồ sơ cá nhân</h1>
+          <p className="mt-2 text-lg text-gray-600">
+            Quản lý thông tin và lịch sử tiêm chủng của bạn
+          </p>
         </div>
 
-        {/* Right Column */}
-        <div className="lg:col-span-3">
-          <Card>
-            <Tabs defaultActiveKey="1">
-              {user?.role === 'PATIENT' && (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-1 space-y-6">
+            <UserInfoCard
+              user={user}
+              onEdit={() => setOpenModal(true)}
+              getRole={getRole}
+            />
+            <WalletCard address={address} balance={formattedValue} />
+          </div>
+
+          {/* Right Column */}
+          <div className="lg:col-span-3">
+            <Card className="border-0 shadow-lg">
+              <Tabs defaultActiveKey="1">
+                {user?.role === 'PATIENT' && (
+                  <TabPane
+                    tab={
+                      <span className="flex items-center gap-2">
+                        <CalendarOutlined />
+                        <span className="font-medium">
+                          Lịch sử đăng ký tiêm chủng
+                        </span>
+                      </span>
+                    }
+                    key="2"
+                  >
+                    <AppointmentHistory
+                      appointments={appointments}
+                      loadingAppointments={loadingAppointments}
+                      handleCancel={handleCancel}
+                    />
+                  </TabPane>
+                )}
                 <TabPane
                   tab={
-                    <span>
-                      <CalendarOutlined />
-                      Lịch sử đăng ký tiêm chủng
+                    <span className="flex items-center gap-2">
+                      <WalletOutlined />
+                      <span className="font-medium">Lịch sử giao dịch</span>
                     </span>
                   }
-                  key="2"
+                  key="3"
                 >
-                  <AppointmentHistory
-                    appointments={appointments}
-                    loadingAppointments={loadingAppointments}
-                    handleCancel={handleCancel}
+                  <TransactionHistory
+                    allTransactions={allTransactions}
+                    sender={sender}
+                    receiver={receiver}
                   />
                 </TabPane>
-              )}
-              <TabPane
-                tab={
-                  <span>
-                    <WalletOutlined />
-                    Lịch sử giao dịch
-                  </span>
-                }
-                key="3"
-              >
-                <TransactionHistory
-                  allTransactions={allTransactions}
-                  sender={sender}
-                  receiver={receiver}
-                />
-              </TabPane>
-            </Tabs>
-          </Card>
+              </Tabs>
+            </Card>
+          </div>
         </div>
       </div>
 

@@ -235,3 +235,29 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* Admin Layout Styles */
+
+.admin-menu .ant-menu-item {
+  margin: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.admin-menu .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-menu .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.admin-menu .ant-menu-item-selected::after {
+  display: none;
+}
+
+.admin-menu .anticon {
+  font-size: 18px;
+}

@@ -5,6 +5,7 @@ import {
 } from '@ant-design/pro-components';
 import { Col, Form, message, notification, Row } from 'antd';
 import { useState } from 'react';
+import { UserOutlined, SaveOutlined } from '@ant-design/icons';
 
 import { callUpdateUser } from '../../config/api.user';
 
@@ -64,14 +65,36 @@ const ModalProfile = (props) => {
     <>
       {openModal && (
         <ModalForm
-          title="Edit Profile Information"
+          title={
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                <UserOutlined className="text-white text-lg" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 m-0">
+                  Chỉnh sửa thông tin
+                </h3>
+                <p className="text-sm text-gray-500 m-0">
+                  Cập nhật thông tin cá nhân của bạn
+                </p>
+              </div>
+            </div>
+          }
           open={openModal}
           preserve={false}
           form={form}
           submitter={{
             searchConfig: {
-              submitText: 'Update',
-              resetText: 'Cancel',
+              submitText: 'Cập nhật',
+              resetText: 'Hủy',
+            },
+            submitButtonProps: {
+              icon: <SaveOutlined />,
+              className:
+                'bg-gradient-to-r from-blue-600 to-indigo-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg',
+            },
+            resetButtonProps: {
+              className: 'h-10 px-6 font-semibold',
             },
           }}
           initialValues={user}
@@ -87,62 +110,95 @@ const ModalProfile = (props) => {
             maskClosable: false,
             className: `modal-company ${animation}`,
             rootClassName: `modal-company-root ${animation}`,
+            width: 720,
+            styles: {
+              body: { paddingTop: 24 },
+            },
           }}
         >
-          <Row gutter={16}>
+          <Row gutter={[16, 16]}>
             <Col span={12}>
               <ProFormText
-                label="Full Name"
+                label={
+                  <span className="font-semibold text-gray-700">Họ và tên</span>
+                }
                 name="fullName"
-                rules={[
-                  { required: true, message: 'Please do not leave blank' },
-                ]}
-                placeholder="Enter name ..."
+                rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+                placeholder="Nhập họ và tên..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
             <Col span={12}>
               <ProFormText
-                label="Email"
+                label={
+                  <span className="font-semibold text-gray-700">Email</span>
+                }
                 name="email"
                 rules={[
-                  { required: true, message: 'Please do not leave blank' },
+                  { required: true, message: 'Vui lòng nhập email' },
+                  { type: 'email', message: 'Email không hợp lệ' },
                 ]}
-                placeholder="Enter email ..."
+                placeholder="Nhập địa chỉ email..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
             <Col span={12}>
               <ProFormText
-                label="Address"
-                name="address"
-                rules={[
-                  { required: true, message: 'Please do not leave blank' },
-                ]}
-                placeholder="Enter address..."
-              />
-            </Col>
-            <Col span={12}>
-              <ProFormText
-                label="Phone Number"
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Số điện thoại
+                  </span>
+                }
                 name="phoneNumber"
                 rules={[
-                  { required: true, message: 'Please do not leave blank' },
+                  { required: true, message: 'Vui lòng nhập số điện thoại' },
                 ]}
-                placeholder="Enter phone number..."
+                placeholder="Nhập số điện thoại..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
             <Col span={12}>
               <ProFormDatePicker
-                colProps={{ xl: 12, md: 24 }}
-                width="md"
-                label="Birthday"
+                width="100%"
+                label={
+                  <span className="font-semibold text-gray-700">Ngày sinh</span>
+                }
                 name="birthday"
-                placeholder="Select birthday"
+                placeholder="Chọn ngày sinh"
                 rules={[
                   {
                     required: true,
-                    message: 'Please select birthday!',
+                    message: 'Vui lòng chọn ngày sinh',
                   },
                 ]}
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg w-full',
+                  format: 'DD/MM/YYYY',
+                }}
+              />
+            </Col>
+            <Col span={24}>
+              <ProFormText
+                label={
+                  <span className="font-semibold text-gray-700">Địa chỉ</span>
+                }
+                name="address"
+                rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+                placeholder="Nhập địa chỉ đầy đủ..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
           </Row>

@@ -130,22 +130,25 @@ const LayoutAdmin = () => {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', background: '#f5f7fa' }}>
       <Sider
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
-        theme="light"
+        width={260}
         style={{
-          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+          background: 'linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%)',
+          boxShadow: '2px 0 8px rgba(0, 0, 0, 0.1)',
           zIndex: 10,
         }}
       >
-        <div className="p-4 h-16 flex items-center">
-          <div className="flex items-center gap-2">
-            <SafetyCertificateOutlined className="text-xl text-blue-500" />
+        <div className="h-16 flex items-center justify-center border-b border-blue-800/30">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+              <SafetyCertificateOutlined className="text-2xl text-white" />
+            </div>
             {!collapsed && (
-              <span className="text-lg font-bold text-gray-900">VaxChain</span>
+              <span className="text-xl font-bold text-white">VaxChain</span>
             )}
           </div>
         </div>
@@ -154,40 +157,71 @@ const LayoutAdmin = () => {
           selectedKeys={[activeMenu]}
           items={menuItems}
           onClick={handleMenuClick}
-          style={{ height: 'calc(100% - 64px)', borderRight: 0 }}
+          style={{
+            height: 'calc(100% - 64px)',
+            borderRight: 0,
+            background: 'transparent',
+            color: 'rgba(255, 255, 255, 0.85)',
+          }}
+          theme="dark"
+          className="admin-menu"
         />
       </Sider>
-      <Layout>
+      <Layout style={{ background: '#f5f7fa' }}>
         <Header
-          className="bg-white p-0 px-6 flex items-center justify-end"
+          className="px-6 flex items-center justify-between"
           style={{
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+            background: 'white',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
             height: 64,
+            padding: '0 24px',
           }}
         >
+          <div className="flex items-center gap-4">
+            <MenuOutlined
+              className="text-xl text-gray-600 cursor-pointer hover:text-blue-600 transition-colors lg:hidden"
+              onClick={() => setCollapsed(!collapsed)}
+            />
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 m-0">
+                Hệ thống quản lý tiêm chủng
+              </h2>
+              <p className="text-xs text-gray-500 m-0">
+                Quản lý và theo dõi tiêm chủng trên blockchain
+              </p>
+            </div>
+          </div>
           <Dropdown
             menu={{ items: userMenuItems }}
             placement="bottomRight"
             arrow
             trigger={['click']}
           >
-            <div className="cursor-pointer flex items-center gap-2">
-              <Badge dot={user?.isVerified}>
-                <Avatar src={user?.avatar} className="bg-blue-500">
-                  {user?.fullName?.charAt(0) || <UserOutlined />}
-                </Avatar>
-              </Badge>
-              <div className="hidden sm:block">
-                <div className="text-sm font-medium">{user?.fullName}</div>
+            <div className="cursor-pointer flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
+              <div className="hidden sm:block text-right">
+                <div className="text-sm font-semibold text-gray-900">
+                  {user?.fullName}
+                </div>
                 <div className="text-xs text-gray-500">
                   {getRole(user?.role)}
                 </div>
               </div>
+              <Badge dot={user?.isVerified} color="#10b981">
+                <Avatar
+                  src={user?.avatar}
+                  size={40}
+                  className="bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md"
+                >
+                  {user?.fullName?.charAt(0) || <UserOutlined />}
+                </Avatar>
+              </Badge>
             </div>
           </Dropdown>
         </Header>
-        <Content className="m-5 p-5 bg-white rounded-lg">
-          <Outlet />
+        <Content style={{ margin: '24px', minHeight: 280 }}>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>

@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { CheckSquareOutlined } from '@ant-design/icons';
+import {
+  CheckSquareOutlined,
+  UserOutlined,
+  SaveOutlined,
+} from '@ant-design/icons';
 import { Col, Form, message, notification, Row } from 'antd';
 import {
   FooterToolbar,
@@ -90,7 +94,21 @@ const ModalUser = (props) => {
     <>
       {openModal && (
         <ModalForm
-          title="Update User"
+          title={
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+                <UserOutlined className="text-white text-lg" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 m-0">
+                  Cập nhật người dùng
+                </h3>
+                <p className="text-sm text-gray-500 m-0">
+                  Chỉnh sửa thông tin người dùng
+                </p>
+              </div>
+            </div>
+          }
           open={openModal}
           modalProps={{
             onCancel: () => {
@@ -103,6 +121,10 @@ const ModalUser = (props) => {
             maskClosable: false,
             className: `modal-company ${animation}`,
             rootClassName: `modal-company-root ${animation}`,
+            width: 800,
+            styles: {
+              body: { paddingTop: 24 },
+            },
           }}
           scrollToFirstError
           preserve={false}
@@ -112,68 +134,100 @@ const ModalUser = (props) => {
           submitter={{
             render: (_, dom) => <FooterToolbar>{dom}</FooterToolbar>,
             submitButtonProps: {
-              icon: <CheckSquareOutlined />,
+              icon: <SaveOutlined />,
+              className:
+                'bg-gradient-to-r from-blue-600 to-indigo-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg',
+            },
+            resetButtonProps: {
+              className: 'h-10 px-6 font-semibold',
             },
             searchConfig: {
-              resetText: 'Cancel',
-              submitText: 'Update',
+              resetText: 'Hủy',
+              submitText: 'Cập nhật',
             },
           }}
         >
-          <Row gutter={16}>
+          <Row gutter={[16, 16]}>
             <Col span={12}>
               <ProFormText
-                label="User Name"
+                label={
+                  <span className="font-semibold text-gray-700">Họ và tên</span>
+                }
                 name="fullname"
-                rules={[
-                  { required: true, message: 'Please do not leave blank' },
-                ]}
-                placeholder="Enter user name..."
+                rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+                placeholder="Nhập họ và tên..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
             <Col span={12}>
               <ProFormText
-                label="Email"
+                label={
+                  <span className="font-semibold text-gray-700">Email</span>
+                }
                 name="email"
                 rules={[
-                  { required: true, message: 'Please do not leave blank' },
+                  { required: true, message: 'Vui lòng nhập email' },
+                  { type: 'email', message: 'Email không hợp lệ' },
                 ]}
-                placeholder="Enter email..."
+                placeholder="Nhập địa chỉ email..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
             <Col span={12}>
               <ProFormText
-                label="Phone Number"
+                label={
+                  <span className="font-semibold text-gray-700">
+                    Số điện thoại
+                  </span>
+                }
                 name="phoneNumber"
                 rules={[
-                  { required: true, message: 'Please do not leave blank' },
+                  { required: true, message: 'Vui lòng nhập số điện thoại' },
                 ]}
-                placeholder="Enter phone number..."
+                placeholder="Nhập số điện thoại..."
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
               />
             </Col>
             <Col span={12}>
               <ProFormDatePicker
                 name="birthday"
-                label="Birthday"
-                placeholder="Enter birthday..."
+                label={
+                  <span className="font-semibold text-gray-700">Ngày sinh</span>
+                }
+                placeholder="Chọn ngày sinh..."
                 value={
                   dataInit?.birthday
                     ? dayjs(dataInit.birthday, dateFormat)
                     : null
                 }
                 width="100%"
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg w-full',
+                  format: 'DD/MM/YYYY',
+                }}
               />
             </Col>
             <Col span={12}>
               <ProFormTextArea
-                label="Address"
+                label={
+                  <span className="font-semibold text-gray-700">Địa chỉ</span>
+                }
                 name="address"
-                rules={[
-                  { required: true, message: 'Please do not leave blank' },
-                ]}
-                placeholder="Enter address..."
+                rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+                placeholder="Nhập địa chỉ đầy đủ..."
                 fieldProps={{
                   autoSize: { minRows: 4 },
+                  className: 'rounded-lg',
                 }}
               />
             </Col>
@@ -183,16 +237,20 @@ const ModalUser = (props) => {
                   width="100%"
                   onChange={(value) => setRole(value)}
                   options={[
-                    { value: 'DOCTOR', label: 'DOCTOR' },
-                    { value: 'PATIENT', label: 'PATIENT' },
-                    { value: 'CASHIER', label: 'CASHIER' },
+                    { value: 'DOCTOR', label: 'Bác sĩ' },
+                    { value: 'PATIENT', label: 'Bệnh nhân' },
+                    { value: 'CASHIER', label: 'Thu ngân' },
                   ]}
                   name="role"
-                  label="Role"
-                  placeholder="Select role..."
-                  rules={[
-                    { required: true, message: 'Please do not leave blank' },
-                  ]}
+                  label={
+                    <span className="font-semibold text-gray-700">Vai trò</span>
+                  }
+                  placeholder="Chọn vai trò..."
+                  rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
+                  fieldProps={{
+                    size: 'large',
+                    className: 'rounded-lg',
+                  }}
                 />
               )}
             </Col>
@@ -213,11 +271,19 @@ const ModalUser = (props) => {
                     })
                   }
                   name="centerName"
-                  label="Select Working Center"
-                  placeholder="Select role..."
+                  label={
+                    <span className="font-semibold text-gray-700">
+                      Trung tâm làm việc
+                    </span>
+                  }
+                  placeholder="Chọn trung tâm..."
                   rules={[
-                    { required: true, message: 'Please do not leave blank' },
+                    { required: true, message: 'Vui lòng chọn trung tâm' },
                   ]}
+                  fieldProps={{
+                    size: 'large',
+                    className: 'rounded-lg',
+                  }}
                 />
               ) : null}
             </Col>

@@ -30,6 +30,7 @@ import HomePage from './pages/client/home';
 import MarketPage from './pages/client/market';
 import BookingPage from './pages/client/booking';
 import CertificatePage from './pages/auth/certificate/[id]';
+import AIBookingPage from './pages/client/ai-booking';
 
 // Staff pages
 import LayoutStaff from './components/staff/layout.staff';
@@ -69,6 +70,14 @@ const App = () => {
           ),
         },
         { path: 'booking', element: <BookingPage /> },
+        {
+          path: 'ai-booking',
+          element: (
+            <ProtectedUserRoute>
+              <AIBookingPage />
+            </ProtectedUserRoute>
+          ),
+        },
         { path: 'success', element: <SuccessPage /> },
         { path: 'demo', element: <VaccineRAGSystem /> },
         { path: 'checkout', element: <Checkout /> },

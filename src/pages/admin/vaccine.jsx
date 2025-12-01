@@ -8,7 +8,12 @@ import {
   Space,
   Tooltip,
 } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  MedicineBoxOutlined,
+} from '@ant-design/icons';
 import { sfLike } from 'spring-filter-query-builder';
 import queryString from 'query-string';
 
@@ -29,7 +34,6 @@ const VaccinePage = () => {
   const meta = useSelector((state) => state.vaccine.meta);
   const vaccines = useSelector((state) => state.vaccine.result);
   const dispatch = useDispatch();
-
 
   const [openModal, setOpenModal] = useState(false);
 
@@ -136,15 +140,15 @@ const VaccinePage = () => {
       render: (value) => {
         return new Intl.NumberFormat('vi-VN', {
           style: 'currency',
-          currency: 'VND'
+          currency: 'VND',
         }).format(value);
-      }
+      },
     },
     {
       title: 'Tồn kho',
       dataIndex: 'stockQuantity',
       width: 80,
-      hideInSearch: true, 
+      hideInSearch: true,
     },
     {
       title: 'Mô tả',
@@ -176,12 +180,12 @@ const VaccinePage = () => {
           />
 
           <Popconfirm
-            placement='leftTop'
-            title='Xóa Vaccine'
-            description='Bạn có chắc chắn muốn xóa vaccine này?'
+            placement="leftTop"
+            title="Xóa Vaccine"
+            description="Bạn có chắc chắn muốn xóa vaccine này?"
             onConfirm={() => handleDeleteVaccine(entity.vaccineId)}
-            okText='Xác nhận'
-            cancelText='Hủy'
+            okText="Xác nhận"
+            cancelText="Hủy"
           >
             <span style={{ cursor: 'pointer', margin: '0 10px' }}>
               <DeleteOutlined
@@ -205,8 +209,7 @@ const VaccinePage = () => {
       filter: '',
     };
 
-    if (clone.name)
-      q.filter = `${sfLike('name', clone.name)}`;
+    if (clone.name) q.filter = `${sfLike('name', clone.name)}`;
     if (clone.manufacturer) {
       q.filter = clone.name
         ? q.filter + ' and ' + `${sfLike('manufacturer', clone.manufacturer)}`
@@ -227,12 +230,15 @@ const VaccinePage = () => {
       sortBy = sort.name === 'ascend' ? 'sort=name,asc' : 'sort=name,desc';
     }
     if (sort && sort.manufacturer) {
-      sortBy = sort.manufacturer === 'ascend' ? 'sort=manufacturer,asc' : 'sort=manufacturer,desc';
+      sortBy =
+        sort.manufacturer === 'ascend'
+          ? 'sort=manufacturer,asc'
+          : 'sort=manufacturer,desc';
     }
     if (sort && sort.price) {
       sortBy = sort.price === 'ascend' ? 'sort=price,asc' : 'sort=price,desc';
     }
-    
+
     temp = `${temp}&${sortBy}`;
 
     return temp;
@@ -240,10 +246,28 @@ const VaccinePage = () => {
 
   return (
     <>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+          Quản lý Vaccine
+        </h1>
+        <p className="mt-1 text-sm text-gray-600">
+          Danh sách và thông tin các loại vaccine trong hệ thống
+        </p>
+      </div>
+
       <DataTable
         actionRef={tableRef}
-        headerTitle='Danh sách Vaccine'
-        rowKey='vaccineId'
+        headerTitle={
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+              <MedicineBoxOutlined className="text-white text-lg" />
+            </div>
+            <span className="text-lg font-semibold text-gray-900">
+              Danh sách Vaccine
+            </span>
+          </div>
+        }
+        rowKey="vaccineId"
         loading={isFetching}
         columns={columns}
         dataSource={vaccines}
@@ -266,8 +290,10 @@ const VaccinePage = () => {
         }}
         toolBarRender={() => [
           <Button
-            key='button'
-            type='primary'
+            key="button"
+            type="primary"
+            size="large"
+            className="bg-gradient-to-r from-green-600 to-emerald-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg rounded-lg"
             onClick={() => {
               setOpenModal(true);
               setDataInit(null);

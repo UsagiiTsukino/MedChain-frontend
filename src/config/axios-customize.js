@@ -62,7 +62,7 @@ instance.interceptors.response.use(
       }
     }
 
-    if (+error.response.status === 403) {
+    if (error.response && +error.response.status === 403) {
       notification.error({
         message: error?.response?.data?.message ?? '',
         description: error?.response?.data?.error ?? '',

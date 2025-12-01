@@ -34,7 +34,10 @@ const DashboardPage = () => {
     datasets: [
       {
         label: 'Tiêm chủng hàng ngày',
-        data: Array.from({ length: 30 }, () => Math.floor(Math.random() * 50000) + 20000),
+        data: Array.from(
+          { length: 30 },
+          () => Math.floor(Math.random() * 50000) + 20000
+        ),
         backgroundColor: 'rgba(59, 130, 246, 0.05)',
         borderColor: 'rgba(59, 130, 246, 1)',
         borderWidth: 2,
@@ -86,7 +89,9 @@ const DashboardPage = () => {
           </div>
           <div>
             <div style={{ fontWeight: 500 }}>{text}</div>
-            <div style={{ fontSize: 12, color: '#666' }}>{record.districts} quận/huyện</div>
+            <div style={{ fontSize: 12, color: '#666' }}>
+              {record.districts} quận/huyện
+            </div>
           </div>
         </div>
       ),
@@ -142,87 +147,141 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Bảng điều khiển tiêm chủng quốc gia</h1>
-        <p className="mt-1 text-sm text-gray-500">Dữ liệu tiêm chủng thời gian thực trên tất cả các khu vực</p>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Bảng điều khiển tiêm chủng quốc gia
+        </h1>
+        <p className="mt-2 text-sm text-gray-600">
+          Dữ liệu tiêm chủng thời gian thực trên tất cả các khu vực
+        </p>
       </div>
 
-      <Row gutter={[16, 16]} className="mb-6">
+      <Row gutter={[24, 24]} className="mb-8">
         <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Tổng người tiêm"
-              value={4832109}
-              formatter={formatter}
-              prefix={<CheckCircleOutlined style={{ color: '#10B981' }} />}
-              suffix={
-                <div className="text-sm text-green-600">
-                  +12.3% <span className="text-gray-500">so với tuần trước</span>
+          <Card
+            className="hover:shadow-lg transition-shadow duration-300 rounded-xl border-0"
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: 'white',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <CheckCircleOutlined className="text-3xl text-white" />
+              </div>
+              <div className="flex-1">
+                <div className="text-white/80 text-sm mb-1">
+                  Tổng người tiêm
                 </div>
-              }
-            />
+                <div className="text-3xl font-bold">
+                  <CountUp end={4832109} separator="," />
+                </div>
+                <div className="text-xs text-white/70 mt-1">
+                  +12.3% so với tuần trước
+                </div>
+              </div>
+            </div>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Tiêm đủ liều"
-              value={3781456}
-              formatter={formatter}
-              prefix={<CheckCircleOutlined style={{ color: '#3B82F6' }} />}
-              suffix={
-                <div className="text-sm text-green-600">
-                  +8.5% <span className="text-gray-500">so với tuần trước</span>
+          <Card
+            className="hover:shadow-lg transition-shadow duration-300 rounded-xl border-0"
+            style={{
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              color: 'white',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <CheckCircleOutlined className="text-3xl text-white" />
+              </div>
+              <div className="flex-1">
+                <div className="text-white/80 text-sm mb-1">Tiêm đủ liều</div>
+                <div className="text-3xl font-bold">
+                  <CountUp end={3781456} separator="," />
                 </div>
-              }
-            />
+                <div className="text-xs text-white/70 mt-1">
+                  +8.5% so với tuần trước
+                </div>
+              </div>
+            </div>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Liều có sẵn"
-              value={1245321}
-              formatter={formatter}
-              prefix={<CheckCircleOutlined style={{ color: '#F59E0B' }} />}
-              suffix={
-                <div className="text-sm text-red-600">
-                  -2.1% <span className="text-gray-500">so với tuần trước</span>
+          <Card
+            className="hover:shadow-lg transition-shadow duration-300 rounded-xl border-0"
+            style={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: 'white',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <CheckCircleOutlined className="text-3xl text-white" />
+              </div>
+              <div className="flex-1">
+                <div className="text-white/80 text-sm mb-1">Liều có sẵn</div>
+                <div className="text-3xl font-bold">
+                  <CountUp end={1245321} separator="," />
                 </div>
-              }
-            />
+                <div className="text-xs text-white/70 mt-1">
+                  -2.1% so với tuần trước
+                </div>
+              </div>
+            </div>
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card>
-            <Statistic
-              title="Xác thực blockchain"
-              value={4521987}
-              formatter={formatter}
-              prefix={<LinkOutlined style={{ color: '#8B5CF6' }} />}
-              suffix={
-                <div className="text-sm text-green-600">
-                  +15.7% <span className="text-gray-500">so với tuần trước</span>
+          <Card
+            className="hover:shadow-lg transition-shadow duration-300 rounded-xl border-0"
+            style={{
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              color: 'white',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-14 w-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <LinkOutlined className="text-3xl text-white" />
+              </div>
+              <div className="flex-1">
+                <div className="text-white/80 text-sm mb-1">
+                  Xác thực blockchain
                 </div>
-              }
-            />
+                <div className="text-3xl font-bold">
+                  <CountUp end={4521987} separator="," />
+                </div>
+                <div className="text-xs text-white/70 mt-1">
+                  +15.7% so với tuần trước
+                </div>
+              </div>
+            </div>
           </Card>
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]} className="mb-6">
+      <Row gutter={[24, 24]} className="mb-6">
         <Col xs={24} lg={12}>
           <Card
-            title="Tỷ lệ tiêm chủng hàng ngày"
+            title={
+              <span className="text-lg font-semibold text-gray-900">
+                Tỷ lệ tiêm chủng hàng ngày
+              </span>
+            }
             extra={
-              <Select defaultValue="30" style={{ width: 120 }}>
+              <Select
+                defaultValue="30"
+                style={{ width: 140 }}
+                size="large"
+                className="rounded-lg"
+              >
                 <Select.Option value="7">7 ngày qua</Select.Option>
                 <Select.Option value="14">14 ngày qua</Select.Option>
                 <Select.Option value="30">30 ngày qua</Select.Option>
                 <Select.Option value="90">90 ngày qua</Select.Option>
               </Select>
             }
+            className="rounded-xl shadow-sm border-0 hover:shadow-md transition-shadow"
           >
             <div style={{ height: 300 }}>
               <Line
@@ -247,16 +306,28 @@ const DashboardPage = () => {
         </Col>
         <Col xs={24} lg={12}>
           <Card
-            title="Phân bố loại vaccine"
+            title={
+              <span className="text-lg font-semibold text-gray-900">
+                Phân bố loại vaccine
+              </span>
+            }
             extra={
-              <Select defaultValue="all" style={{ width: 120 }}>
+              <Select
+                defaultValue="all"
+                style={{ width: 140 }}
+                size="large"
+                className="rounded-lg"
+              >
                 <Select.Option value="all">Tất cả</Select.Option>
                 <Select.Option value="month">Theo tháng</Select.Option>
                 <Select.Option value="quarter">Theo quý</Select.Option>
               </Select>
             }
+            className="rounded-xl shadow-sm border-0 hover:shadow-md transition-shadow"
           >
-            <div style={{ height: 300, display: 'flex', justifyContent: 'center' }}>
+            <div
+              style={{ height: 300, display: 'flex', justifyContent: 'center' }}
+            >
               <div style={{ width: '70%' }}>
                 <Doughnut
                   data={vaccineDistributionData}
@@ -276,10 +347,6 @@ const DashboardPage = () => {
           </Card>
         </Col>
       </Row>
-
-      
-
-   
     </div>
   );
 };

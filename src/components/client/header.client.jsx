@@ -35,13 +35,16 @@ const Navbar = () => {
   const [searchValue, setSearchValue] = useState('');
 
   const handleLogout = async () => {
-    const res = await callLogout();
-    if (res && res && +res.statusCode === 200) {
-      localStorage.removeItem('access_token');
-      dispatch(setLogoutAction({}));
-      message.success('Đăng xuất thành công');
-      navigate('/');
+    try {
+      await callLogout();
+    } catch {
+      // Ignore API errors, continue with local logout
     }
+    // Always logout locally regardless of API response
+    localStorage.removeItem('access_token');
+    dispatch(setLogoutAction({}));
+    message.success('Đăng xuất thành công');
+    navigate('/');
   };
 
   const handleMobileMenuClose = () => {
@@ -218,12 +221,15 @@ const Navbar = () => {
             {/* Các nút action */}
             <div className="hidden md:flex items-center gap-2">
               <button
-                onClick={() => navigate('/demo')}
-                className="p-2.5 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 relative group"
-                title="AI Chat"
+                onClick={() => navigate('/ai-booking')}
+                className="relative flex items-center gap-2 px-3 py-2.5 rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 hover:text-purple-700 transition-all duration-200"
+                title="Tư vấn AI"
               >
                 <RobotOutlined className="text-lg" />
-                <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm font-medium">AI tư vấn</span>
+                <span className="absolute -top-0.5 -right-0.5 px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full font-bold shadow-md animate-pulse text-[10px] leading-none">
+                  NEW
+                </span>
               </button>
             </div>
 
@@ -249,7 +255,21 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div className="hidden md:flex items-center gap-3 pl-3 border-l border-gray-200">
                 <Dropdown
-                  menu={{ items: userMenuItems }}
+                  menu={{
+                    items: userMenuItems.map((item) => {
+                      if (item.type === 'divider') return item;
+                      return {
+                        ...item,
+                        onClick: undefined, // Remove onClick from item
+                      };
+                    }),
+                    onClick: (e) => {
+                      const item = userMenuItems.find((i) => i.key === e.key);
+                      if (item && item.onClick) {
+                        item.onClick();
+                      }
+                    },
+                  }}
                   placement="bottomRight"
                   trigger={['click']}
                 >
@@ -528,17 +548,19 @@ const Navbar = () => {
 
           {/* Additional Mobile Actions */}
           <div className="border-t border-gray-200 p-4 bg-gray-50">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => {
-                  navigate('/demo');
+                  navigate('/ai-booking');
                   setMobileMenuVisible(false);
                 }}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white hover:bg-blue-50 transition-all duration-200 border border-gray-100"
+                title="Tư vấn AI"
+                className="relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 hover:text-purple-700 transition-all duration-200"
               >
-                <RobotOutlined className="text-xl text-blue-600" />
-                <span className="text-xs font-medium text-gray-700">
-                  AI Chat
+                <RobotOutlined className="text-xl" />
+                <span className="text-sm font-medium">AI tư vấn</span>
+                <span className="absolute -top-0.5 -right-0.5 px-1.5 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold rounded-md shadow-md animate-pulse">
+                  NEW
                 </span>
               </button>
               <button
@@ -546,16 +568,14 @@ const Navbar = () => {
                   navigate('/cart');
                   setMobileMenuVisible(false);
                 }}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white hover:bg-blue-50 transition-all duration-200 border border-gray-100 relative"
+                title="Giỏ hàng"
+                className="relative p-3 rounded-xl text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
               >
-                <ShoppingCartOutlined className="text-xl text-blue-600" />
-                <span className="text-xs font-medium text-gray-700">
-                  Giỏ hàng
-                </span>
+                <ShoppingCartOutlined className="text-2xl" />
                 {itemCount > 0 && (
-                  <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
+                  <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center font-bold">
                     {itemCount}
-                  </div>
+                  </span>
                 )}
               </button>
             </div>

@@ -1,7 +1,12 @@
 import { Badge, Button, message, notification, Popconfirm, Space } from 'antd';
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 import { sfLike } from 'spring-filter-query-builder';
 import queryString from 'query-string';
 
@@ -205,9 +210,27 @@ const UserPage = () => {
 
   return (
     <>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          Quản lý Người dùng
+        </h1>
+        <p className="mt-1 text-sm text-gray-600">
+          Danh sách và thông tin người dùng trong hệ thống
+        </p>
+      </div>
+
       <DataTable
         actionRef={tableRef}
-        headerTitle="Danh sách người dùng"
+        headerTitle={
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+              <TeamOutlined className="text-white text-lg" />
+            </div>
+            <span className="text-lg font-semibold text-gray-900">
+              Danh sách người dùng
+            </span>
+          </div>
+        }
         rowKey="userId"
         loading={isFetching}
         columns={columns}
@@ -249,6 +272,20 @@ const UserPage = () => {
           },
         }}
         rowSelection={false}
+        toolBarRender={() => [
+          <Button
+            key="button"
+            type="primary"
+            size="large"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg rounded-lg"
+            onClick={() => {
+              setOpenModal(true);
+              setDataInit(null);
+            }}
+          >
+            <PlusOutlined /> Thêm người dùng
+          </Button>,
+        ]}
       />
       <ModalUser
         openModal={openModal}
