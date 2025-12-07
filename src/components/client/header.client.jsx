@@ -282,7 +282,7 @@ const Navbar = () => {
                     />
                     <div className="text-left hidden lg:block">
                       <div className="text-sm font-medium text-gray-900 line-clamp-1 max-w-24">
-                        {user?.fullname || 'User'}
+                        {user?.fullName || 'User'}
                       </div>
                       <div className="text-xs text-gray-500">
                         {user?.role === 'ADMIN'

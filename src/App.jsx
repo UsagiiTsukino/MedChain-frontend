@@ -31,6 +31,7 @@ import MarketPage from './pages/client/market';
 import BookingPage from './pages/client/booking';
 import CertificatePage from './pages/auth/certificate/[id]';
 import AIBookingPage from './pages/client/ai-booking';
+import VerifyPage from './pages/client/verify';
 
 // Staff pages
 import LayoutStaff from './components/staff/layout.staff';
@@ -189,6 +190,10 @@ const App = () => {
     {
       path: '/auth/certificate/:id',
       element: <CertificatePage />,
+    },
+    {
+      path: '/verify/:bookingId',
+      element: <VerifyPage />,
     },
     {
       path: '/login',

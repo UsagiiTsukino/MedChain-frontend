@@ -1,13 +1,13 @@
 import { createConfig, http } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 
-// Ganache mặc định chạy ở http://localhost:7545
+// Ganache - chainId 1337 (mặc định)
 const ganacheChain = {
-  id: 1337, // Chain ID của Ganache (mặc định là 1337)
-  name: 'Ganache',
+  id: 1337, // Chain ID của Ganache
+  name: 'Ganache Local',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
-    default: { http: ['http://localhost:7545'] },
+    default: { http: ['http://127.0.0.1:7545'] },
   },
 };
 
@@ -17,4 +17,4 @@ export const config = createConfig({
   transports: {
     [ganacheChain.id]: http(), // Sử dụng RPC của Ganache
   },
-}); 
+});

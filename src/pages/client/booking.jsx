@@ -21,9 +21,11 @@ import {
 import dayjs from 'dayjs';
 import { useSelector } from 'react-redux';
 import { Web3 } from 'web3';
+import { useAccount } from 'wagmi';
 
 const BookingPage = () => {
   const user = useSelector((state) => state.account.user);
+  const { address: connectedWalletAddress, isConnected } = useAccount();
   const navigate = useNavigate();
   const location = useLocation();
   // Create Web3 instance only once using useMemo
@@ -353,15 +355,76 @@ const BookingPage = () => {
     setCurrent(current - 1);
   };
 
+  // Hàm chuyển sang Ganache network
+  const switchToGanache = async () => {
+    const ganacheChainId = '0x539'; // 1337 in hex
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: ganacheChainId }],
+      });
+      return true;
+    } catch (switchError) {
+      // Network chưa được thêm vào MetaMask
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: ganacheChainId,
+                chainName: 'Ganache Local',
+                nativeCurrency: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+                rpcUrls: ['http://127.0.0.1:7545'],
+              },
+            ],
+          });
+          return true;
+        } catch (addError) {
+          console.error('Failed to add Ganache network:', addError);
+          return false;
+        }
+      }
+      console.error('Failed to switch network:', switchError);
+      return false;
+    }
+  };
+
   const sendETH = async (amount) => {
     try {
-      const wallet = '0x672DF7fDcf5dA93C30490C7d49bd6b5bF7B4D32C';
+      // Treasury wallet - nơi nhận thanh toán
+      const treasuryWallet = '0xcC177e1F003856d9d5c6870cAFfA798B50431ea6';
+
+      // Kiểm tra ví đã kết nối chưa
+      if (!isConnected || !connectedWalletAddress) {
+        message.error('Vui lòng kết nối ví MetaMask trước khi thanh toán!');
+        return false;
+      }
+
+      // Kiểm tra và chuyển sang Ganache network
+      const currentChainId = await web3Instance.eth.getChainId();
+      if (currentChainId !== 1337n && currentChainId !== 5777n) {
+        message.loading('Đang chuyển sang Ganache network...', 0);
+        const switched = await switchToGanache();
+        message.destroy();
+        if (!switched) {
+          message.error('Vui lòng chuyển sang Ganache network trong MetaMask!');
+          return false;
+        }
+        // Đợi một chút để network chuyển xong
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
       const amountInWei = web3Instance.utils.toWei(amount.toString(), 'ether');
 
       const tx = {
-        // from: user.walletAddress,
-        from: '0x50803992C2Fc89952C237577020c9f51523519fc',
-        to: wallet,
+        from: connectedWalletAddress, // Sử dụng ví đã kết nối từ wagmi
+        to: treasuryWallet,
         value: amountInWei,
         gas: 21000,
       };
@@ -370,6 +433,15 @@ const BookingPage = () => {
       return receipt.transactionHash;
     } catch (error) {
       console.error('Transaction failed:', error);
+      if (error.code === 4001) {
+        message.error('Bạn đã từ chối giao dịch');
+      } else if (error.message?.includes('insufficient funds')) {
+        message.error(
+          'Không đủ ETH trong ví. Vui lòng kiểm tra bạn đang ở Ganache network!'
+        );
+      } else {
+        message.error('Giao dịch thất bại: ' + error.message);
+      }
       return false;
     }
   };

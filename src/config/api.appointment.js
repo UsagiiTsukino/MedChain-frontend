@@ -137,3 +137,32 @@ export const callRefundAppointment = (appointmentId) => {
 export const callVerifyId = (id) => {
   return axios.get(`/appointments/${id}/verify`);
 };
+
+// ============ BLOCKCHAIN APIS ============
+
+/**
+ * Verify booking on blockchain
+ * @param {string} bookingId - Booking ID to verify
+ */
+export const callVerifyBookingOnChain = (bookingId) => {
+  return axios.get(`/bookings/${bookingId}/verify`);
+};
+
+/**
+ * Get booking history with blockchain info
+ */
+export const callMyBookingHistory = () => {
+  return axios.get('/bookings/my-history');
+};
+
+/**
+ * Update payment status after MetaMask transaction
+ * @param {string} bookingId - Booking ID
+ * @param {string} txHash - Transaction hash from MetaMask
+ */
+export const callConfirmMetaMaskPayment = (bookingId, txHash) => {
+  return axios.post('/payments/confirm-metamask', {
+    bookingId,
+    txHash,
+  });
+};

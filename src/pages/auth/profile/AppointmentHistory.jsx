@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Tag, Space, Button, Statistic } from 'antd';
+import { Card, Tag, Space, Button, Statistic, Tooltip } from 'antd';
 import {
   MedicineBoxOutlined,
   CheckCircleOutlined,
@@ -8,23 +8,17 @@ import {
   EnvironmentOutlined,
   InfoCircleOutlined,
   DownloadOutlined,
+  SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import LoadingTable from '../../../components/share/LoadingTable';
+import { BlockchainVerifyBadge } from '../../../components/blockchain/BlockchainComponents';
 
 /**
  * Component hiển thị lịch sử đăng ký tiêm chủng
- *
- * @param {Array} appointments - Danh sách lịch hẹn
- * @param {boolean} loadingAppointments - Trạng thái loading dữ liệu
- * @param {Function} handleCancel - Hàm xử lý khi hủy lịch hẹn
  */
-const AppointmentHistory = ({
-  appointments,
-  loadingAppointments,
-  handleCancel,
-}) => {
+const AppointmentHistory = ({ appointments, loadingAppointments }) => {
   const navigate = useNavigate();
 
   const getStatusColor = (status) => {
@@ -135,6 +129,18 @@ const AppointmentHistory = ({
       ),
     },
     {
+      title: 'Blockchain',
+      key: 'blockchain',
+      width: 150,
+      render: (_, record) => (
+        <BlockchainVerifyBadge
+          bookingId={record.bookingId}
+          transactionHash={record.transactionHash}
+          blockchainStatus={record.blockchainStatus}
+        />
+      ),
+    },
+    {
       title: 'Thao tác',
       key: 'action',
       render: (_, record) => (
@@ -148,14 +154,29 @@ const AppointmentHistory = ({
             Chi tiết
           </Button>
           {record.status === 'COMPLETED' && (
-            <Button
-              type="primary"
-              size="small"
-              icon={<DownloadOutlined />}
-              onClick={() => navigate(`/certificate/${record.bookingId}`)}
-            >
-              Xem chứng nhận
-            </Button>
+            <>
+              <Button
+                type="primary"
+                size="small"
+                icon={<DownloadOutlined />}
+                onClick={() => navigate(`/certificate/${record.bookingId}`)}
+              >
+                Xem chứng nhận
+              </Button>
+              {record.transactionHash && (
+                <Tooltip title="Xác minh trên Blockchain">
+                  <Button
+                    size="small"
+                    icon={<SafetyCertificateOutlined />}
+                    onClick={() =>
+                      window.open(`/verify/${record.bookingId}`, '_blank')
+                    }
+                  >
+                    Xác minh
+                  </Button>
+                </Tooltip>
+              )}
+            </>
           )}
         </Space>
       ),
@@ -166,7 +187,7 @@ const AppointmentHistory = ({
     <div className="space-y-6">
       {appointments?.length && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <Statistic
                 title="Tổng số mũi tiêm"
@@ -189,6 +210,18 @@ const AppointmentHistory = ({
                     .length
                 }
                 prefix={<ClockCircleOutlined className="text-orange-500" />}
+              />
+            </Card>
+            <Card>
+              <Statistic
+                title="Đã xác thực Blockchain"
+                value={
+                  appointments.filter((a) => a.blockchainStatus === 'CONFIRMED')
+                    .length
+                }
+                prefix={
+                  <SafetyCertificateOutlined className="text-purple-500" />
+                }
               />
             </Card>
           </div>
