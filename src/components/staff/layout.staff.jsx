@@ -9,15 +9,17 @@ import {
   LogoutOutlined,
   EditOutlined,
   SafetyCertificateOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ProLayout } from '@ant-design/pro-components';
 import { useDisconnect } from 'wagmi';
-import { Avatar, Badge, Dropdown, message } from 'antd';
+import { Avatar, Badge, Dropdown, message, Menu, Layout } from 'antd';
 import { setLogoutAction } from '../../redux/slice/accountSlide';
 import { callLogout } from '../../config/api.auth';
+
+const { Header, Sider, Content } = Layout;
 
 const LayoutStaff = () => {
   const dispatch = useDispatch();
@@ -27,6 +29,8 @@ const LayoutStaff = () => {
 
   const location = useLocation();
   const [activeMenu, setActiveMenu] = useState('');
+  const [collapsed, setCollapsed] = useState(false);
+
   useEffect(() => {
     setActiveMenu(location.pathname);
   }, [location]);
@@ -57,48 +61,46 @@ const LayoutStaff = () => {
     },
   ];
 
-  const menuSidebar = [
+  const menuItems = [
     {
-      path: '/staff/dashboard',
+      key: '/staff/dashboard',
       icon: <DashboardOutlined />,
-      name: <Link to="/staff/dashboard">Bảng điều khiển</Link>,
-      roles: ['DOCTOR', 'CASHIER'],
+      label: 'Bảng điều khiển',
     },
     {
-      path: '/staff/vaccines',
+      key: '/staff/vaccines',
       icon: <MedicineBoxOutlined />,
-      name: <Link to="/staff/vaccines">Vaccine</Link>,
-      roles: ['DOCTOR', 'CASHIER'],
+      label: 'Vaccine',
     },
     {
-      path: '/staff/centers',
+      key: '/staff/centers',
       icon: <BankOutlined />,
-      name: <Link to="/staff/centers">Cơ sở tiêm chủng</Link>,
-      roles: ['DOCTOR', 'CASHIER'],
+      label: 'Cơ sở tiêm chủng',
     },
-    {
-      path: '/staff/my-schedule',
-      icon: <CalendarOutlined />,
-      name: <Link to="/staff/my-schedule">Lịch làm việc</Link>,
-      roles: ['DOCTOR'],
-    },
-    {
-      path: '/staff/appointments',
-      name: <Link to="/staff/appointments">Quản lý lịch hẹn</Link>,
-      icon: <EditOutlined />,
-      roles: ['CASHIER'],
-    },
-    {
-      path: '/staff/calendar-view',
-      name: <Link to="/staff/calendar-view">Lịch làm việc</Link>,
-      icon: <CalendarOutlined />,
-      roles: ['CASHIER'],
-    },
+    ...(user?.role === 'DOCTOR'
+      ? [
+          {
+            key: '/staff/my-schedule',
+            icon: <CalendarOutlined />,
+            label: 'Lịch làm việc',
+          },
+        ]
+      : []),
+    ...(user?.role === 'CASHIER'
+      ? [
+          {
+            key: '/staff/bookings',
+            icon: <EditOutlined />,
+            label: 'Quản lý Booking',
+          },
+          {
+            key: '/staff/calendar-view',
+            icon: <CalendarOutlined />,
+            label: 'Lịch làm việc',
+          },
+        ]
+      : []),
   ];
-
-  const filterMenuByRole = (menuItems, userRole) => {
-    return menuItems.filter((item) => item.roles.includes(userRole));
-  };
 
   const getRole = (role) => {
     switch (role) {
@@ -111,53 +113,106 @@ const LayoutStaff = () => {
     }
   };
 
+  const handleMenuClick = (e) => {
+    navigate(e.key);
+  };
+
   return (
-    <>
-      <ProLayout
-        fixSiderbar
-        fixedHeader
-        defaultCollapsed
-        pageTitleRender={false}
-        title="VaxChain - Nhân viên"
-        actionsRender={() => [
-          <>
-            <Dropdown
-              menu={{ items: userMenuItems }}
-              placement="bottomRight"
-              arrow
-              trigger={['click']}
-            >
-              <div className="cursor-pointer flex items-center gap-2">
-                <Badge dot={user?.isVerified}>
-                  <Avatar src={user?.avatar} className="bg-brand-primary">
-                    {user?.name?.charAt(0) || <UserOutlined />}
-                  </Avatar>
-                </Badge>
-                <div className="hidden md:block">
-                  <div className="text-sm font-medium">{user?.fullName}</div>
-                  <div className="text-xs text-gray-500">
-                    {getRole(user?.role)}
-                  </div>
+    <Layout style={{ minHeight: '100vh', background: '#f5f7fa' }}>
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={(value) => setCollapsed(value)}
+        width={260}
+        style={{
+          background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
+          boxShadow: '2px 0 8px rgba(0, 0, 0, 0.1)',
+          zIndex: 10,
+        }}
+      >
+        <div className="h-16 flex items-center justify-center border-b border-slate-700/30">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+              <SafetyCertificateOutlined className="text-2xl text-white" />
+            </div>
+            {!collapsed && (
+              <span className="text-xl font-bold text-white">VaxChain</span>
+            )}
+          </div>
+        </div>
+        <Menu
+          mode="inline"
+          selectedKeys={[activeMenu]}
+          items={menuItems}
+          onClick={handleMenuClick}
+          style={{
+            height: 'calc(100% - 64px)',
+            borderRight: 0,
+            background: 'transparent',
+            color: 'rgba(255, 255, 255, 0.85)',
+          }}
+          theme="dark"
+          className="staff-menu"
+        />
+      </Sider>
+      <Layout style={{ background: '#f5f7fa' }}>
+        <Header
+          className="px-6 flex items-center justify-between"
+          style={{
+            background: 'white',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+            height: 64,
+            padding: '0 24px',
+          }}
+        >
+          <div className="flex items-center gap-4">
+            <MenuOutlined
+              className="text-xl text-gray-600 cursor-pointer hover:text-slate-600 transition-colors lg:hidden"
+              onClick={() => setCollapsed(!collapsed)}
+            />
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 m-0">
+                Hệ thống quản lý tiêm chủng
+              </h2>
+              <p className="text-xs text-gray-500 m-0">
+                Quản lý và theo dõi tiêm chủng trên blockchain
+              </p>
+            </div>
+          </div>
+          <Dropdown
+            menu={{ items: userMenuItems }}
+            placement="bottomRight"
+            arrow
+            trigger={['click']}
+          >
+            <div className="cursor-pointer flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-all">
+              <div className="hidden sm:block text-right">
+                <div className="text-sm font-semibold text-gray-900">
+                  {user?.fullName}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {getRole(user?.role)}
                 </div>
               </div>
-            </Dropdown>
-          </>,
-        ]}
-        menuDataRender={() => filterMenuByRole(menuSidebar, user.role)}
-        layout="mix"
-        location={{
-          pathname: activeMenu,
-        }}
-        logoRender={() => (
-          <div className="flex items-center gap-2">
-            <SafetyCertificateOutlined className="text-2xl text-brand-primary" />
-            <span className="text-xl font-bold text-gray-900">VaxChain</span>
+              <Badge dot={user?.isVerified} color="#0f172a">
+                <Avatar
+                  src={user?.avatar}
+                  size={40}
+                  className="bg-gradient-to-br from-slate-600 to-slate-800 shadow-md"
+                >
+                  {user?.fullName?.charAt(0) || <UserOutlined />}
+                </Avatar>
+              </Badge>
+            </div>
+          </Dropdown>
+        </Header>
+        <Content style={{ margin: '24px', minHeight: 280 }}>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <Outlet />
           </div>
-        )}
-      >
-        <Outlet />
-      </ProLayout>
-    </>
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 

@@ -2,8 +2,27 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
 import queryString from 'query-string';
 import { sfLike } from 'spring-filter-query-builder';
-import { Button, message, notification, Popconfirm, Space } from 'antd';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  Button,
+  message,
+  notification,
+  Popconfirm,
+  Space,
+  Tag,
+  Avatar,
+  Tooltip,
+  Image,
+} from 'antd';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  EnvironmentOutlined,
+  PhoneOutlined,
+  ClockCircleOutlined,
+  TeamOutlined,
+  HomeOutlined,
+} from '@ant-design/icons';
 
 import { fetchCenter } from '../../redux/slice/centerSlice';
 import DataTable from '../../components/data-table';
@@ -54,73 +73,109 @@ const CenterPage = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 50,
+      width: 60,
       align: 'center',
-      render: (text, record, index) => {
-        // Backend returns 0-based page, so use meta.page directly
-        return <>{index + 1 + (meta.page || 0) * (meta.pageSize || 20)}</>;
-      },
+      fixed: 'left',
+      render: (text, record, index) => (
+        <span className="font-semibold text-gray-600">
+          {index + 1 + (meta.page || 0) * (meta.pageSize || 20)}
+        </span>
+      ),
       hideInSearch: true,
     },
     {
-      title: 'Hình ảnh',
-      dataIndex: 'image',
-      hideInSearch: true,
-      render: (text) => (
-        <img
-          src={'http://localhost:8080/storage/center/' + text}
-          alt="center"
-          style={{
-            width: '50px',
-            height: 'auto',
-            objectFit: 'cover',
-            borderRadius: '8px',
-          }}
-        />
+      title: 'Trung tâm',
+      dataIndex: 'name',
+      width: 300,
+      sorter: true,
+      render: (text, record) => (
+        <div className="flex items-center gap-3">
+          <Image
+            src={'http://localhost:8080/storage/center/' + record.image}
+            alt="center"
+            width={56}
+            height={56}
+            className="rounded-xl object-cover shadow-md"
+            preview={{
+              mask: 'Đồ XEM',
+            }}
+          />
+          <div>
+            <div className="font-semibold text-gray-900 mb-1">{text}</div>
+            <Tag color="blue" icon={<HomeOutlined />} className="text-xs">
+              Trung tâm tiêm chủng
+            </Tag>
+          </div>
+        </div>
       ),
     },
     {
-      title: 'Tên cơ sở',
-      dataIndex: 'name',
-      sorter: true,
-    },
-    {
-      title: 'Địa chỉ',
-      dataIndex: 'address',
-      sorter: true,
-    },
-    {
-      title: 'Số điện thoại',
-      dataIndex: 'phoneNumber',
+      title: 'Thông tin liên hệ',
+      width: 280,
       hideInSearch: true,
+      render: (_, record) => (
+        <div className="space-y-2">
+          <Tooltip title={record.address}>
+            <div className="flex items-center gap-2">
+              <EnvironmentOutlined className="text-red-500" />
+              <span className="text-sm text-gray-600 truncate">
+                {record.address || 'N/A'}
+              </span>
+            </div>
+          </Tooltip>
+          <div className="flex items-center gap-2">
+            <PhoneOutlined className="text-green-500" />
+            <span className="text-sm text-gray-600">
+              {record.phoneNumber || 'N/A'}
+            </span>
+          </div>
+        </div>
+      ),
     },
     {
       title: 'Sức chứa',
       dataIndex: 'capacity',
+      width: 120,
+      align: 'center',
       hideInSearch: true,
       sorter: true,
+      render: (text) => (
+        <Tag color="purple" className="px-3 py-1 text-sm font-semibold">
+          <TeamOutlined /> {text || 0} người
+        </Tag>
+      ),
     },
     {
       title: 'Giờ làm việc',
-      hideInSearch: true,
       dataIndex: 'workingHours',
+      width: 150,
+      hideInSearch: true,
+      render: (text) => (
+        <div className="flex items-center gap-2">
+          <ClockCircleOutlined className="text-orange-500" />
+          <span className="text-sm text-gray-600">{text || 'N/A'}</span>
+        </div>
+      ),
     },
     {
       title: 'Thao tác',
       hideInSearch: true,
-      width: 50,
+      width: 120,
+      fixed: 'right',
+      align: 'center',
       render: (_value, entity) => (
-        <Space>
-          <EditOutlined
-            style={{
-              fontSize: 20,
-              color: '#ffa500',
-            }}
-            onClick={() => {
-              setOpenModal(true);
-              setDataInit(entity);
-            }}
-          />
+        <Space size="middle">
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              className="text-orange-500 hover:text-orange-600 hover:bg-orange-50"
+              onClick={() => {
+                setOpenModal(true);
+                setDataInit(entity);
+              }}
+            />
+          </Tooltip>
 
           <Popconfirm
             placement="leftTop"
@@ -130,14 +185,14 @@ const CenterPage = () => {
             okText="Xác nhận"
             cancelText="Hủy"
           >
-            <span style={{ cursor: 'pointer', margin: '0 10px' }}>
-              <DeleteOutlined
-                style={{
-                  fontSize: 20,
-                  color: '#ff4d4f',
-                }}
+            <Tooltip title="Xóa">
+              <Button
+                type="text"
+                icon={<DeleteOutlined />}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                danger
               />
-            </span>
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),
@@ -186,9 +241,27 @@ const CenterPage = () => {
 
   return (
     <>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+          Quản lý Trung tâm
+        </h1>
+        <p className="mt-1 text-sm text-gray-600">
+          Danh sách và thông tin các trung tâm tiêm chủng
+        </p>
+      </div>
+
       <DataTable
         actionRef={tableRef}
-        headerTitle="Danh sách cơ sở tiêm chủng"
+        headerTitle={
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+              <HomeOutlined className="text-white text-lg" />
+            </div>
+            <span className="text-lg font-semibold text-gray-900">
+              Danh sách trung tâm
+            </span>
+          </div>
+        }
         rowKey="centerId"
         loading={isFetching}
         columns={columns}
@@ -230,17 +303,18 @@ const CenterPage = () => {
           },
         }}
         rowSelection={false}
-        toolBarRender={() => {
-          return (
-            <Button
-              icon={<PlusOutlined />}
-              type="primary"
-              onClick={() => setOpenModal(true)}
-            >
-              Thêm mới
-            </Button>
-          );
-        }}
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            type="primary"
+            size="large"
+            className="bg-gradient-to-r from-green-600 to-emerald-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg rounded-lg"
+            onClick={() => setOpenModal(true)}
+          >
+            Thêm trung tâm
+          </Button>,
+        ]}
       />
       <ModalCenter
         openModal={openModal}

@@ -72,15 +72,19 @@ export const callAddAppointmentMetaMark = (
   });
 };
 
-export const callAllBookings = () => {
-  return axios.get('/bookings');
+export const callAllBookings = (page = 0, size = 10) => {
+  return axios.get(`/bookings?page=${page}&size=${size}`);
 };
 
 export const callUpdateAppointment = (appointmentId, doctorId) => {
-  return axios.put('/appointments', {
-    appointmentId,
-    doctorId,
+  return axios.put(`/appointments/${appointmentId}/process`, {
+    doctorAddress: doctorId,
+    cashierAddress: doctorId, // TODO: Get actual cashier from session
   });
+};
+
+export const callUnassignDoctor = (appointmentId) => {
+  return axios.put(`/appointments/${appointmentId}/unassign-doctor`);
 };
 
 export const callCancelAppointment = (appointmentId) => {
@@ -99,8 +103,12 @@ export const callFetchAppointmentOfCenter = (query) => {
   return axios.get(`/appointments/center?${query}`);
 };
 
-export const callMySchedule = () => {
-  return axios.get('/appointments/my-schedules');
+export const callMySchedule = (query) => {
+  return axios.get(`/appointments/my-schedules?${query}`);
+};
+
+export const callAcceptAppointment = (appointmentId) => {
+  return axios.put(`/appointments/${appointmentId}/accept`);
 };
 
 export const callVerifyAppointment = (appointmentHash, paymentHash) => {

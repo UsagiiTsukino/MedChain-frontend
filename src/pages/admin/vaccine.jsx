@@ -7,12 +7,17 @@ import {
   Popconfirm,
   Space,
   Tooltip,
+  Tag,
+  Avatar,
+  Image,
 } from 'antd';
 import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
   MedicineBoxOutlined,
+  DollarOutlined,
+  SafetyOutlined,
 } from '@ant-design/icons';
 import { sfLike } from 'spring-filter-query-builder';
 import queryString from 'query-string';
@@ -56,54 +61,68 @@ const VaccinePage = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 50,
+      width: 60,
       align: 'center',
+      fixed: 'left',
       render: (text, record, index) => {
-        return <>{index + 1 + (meta.page - 1) * meta.pageSize}</>;
+        return (
+          <span className="font-semibold text-gray-600">
+            {index + 1 + (meta.page - 1) * meta.pageSize}
+          </span>
+        );
       },
       hideInSearch: true,
     },
     {
-      title: 'Tên',
+      title: 'Tên Vaccine',
       dataIndex: 'name',
       sorter: true,
-      width: 150,
-      render: (text) => (
-        <Tooltip title={text}>
-          {text.length > 20 ? text.slice(0, 20) + '...' : text}
-        </Tooltip>
+      width: 300,
+      render: (text, record) => (
+        <div className="flex items-center gap-3">
+          <Avatar
+            size={48}
+            icon={<SafetyOutlined />}
+            className="bg-gradient-to-br from-purple-500 to-pink-600"
+          />
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-900">{text}</span>
+            <Tag color="purple" className="w-fit mt-1">
+              {record.manufacturer}
+            </Tag>
+          </div>
+        </div>
       ),
-    },
-    {
-      title: 'Nhà sản xuất',
-      dataIndex: 'manufacturer',
-      sorter: true,
-      width: 120,
     },
     {
       title: 'Quốc gia',
       dataIndex: 'country',
-      width: 100,
+      width: 120,
       hideInSearch: true,
+      render: (text) => <Tag color="blue">{text}</Tag>,
     },
     {
       title: 'Bệnh',
       dataIndex: 'disease',
-      width: 120,
+      width: 150,
       render: (text) => (
         <Tooltip title={text}>
-          {text.length > 20 ? text.slice(0, 20) + '...' : text}
+          <Tag color="orange" className="max-w-full truncate">
+            {text}
+          </Tag>
         </Tooltip>
       ),
     },
     {
       title: 'Lịch tiêm',
       dataIndex: 'schedule',
-      width: 120,
+      width: 150,
       hideInSearch: true,
       render: (text) => (
         <Tooltip title={text}>
-          {text.length > 20 ? text.slice(0, 20) + '...' : text}
+          <span className="text-gray-600">
+            {text.length > 20 ? text.slice(0, 20) + '...' : text}
+          </span>
         </Tooltip>
       ),
     },
@@ -112,43 +131,62 @@ const VaccinePage = () => {
       dataIndex: 'efficacy',
       width: 100,
       hideInSearch: true,
-      render: (text) => text + '%',
+      render: (text) => (
+        <Tag color="green" className="font-semibold">
+          {text}%
+        </Tag>
+      ),
     },
     {
       title: 'Đối tượng',
       dataIndex: 'target',
-      width: 120,
+      width: 150,
       hideInSearch: true,
       render: (text) => (
         <Tooltip title={text}>
-          {text.length > 20 ? text.slice(0, 20) + '...' : text}
+          <span className="text-gray-600">
+            {text.length > 20 ? text.slice(0, 20) + '...' : text}
+          </span>
         </Tooltip>
       ),
     },
     {
       title: 'Liều lượng',
       dataIndex: 'dosage',
-      width: 100,
+      width: 120,
       hideInSearch: true,
+      render: (text) => <Tag color="cyan">{text}</Tag>,
     },
     {
       title: 'Giá',
       dataIndex: 'price',
-      width: 100,
+      width: 150,
       hideInSearch: true,
       sorter: true,
       render: (value) => {
-        return new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND',
-        }).format(value);
+        return (
+          <div className="flex items-center gap-2">
+            <DollarOutlined className="text-lg bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent" />
+            <span className="font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              {new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+              }).format(value)}
+            </span>
+          </div>
+        );
       },
     },
     {
       title: 'Tồn kho',
       dataIndex: 'stockQuantity',
-      width: 80,
+      width: 100,
       hideInSearch: true,
+      render: (value) => (
+        <Tag color={value > 50 ? 'green' : value > 10 ? 'orange' : 'red'}>
+          {value}
+        </Tag>
+      ),
     },
     {
       title: 'Mô tả',
@@ -157,27 +195,36 @@ const VaccinePage = () => {
       hideInSearch: true,
       render: (text) => (
         <Tooltip title={text}>
-          {text.length > 50 ? text.slice(0, 50) + '...' : text}
+          <span className="text-gray-600">
+            {text.length > 50 ? text.slice(0, 50) + '...' : text}
+          </span>
         </Tooltip>
       ),
     },
     {
       title: 'Thao tác',
       hideInSearch: true,
-      width: 80,
+      width: 120,
       fixed: 'right',
       render: (_value, entity) => (
         <Space>
-          <EditOutlined
-            style={{
-              fontSize: 20,
-              color: '#ffa500',
-            }}
-            onClick={() => {
-              setOpenModal(true);
-              setDataInit(entity);
-            }}
-          />
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="text"
+              icon={
+                <EditOutlined
+                  style={{
+                    fontSize: 18,
+                    color: '#ffa500',
+                  }}
+                />
+              }
+              onClick={() => {
+                setOpenModal(true);
+                setDataInit(entity);
+              }}
+            />
+          </Tooltip>
 
           <Popconfirm
             placement="leftTop"
@@ -187,14 +234,19 @@ const VaccinePage = () => {
             okText="Xác nhận"
             cancelText="Hủy"
           >
-            <span style={{ cursor: 'pointer', margin: '0 10px' }}>
-              <DeleteOutlined
-                style={{
-                  fontSize: 20,
-                  color: '#ff4d4f',
-                }}
+            <Tooltip title="Xóa">
+              <Button
+                type="text"
+                danger
+                icon={
+                  <DeleteOutlined
+                    style={{
+                      fontSize: 18,
+                    }}
+                  />
+                }
               />
-            </span>
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),
@@ -247,7 +299,7 @@ const VaccinePage = () => {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
           Quản lý Vaccine
         </h1>
         <p className="mt-1 text-sm text-gray-600">
@@ -259,7 +311,7 @@ const VaccinePage = () => {
         actionRef={tableRef}
         headerTitle={
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
               <MedicineBoxOutlined className="text-white text-lg" />
             </div>
             <span className="text-lg font-semibold text-gray-900">
@@ -293,7 +345,7 @@ const VaccinePage = () => {
             key="button"
             type="primary"
             size="large"
-            className="bg-gradient-to-r from-green-600 to-emerald-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg rounded-lg"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 border-0 h-10 px-6 font-semibold shadow-md hover:shadow-lg rounded-lg"
             onClick={() => {
               setOpenModal(true);
               setDataInit(null);

@@ -11,7 +11,8 @@ export const callUpdateUser = (
   phoneNumber,
   birthday,
   address,
-  centerName
+  centerName,
+  role
 ) => {
   return axios.put(`/users/${walletAddress}`, {
     fullName,
@@ -20,6 +21,7 @@ export const callUpdateUser = (
     birthday,
     address,
     centerName,
+    role,
   });
 };
 
@@ -31,6 +33,7 @@ export const callDeleteUser = (id) => {
   return axios.delete(`/users/${id}`);
 };
 
-export const callFetchDoctor = () => {
-  return axios.get('/users/doctors');
+export const callFetchDoctor = (centerId) => {
+  const params = centerId ? `?centerId=${centerId}` : '';
+  return axios.get(`/users/doctors${params}`);
 };

@@ -28,7 +28,7 @@ const ModalUser = (props) => {
 
   const [form] = Form.useForm();
   const [animation, setAnimation] = useState('open');
-  const [displayCenter, setDisplayCenter] = useState(null);
+  const [displayCenter, setDisplayCenter] = useState([]);
   const [role, setRole] = useState();
 
   useEffect(() => {
@@ -77,15 +77,45 @@ const ModalUser = (props) => {
   }, []);
 
   const fetchCenter = async () => {
-    const res = await callFetchCenter();
-    if (res && res.data) {
-      setDisplayCenter(res.data.result);
+    try {
+      // eslint-disable-next-line no-console
+      console.log('[ModalUser] Fetching centers...');
+      const res = await callFetchCenter('');
+      // eslint-disable-next-line no-console
+      console.log('[ModalUser] Centers response:', res);
+
+      // Axios interceptor đã unwrap data, nên res = {result: [...], meta: {...}}
+      if (res && res.result) {
+        setDisplayCenter(res.result);
+        // eslint-disable-next-line no-console
+        console.log(
+          '[ModalUser] Centers loaded:',
+          res.result.length,
+          'centers'
+        );
+      } else {
+        // eslint-disable-next-line no-console
+        console.warn('[ModalUser] No centers found in response');
+        setDisplayCenter([]);
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('[ModalUser] Error fetching centers:', error);
+      message.error('Không thể tải danh sách trung tâm');
+      setDisplayCenter([]);
     }
   };
 
   const submitUser = async (valuesForm) => {
-    const { fullname, email, phoneNumber, birthday, address, centerName } =
-      valuesForm;
+    const {
+      fullname,
+      email,
+      phoneNumber,
+      birthday,
+      address,
+      centerName,
+      role,
+    } = valuesForm;
 
     try {
       if (dataInit?.walletAddress) {
@@ -97,15 +127,17 @@ const ModalUser = (props) => {
           phoneNumber,
           birthday,
           address,
-          centerName
+          centerName,
+          role
         );
 
-        if (res.data) {
-          message.success('User updated successfully');
+        // Axios interceptor đã unwrap data, nên res trực tiếp là user object
+        if (res) {
+          message.success('Cập nhật người dùng thành công');
         } else {
           notification.error({
-            message: 'An error occurred',
-            description: res.message,
+            message: 'Có lỗi xảy ra',
+            description: 'Không thể cập nhật người dùng',
           });
         }
       }
@@ -114,13 +146,14 @@ const ModalUser = (props) => {
       reloadTable();
     } catch (error) {
       notification.error({
-        message: 'An error occurred',
-        description: error.message || 'Unknown error',
+        message: 'Có lỗi xảy ra',
+        description: error.message || 'Lỗi không xác định',
       });
     }
   };
 
   const handleReset = async () => {
+    // eslint-disable-next-line no-console
     console.log('[ModalUser] handleReset called');
     form.resetFields();
     setRole(null);
@@ -295,20 +328,19 @@ const ModalUser = (props) => {
               />
             </Col>
             <Col span={12}>
-              {role === 'DOCTOR' ||
-              role === 'CASHIER' ||
-              dataInit?.role === 'DOCTOR' ||
-              dataInit?.role === 'CASHIER' ? (
+              {(role === 'DOCTOR' ||
+                role === 'CASHIER' ||
+                dataInit?.role === 'DOCTOR' ||
+                dataInit?.role === 'CASHIER') && (
                 <ProFormSelect
                   width="100%"
                   options={
-                    displayCenter &&
-                    displayCenter.map((center) => {
-                      return {
-                        label: center.name,
-                        value: center.name,
-                      };
-                    })
+                    displayCenter && displayCenter.length > 0
+                      ? displayCenter.map((center) => ({
+                          label: center.name,
+                          value: center.name,
+                        }))
+                      : []
                   }
                   name="centerName"
                   label={
@@ -316,16 +348,21 @@ const ModalUser = (props) => {
                       Trung tâm làm việc
                     </span>
                   }
-                  placeholder="Chọn trung tâm..."
+                  placeholder={
+                    displayCenter && displayCenter.length > 0
+                      ? 'Chọn trung tâm...'
+                      : 'Đang tải danh sách trung tâm...'
+                  }
                   rules={[
                     { required: true, message: 'Vui lòng chọn trung tâm' },
                   ]}
                   fieldProps={{
                     size: 'large',
                     className: 'rounded-lg',
+                    loading: !displayCenter || displayCenter.length === 0,
                   }}
                 />
-              ) : null}
+              )}
             </Col>
           </Row>
         </ModalForm>

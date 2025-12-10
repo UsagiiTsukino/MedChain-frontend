@@ -261,3 +261,103 @@ body {
 .admin-menu .anticon {
   font-size: 18px;
 }
+
+/* Certificate Print Styles */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    margin: 0;
+    padding: 0;
+  }
+
+  .certificate-page-wrapper {
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  .certificate-page-wrapper > div {
+    min-height: 0 !important;
+    padding: 0 !important;
+  }
+
+  .certificate-page-wrapper > div > div {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .certificate-content {
+    box-shadow: none !important;
+    border: 2px solid #2563eb !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    page-break-inside: avoid;
+  }
+
+  .certificate-header {
+    padding: 12px 16px !important;
+  }
+
+  .certificate-header h1 {
+    font-size: 20px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .certificate-header p {
+    font-size: 11px !important;
+    margin: 2px 0 !important;
+  }
+
+  .certificate-body {
+    padding: 16px !important;
+  }
+
+  .certificate-body h2 {
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .certificate-body > div {
+    margin-bottom: 12px !important;
+  }
+
+  .certificate-body .grid {
+    gap: 8px !important;
+  }
+
+  .certificate-body .text-sm {
+    font-size: 10px !important;
+  }
+
+  .certificate-body .font-medium {
+    font-size: 12px !important;
+  }
+
+  .certificate-body .text-lg {
+    font-size: 14px !important;
+  }
+
+  .certificate-footer {
+    padding: 8px 16px !important;
+  }
+
+  .bg-gradient-to-r {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide verification instructions when printing */
+  .certificate-content ~ div {
+    display: none !important;
+  }
+}

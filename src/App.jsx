@@ -39,7 +39,7 @@ import StaffDashboard from './pages/staff/dashboard';
 import StaffVaccinePage from './pages/staff/vaccines';
 import StaffCenterPage from './pages/staff/centers';
 import MySchedulePage from './pages/staff/my-schedule';
-import AppointmentPage from './pages/staff/appointment';
+import BookingsPage from './pages/staff/bookings';
 import BookingMangaer from './pages/admin/booking';
 import VaccineRAGSystem from './pages/client/recommend';
 import CartPage from './pages/client/cart';
@@ -173,8 +173,8 @@ const App = () => {
           element: <StaffCenterPage />,
         },
         {
-          path: 'appointments',
-          element: <AppointmentPage />,
+          path: 'bookings',
+          element: <BookingsPage />,
         },
         {
           path: 'calendar-view',

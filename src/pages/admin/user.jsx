@@ -1,4 +1,14 @@
-import { Badge, Button, message, notification, Popconfirm, Space } from 'antd';
+import {
+  Badge,
+  Button,
+  message,
+  notification,
+  Popconfirm,
+  Space,
+  Tag,
+  Avatar,
+  Tooltip,
+} from 'antd';
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -6,6 +16,10 @@ import {
   EditOutlined,
   PlusOutlined,
   TeamOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  EnvironmentOutlined,
+  CalendarOutlined,
 } from '@ant-design/icons';
 import { sfLike } from 'spring-filter-query-builder';
 import queryString from 'query-string';
@@ -66,88 +80,134 @@ const UserPage = () => {
     {
       title: 'STT',
       key: 'index',
-      width: 50,
+      width: 60,
       align: 'center',
+      fixed: 'left',
       hideInSearch: true,
-      render: (text, record, index) => {
-        // Backend returns 0-based page, so use meta.page directly
-        return <>{index + 1 + (meta.page || 0) * (meta.pageSize || 20)}</>;
+      render: (text, record, index) => (
+        <span className="font-semibold text-gray-600">
+          {index + 1 + (meta.page || 0) * (meta.pageSize || 20)}
+        </span>
+      ),
+    },
+    {
+      title: 'Người dùng',
+      dataIndex: 'fullName',
+      width: 250,
+      sorter: true,
+      render: (text, record) => {
+        const roleColors = {
+          ADMIN: 'orange',
+          DOCTOR: 'green',
+          CASHIER: 'blue',
+          PATIENT: 'default',
+        };
+        const roleLabels = {
+          ADMIN: 'Admin',
+          DOCTOR: 'Bác sĩ',
+          CASHIER: 'Thu ngân',
+          PATIENT: 'Bệnh nhân',
+        };
+        return (
+          <div className="flex items-center gap-3">
+            <Avatar
+              size={44}
+              className="bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md"
+            >
+              {text?.charAt(0) || 'U'}
+            </Avatar>
+            <div>
+              <div className="font-semibold text-gray-900">{text || 'N/A'}</div>
+              <Tag color={roleColors[record.role]} className="text-xs mt-1">
+                {roleLabels[record.role] || record.role}
+              </Tag>
+            </div>
+          </div>
+        );
       },
     },
     {
-      title: 'Ví',
-      dataIndex: 'walletAddress',
+      title: 'Liên hệ',
+      width: 250,
       hideInSearch: true,
-    },
-    {
-      title: 'Họ tên',
-      dataIndex: 'fullName',
-      sorter: true,
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      sorter: true,
-    },
-    {
-      title: 'Điện thoại',
-      dataIndex: 'phoneNumber',
-      hideInSearch: true,
+      render: (_, record) => (
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-gray-900">
+            <MailOutlined className="text-blue-500" />
+            <span className="text-sm">{record.email || 'N/A'}</span>
+          </div>
+          <div className="flex items-center gap-2 text-gray-600">
+            <PhoneOutlined className="text-green-500" />
+            <span className="text-sm">{record.phoneNumber || 'N/A'}</span>
+          </div>
+        </div>
+      ),
     },
     {
       title: 'Địa chỉ',
       dataIndex: 'address',
+      width: 200,
       sorter: true,
+      render: (text) => (
+        <Tooltip title={text}>
+          <div className="flex items-center gap-2">
+            <EnvironmentOutlined className="text-red-500" />
+            <span className="truncate text-sm text-gray-600">
+              {text || 'Chưa có'}
+            </span>
+          </div>
+        </Tooltip>
+      ),
     },
     {
-      title: 'Cơ sở',
+      title: 'Trung tâm',
       dataIndex: 'centerName',
+      width: 180,
       hideInSearch: true,
-    },
-    {
-      title: 'Vai trò',
-      dataIndex: 'role',
-      hideInSearch: true,
-      render: (_value, entity) => {
-        let color;
-        switch (entity.role) {
-          case 'ADMIN':
-            color = '#faad14';
-            break;
-          case 'DOCTOR':
-            color = '#52c41a';
-            break;
-          case 'CASHIER':
-            color = '#1890ff';
-            break;
-          default:
-            color = '#d9d9d9';
-        }
-        return <Badge count={entity.role} showZero color={color} />;
-      },
+      render: (text) =>
+        text ? (
+          <Tag color="cyan" className="px-3 py-1">
+            {text}
+          </Tag>
+        ) : (
+          <span className="text-gray-400 text-sm">Chưa có</span>
+        ),
     },
     {
       title: 'Ngày sinh',
       dataIndex: 'birthday',
+      width: 120,
       hideInSearch: true,
+      render: (text) =>
+        text ? (
+          <div className="flex items-center gap-2">
+            <CalendarOutlined className="text-purple-500" />
+            <span className="text-sm text-gray-600">{text}</span>
+          </div>
+        ) : (
+          <span className="text-gray-400 text-sm">N/A</span>
+        ),
     },
     {
       title: 'Thao tác',
       hideInSearch: true,
-      width: 50,
+      width: 120,
+      fixed: 'right',
+      align: 'center',
       render: (_value, entity) => (
-        <Space>
-          <EditOutlined
-            style={{
-              fontSize: 20,
-              color: '#ffa500',
-            }}
-            onClick={() => {
-              console.log('[UserPage] Edit clicked, entity:', entity);
-              setOpenModal(true);
-              setDataInit(entity);
-            }}
-          />
+        <Space size="middle">
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              className="text-orange-500 hover:text-orange-600 hover:bg-orange-50"
+              onClick={() => {
+                console.log('[UserPage] Edit clicked, entity:', entity);
+                setOpenModal(true);
+                setDataInit(entity);
+              }}
+            />
+          </Tooltip>
 
           <Popconfirm
             placement="leftTop"
@@ -157,14 +217,14 @@ const UserPage = () => {
             okText="Xác nhận"
             cancelText="Hủy"
           >
-            <span style={{ cursor: 'pointer', margin: '0 10px' }}>
-              <DeleteOutlined
-                style={{
-                  fontSize: 20,
-                  color: '#ff4d4f',
-                }}
+            <Tooltip title="Xóa">
+              <Button
+                type="text"
+                icon={<DeleteOutlined />}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                danger
               />
-            </span>
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),

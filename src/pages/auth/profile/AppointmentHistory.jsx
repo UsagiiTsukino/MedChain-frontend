@@ -7,7 +7,6 @@ import {
   CalendarOutlined,
   EnvironmentOutlined,
   InfoCircleOutlined,
-  DownloadOutlined,
   SafetyCertificateOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
@@ -25,7 +24,8 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
   const getStatusColor = (status) => {
     const statusMap = {
       PENDING: 'orange',
-      CONFIRMED: 'blue',
+      ASSIGNED: 'gold',
+      PROGRESS: 'blue',
       COMPLETED: 'green',
       CANCELLED: 'red',
     };
@@ -34,8 +34,9 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
 
   const getStatusText = (status) => {
     const statusMap = {
-      PENDING: 'Chờ thanh toán',
-      CONFIRMED: 'Đã xác nhận',
+      PENDING: 'Chờ xử lý',
+      ASSIGNED: 'Đã phân công',
+      PROGRESS: 'Đang tiêm',
       COMPLETED: 'Hoàn thành',
       CANCELLED: 'Đã hủy',
     };
@@ -163,12 +164,12 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
     },
     {
       title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
+      dataIndex: 'overallStatus',
+      key: 'overallStatus',
       width: 120,
-      render: (status) => (
-        <Tag color={getStatusColor(status)} className="m-0">
-          {getStatusText(status)}
+      render: (overallStatus) => (
+        <Tag color={getStatusColor(overallStatus)} className="m-0">
+          {getStatusText(overallStatus)}
         </Tag>
       ),
     },
@@ -197,17 +198,17 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
             type="link"
             size="small"
             icon={<InfoCircleOutlined />}
-            onClick={() => navigate(`/certificate/${record.bookingId}`)}
+            onClick={() => navigate(`/auth/certificate/${record.bookingId}`)}
             className="w-full p-0 h-auto text-left"
           >
             Chi tiết
           </Button>
-          {record.status === 'COMPLETED' && (
+          {record.overallStatus === 'COMPLETED' && (
             <Button
               type="link"
               size="small"
-              icon={<DownloadOutlined />}
-              onClick={() => navigate(`/certificate/${record.bookingId}`)}
+              icon={<SafetyCertificateOutlined />}
+              onClick={() => navigate(`/auth/certificate/${record.bookingId}`)}
               className="w-full p-0 h-auto text-left text-green-600"
             >
               Chứng nhận

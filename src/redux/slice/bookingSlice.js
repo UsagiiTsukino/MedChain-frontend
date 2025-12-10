@@ -4,8 +4,12 @@ import { callAllBookings } from '../../config/api.appointment';
 
 export const fetchBooking = createAsyncThunk(
   'booking/fetchBooking',
-  async ({ query }) => {
-    const response = await callAllBookings(query);
+  async ({ page = 0, size = 10 } = {}) => {
+    // eslint-disable-next-line no-console
+    console.log('[fetchBooking] Requesting page:', page, 'size:', size);
+    const response = await callAllBookings(page, size);
+    // eslint-disable-next-line no-console
+    console.log('[fetchBooking] Response:', response);
     return response;
   }
 );
@@ -13,7 +17,7 @@ export const fetchBooking = createAsyncThunk(
 const initialState = {
   isFetching: true,
   meta: {
-    page: 1,
+    page: 0, // Backend uses 0-based pagination
     pageSize: 10,
     pages: 0,
     total: 0,
@@ -34,10 +38,24 @@ export const bookingSlice = createSlice({
         state.isFetching = false;
       })
       .addCase(fetchBooking.fulfilled, (state, action) => {
-        if (action.payload && action.payload.result) {
+        // eslint-disable-next-line no-console
+        console.log('[BookingSlice] Response:', action.payload);
+        if (action.payload) {
           state.isFetching = false;
-          state.meta = action.payload.meta;
-          state.result = action.payload.result;
+          // Backend returns { result, meta } in response body
+          // Axios interceptor already unwraps res.data, so action.payload = { result, meta }
+          state.meta = action.payload.meta || {
+            page: 0,
+            pageSize: 10,
+            pages: 0,
+            total: 0,
+          };
+          state.result = action.payload.result || [];
+          // eslint-disable-next-line no-console
+          console.log('[BookingSlice] Updated state:', {
+            meta: state.meta,
+            result: state.result,
+          });
         } else {
           state.isFetching = false;
         }

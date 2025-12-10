@@ -8,8 +8,18 @@ import {
   Descriptions,
   Typography,
   Tag,
+  Badge,
+  Image,
+  Progress,
 } from 'antd';
-import { EyeOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+  EyeOutlined,
+  InfoCircleOutlined,
+  MedicineBoxOutlined,
+  SafetyCertificateOutlined,
+  DollarOutlined,
+  ExperimentOutlined,
+} from '@ant-design/icons';
 import { sfLike } from 'spring-filter-query-builder';
 import queryString from 'query-string';
 
@@ -37,87 +47,165 @@ const StaffVaccinePage = () => {
     setDrawerVisible(false);
   };
 
+  const getStockStatus = (quantity) => {
+    if (quantity === 0) return { color: 'error', text: 'Hết hàng' };
+    if (quantity < 10) return { color: 'warning', text: 'Sắp hết' };
+    if (quantity < 50) return { color: 'processing', text: 'Còn ít' };
+    return { color: 'success', text: 'Còn nhiều' };
+  };
+
   const columns = [
     {
       title: 'STT',
       key: 'index',
-      width: 50,
+      width: 60,
       align: 'center',
+      fixed: 'left',
       render: (text, record, index) => {
-        return <>{index + 1 + (meta.page - 1) * meta.pageSize}</>;
+        return (
+          <span className="font-semibold text-gray-600">
+            {index + 1 + (meta.page - 1) * meta.pageSize}
+          </span>
+        );
       },
       hideInSearch: true,
     },
     {
-      title: 'Tên',
+      title: 'Hình ảnh',
+      dataIndex: 'imageUrl',
+      width: 100,
+      hideInSearch: true,
+      render: (imageUrl) => (
+        <Image
+          src={imageUrl || 'http://localhost:8080/storage/vaccine/default.png'}
+          alt="vaccine"
+          width={60}
+          height={60}
+          className="rounded-lg object-cover shadow-sm"
+          preview
+        />
+      ),
+    },
+    {
+      title: 'Tên Vaccine',
       dataIndex: 'name',
       sorter: true,
-      width: 150,
-      render: (text) => (
-        <Tooltip title={text}>
-          {text.length > 20 ? text.slice(0, 20) + '...' : text}
-        </Tooltip>
+      width: 200,
+      render: (text, record) => (
+        <div>
+          <Tooltip title={text}>
+            <div className="font-semibold text-gray-900">
+              {text.length > 30 ? text.slice(0, 30) + '...' : text}
+            </div>
+          </Tooltip>
+          <Tag color="blue" className="text-xs mt-1">
+            {record.disease}
+          </Tag>
+        </div>
       ),
     },
     {
       title: 'Nhà sản xuất',
       dataIndex: 'manufacturer',
       sorter: true,
-      width: 120,
-    },
-    {
-      title: 'Quốc gia',
-      dataIndex: 'country',
-      width: 100,
-      hideInSearch: true,
-    },
-    {
-      title: 'Bệnh',
-      dataIndex: 'disease',
-      width: 120,
-      render: (text) => (
-        <Tooltip title={text}>
-          {text.length > 20 ? text.slice(0, 20) + '...' : text}
-        </Tooltip>
+      width: 150,
+      render: (text, record) => (
+        <div>
+          <div className="font-medium text-gray-900">{text}</div>
+          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
+            <SafetyCertificateOutlined />
+            {record.country}
+          </div>
+        </div>
       ),
     },
     {
       title: 'Hiệu quả',
       dataIndex: 'efficacy',
-      width: 100,
+      width: 120,
       hideInSearch: true,
-      render: (text) => text + '%',
+      render: (value) => (
+        <div className="space-y-1">
+          <Progress
+            percent={value}
+            size="small"
+            strokeColor={{
+              '0%': '#10b981',
+              '100%': '#059669',
+            }}
+          />
+          <div className="text-xs text-gray-500 text-center">
+            {value}% hiệu quả
+          </div>
+        </div>
+      ),
     },
     {
       title: 'Giá',
       dataIndex: 'price',
-      width: 100,
+      width: 130,
       hideInSearch: true,
       sorter: true,
-      render: (value) => {
-        return new Intl.NumberFormat('vi-VN', {
-          style: 'currency',
-          currency: 'VND',
-        }).format(value);
-      },
+      render: (value) => (
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+            <DollarOutlined className="text-green-600" />
+          </div>
+          <span className="font-semibold text-gray-900">
+            {new Intl.NumberFormat('vi-VN', {
+              style: 'currency',
+              currency: 'VND',
+            }).format(value)}
+          </span>
+        </div>
+      ),
     },
     {
       title: 'Tồn kho',
       dataIndex: 'stockQuantity',
-      width: 80,
+      width: 120,
       hideInSearch: true,
+      render: (value) => {
+        const status = getStockStatus(value);
+        return (
+          <Badge
+            count={value}
+            showZero
+            color={status.color}
+            overflowCount={999}
+          >
+            <Tag color={status.color} className="px-3 py-1">
+              {status.text}
+            </Tag>
+          </Badge>
+        );
+      },
     },
     {
-      title: 'Xem chi tiết',
+      title: 'Liều tiêm',
+      dataIndex: 'requiredDoses',
+      width: 90,
+      align: 'center',
       hideInSearch: true,
-      width: 80,
+      render: (value) => (
+        <Tag color="cyan" className="text-sm font-medium">
+          {value || 1} liều
+        </Tag>
+      ),
+    },
+    {
+      title: 'Thao tác',
+      hideInSearch: true,
+      width: 100,
       fixed: 'right',
+      align: 'center',
       render: (_, record) => (
         <Button
           type="primary"
           shape="circle"
           icon={<EyeOutlined />}
-          size="small"
+          size="large"
+          className="bg-gradient-to-r from-blue-600 to-cyan-600 border-0 shadow-md hover:shadow-lg"
           onClick={() => showVaccineDetails(record)}
         />
       ),
@@ -169,9 +257,27 @@ const StaffVaccinePage = () => {
 
   return (
     <>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+          Danh mục Vaccine
+        </h1>
+        <p className="mt-1 text-sm text-gray-600">
+          Thông tin chi tiết về các loại vaccine có sẵn
+        </p>
+      </div>
+
       <DataTable
         actionRef={tableRef}
-        headerTitle="Danh sách Vaccine"
+        headerTitle={
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+              <MedicineBoxOutlined className="text-white text-lg" />
+            </div>
+            <span className="text-lg font-semibold text-gray-900">
+              Danh sách Vaccine
+            </span>
+          </div>
+        }
         rowKey="vaccineId"
         loading={isFetching}
         columns={columns}
@@ -180,6 +286,7 @@ const StaffVaccinePage = () => {
           const query = buildQuery(params, sort, filter);
           dispatch(fetchVaccine({ query }));
         }}
+        scroll={{ x: 1200 }}
         pagination={{
           current: meta.page,
           pageSize: meta.pageSize,
@@ -188,7 +295,7 @@ const StaffVaccinePage = () => {
           showTotal: (total, range) => {
             return (
               <div>
-                {range[0]}-{range[1]} trên tổng số {total} dòng
+                {range[0]}-{range[1]} trên tổng số {total} vaccine
               </div>
             );
           },
@@ -197,79 +304,165 @@ const StaffVaccinePage = () => {
 
       <Drawer
         title={
-          <div>
-            <Title level={4}>{selectedVaccine?.name}</Title>
-            <Tag color="blue">{selectedVaccine?.manufacturer}</Tag>
-            <Tag color="green">{selectedVaccine?.country}</Tag>
+          <div className="flex items-center gap-3 pb-4 border-b">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
+              <MedicineBoxOutlined className="text-white text-xl" />
+            </div>
+            <div>
+              <Title level={4} className="m-0">
+                {selectedVaccine?.name}
+              </Title>
+              <div className="flex gap-2 mt-1">
+                <Tag color="blue" icon={<ExperimentOutlined />}>
+                  {selectedVaccine?.manufacturer}
+                </Tag>
+                <Tag color="green" icon={<SafetyCertificateOutlined />}>
+                  {selectedVaccine?.country}
+                </Tag>
+              </div>
+            </div>
           </div>
         }
-        width={600}
+        width={700}
         onClose={closeDrawer}
         open={drawerVisible}
         extra={
-          <Space>
-            <Button onClick={closeDrawer}>Đóng</Button>
-          </Space>
+          <Button
+            onClick={closeDrawer}
+            size="large"
+            className="border-gray-300"
+          >
+            Đóng
+          </Button>
         }
       >
         {selectedVaccine && (
-          <>
-            <Descriptions title="Thông tin cơ bản" bordered column={1}>
-              <Descriptions.Item label="Tên vaccine">
-                {selectedVaccine.name}
-              </Descriptions.Item>
-              <Descriptions.Item label="Nhà sản xuất">
-                {selectedVaccine.manufacturer}
-              </Descriptions.Item>
-              <Descriptions.Item label="Quốc gia">
-                {selectedVaccine.country}
-              </Descriptions.Item>
-              <Descriptions.Item label="Loại bệnh">
-                {selectedVaccine.disease}
-              </Descriptions.Item>
-              <Descriptions.Item label="Lịch tiêm">
-                {selectedVaccine.schedule}
-              </Descriptions.Item>
-              <Descriptions.Item label="Hiệu quả">
-                {selectedVaccine.efficacy}%
-              </Descriptions.Item>
-              <Descriptions.Item label="Đối tượng">
-                {selectedVaccine.target}
-              </Descriptions.Item>
-              <Descriptions.Item label="Liều lượng">
-                {selectedVaccine.dosage}
-              </Descriptions.Item>
-              <Descriptions.Item label="Giá">
-                {new Intl.NumberFormat('vi-VN', {
-                  style: 'currency',
-                  currency: 'VND',
-                }).format(selectedVaccine.price)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Tồn kho">
-                <span
-                  style={{
-                    color:
-                      selectedVaccine.stockQuantity < 10 ? 'red' : 'inherit',
-                  }}
-                >
-                  {selectedVaccine.stockQuantity}{' '}
-                  {selectedVaccine.stockQuantity < 10 && '(Sắp hết)'}
-                </span>
-              </Descriptions.Item>
-              <Descriptions.Item label="Số mũi cần tiêm">
-                {selectedVaccine.requiredDoses || 'Chưa có thông tin'}
-              </Descriptions.Item>
-            </Descriptions>
+          <div className="space-y-6">
+            {/* Image */}
+            {selectedVaccine.imageUrl && (
+              <div className="flex justify-center">
+                <Image
+                  src={selectedVaccine.imageUrl}
+                  alt={selectedVaccine.name}
+                  width={200}
+                  height={200}
+                  className="rounded-xl shadow-lg object-cover"
+                />
+              </div>
+            )}
 
-            <Title level={5} style={{ marginTop: 24 }}>
-              <InfoCircleOutlined style={{ marginRight: 8 }} />
-              Mô tả
-            </Title>
-            <Paragraph>
-              {selectedVaccine.description ||
-                'Không có mô tả chi tiết cho vaccine này.'}
-            </Paragraph>
-          </>
+            {/* Basic Info */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6">
+              <Descriptions
+                title={
+                  <span className="text-lg font-bold text-gray-900">
+                    Thông tin cơ bản
+                  </span>
+                }
+                bordered
+                column={1}
+                size="middle"
+              >
+                <Descriptions.Item
+                  label={<span className="font-semibold">Tên vaccine</span>}
+                >
+                  <span className="font-medium">{selectedVaccine.name}</span>
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Nhà sản xuất</span>}
+                >
+                  {selectedVaccine.manufacturer}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Quốc gia</span>}
+                >
+                  {selectedVaccine.country}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Loại bệnh</span>}
+                >
+                  <Tag color="red">{selectedVaccine.disease}</Tag>
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Lịch tiêm</span>}
+                >
+                  {selectedVaccine.schedule}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Hiệu quả</span>}
+                >
+                  <Progress
+                    percent={selectedVaccine.efficacy}
+                    strokeColor={{
+                      '0%': '#10b981',
+                      '100%': '#059669',
+                    }}
+                  />
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Đối tượng</span>}
+                >
+                  {selectedVaccine.target}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Liều lượng</span>}
+                >
+                  {selectedVaccine.dosage}
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Giá</span>}
+                >
+                  <span className="text-lg font-bold text-green-600">
+                    {new Intl.NumberFormat('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND',
+                    }).format(selectedVaccine.price)}
+                  </span>
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Tồn kho</span>}
+                >
+                  <Badge
+                    count={selectedVaccine.stockQuantity}
+                    showZero
+                    color={getStockStatus(selectedVaccine.stockQuantity).color}
+                    overflowCount={999}
+                  >
+                    <Tag
+                      color={
+                        getStockStatus(selectedVaccine.stockQuantity).color
+                      }
+                      className="px-3 py-1"
+                    >
+                      {getStockStatus(selectedVaccine.stockQuantity).text}
+                    </Tag>
+                  </Badge>
+                </Descriptions.Item>
+                <Descriptions.Item
+                  label={<span className="font-semibold">Số mũi cần tiêm</span>}
+                >
+                  <Tag color="cyan" className="text-sm">
+                    {selectedVaccine.requiredDoses || 1} liều
+                  </Tag>
+                </Descriptions.Item>
+              </Descriptions>
+            </div>
+
+            {/* Description */}
+            <div className="bg-blue-50 rounded-xl p-6">
+              <Title
+                level={5}
+                className="flex items-center gap-2 text-gray-900"
+              >
+                <InfoCircleOutlined className="text-blue-600" />
+                Mô tả chi tiết
+              </Title>
+              <Paragraph className="text-gray-700 leading-relaxed">
+                {selectedVaccine.description ||
+                  'Không có mô tả chi tiết cho vaccine này.'}
+              </Paragraph>
+            </div>
+          </div>
         )}
       </Drawer>
     </>

@@ -1,128 +1,180 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import { QRCodeSVG } from 'qrcode.react';
 import { useSelector } from 'react-redux';
-const VaccineCertificate = ({ data, transactionHash }) => {
+import { Button } from 'antd';
+import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons';
+
+const VaccineCertificate = ({ bookingData }) => {
   const user = useSelector((state) => state.account.user);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownload = () => {
+    // Generate PDF or download certificate
+    window.print();
+  };
+
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 certificate-page-wrapper">
       <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
+          {/* Print/Download Buttons */}
+          <div className="mb-4 flex justify-end gap-2 no-print">
+            <Button icon={<PrinterOutlined />} onClick={handlePrint}>
+              In chứng nhận
+            </Button>
+            <Button
+              type="primary"
+              icon={<DownloadOutlined />}
+              onClick={handleDownload}
+            >
+              Tải xuống
+            </Button>
+          </div>
+
           {/* Certificate Container */}
-          <div className="bg-white certificate-border shadow-xl rounded-lg overflow-hidden">
+          <div className="bg-white shadow-xl rounded-lg overflow-hidden border-4 border-blue-500 certificate-content">
             {/* Certificate Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-green-500 p-6 text-white">
+            <div className="bg-gradient-to-r from-blue-600 to-green-500 p-4 text-white certificate-header">
               <div className="flex justify-between items-center">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-bold">
                     Chứng Nhận Tiêm Chủng Số
                   </h1>
-                  <p className="mt-1">Được cấp qua Mạng Blockchain VaxChain</p>
+                  <p className="mt-1">Được cấp qua Hệ Thống VaxChain</p>
+                  <p className="text-sm mt-1 opacity-90">
+                    Certificate ID: #{bookingData.bookingId}
+                  </p>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
-                  <i className="fas fa-shield-virus text-white text-xl" />
+                <div className="h-16 w-16 rounded-full bg-white bg-opacity-20 flex items-center justify-center">
+                  <i className="fas fa-shield-virus text-white text-2xl" />
                 </div>
               </div>
             </div>
 
             {/* Certificate Body */}
-            <div className="p-6 sm:p-8">
+            <div className="p-4 sm:p-6 certificate-body">
               {/* Recipient Info */}
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
                   Thông Tin Người Nhận
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Họ Tên</p>
-                    <p className="font-medium">{user.fullname}</p>
+                    <p className="text-sm text-gray-500">Họ và Tên</p>
+                    <p className="font-medium text-lg">
+                      {bookingData.patient?.fullName || user?.fullName || 'N/A'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Ngày Sinh</p>
                     <p className="font-medium">
-                      {dayjs(user.birthday).format('DD/MM/YYYY')}
+                      {bookingData.patient?.birthday
+                        ? dayjs(bookingData.patient.birthday).format(
+                            'DD/MM/YYYY'
+                          )
+                        : user?.birthday
+                        ? dayjs(user.birthday).format('DD/MM/YYYY')
+                        : 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Địa chỉ</p>
+                    <p className="font-medium">
+                      {bookingData.patient?.address || user?.address || 'N/A'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Số điện thoại</p>
+                    <p className="font-medium">
+                      {bookingData.patient?.phone || user?.phone || 'N/A'}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Vaccine Details */}
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3 border-b pb-2">
                   Chi Tiết Tiêm Chủng
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm text-gray-500">Loại Vaccine</p>
-                    <p className="font-medium">{data.vaccineName}</p>
+                    <p className="font-medium text-lg text-blue-600">
+                      {bookingData.vaccine?.name || 'N/A'}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Ngày Tiêm</p>
+                    <p className="text-sm text-gray-500">Ngày Tiêm Mũi Đầu</p>
                     <p className="font-medium">
-                      {dayjs(data.date).format('DD/MM/YYYY')}
+                      {dayjs(bookingData.firstDoseDate).format('DD/MM/YYYY')}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Giờ Tiêm</p>
-                    <p className="font-medium">{data.time}</p>
+                    <p className="font-medium">{bookingData.firstDoseTime}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
                   <div>
+                    <p className="text-sm text-gray-500">Số Liều</p>
+                    <p className="font-medium">{bookingData.totalDoses} liều</p>
+                  </div>
+                  <div>
                     <p className="text-sm text-gray-500">Trạng Thái</p>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <i className="fas fa-check-circle mr-1" /> Đã Xác Thực
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                      <i className="fas fa-check-circle mr-2" /> Hoàn Thành
                     </span>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Cơ Sở Tiêm</p>
-                    <p className="font-medium">{data.centerName}</p>
+                    <p className="font-medium">
+                      {bookingData.center?.name || 'N/A'}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Verification Section */}
-              <div className="border-t border-gray-200 pt-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                  Xác Thực Blockchain
+              <div className="border-t border-gray-200 pt-4">
+                <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                  Xác Thực Hệ Thống
                 </h2>
                 <div className="flex flex-col sm:flex-row gap-6">
                   {/* QR Code */}
                   <div className="sm:w-1/3">
-                    <div className="bg-gray-100 p-4 rounded-lg flex flex-col items-center">
-                      <div className="h-40 w-40 bg-white p-2 rounded flex items-center justify-center mb-2">
+                    <div className="bg-gray-100 p-3 rounded-lg flex flex-col items-center">
+                      <div className="h-32 w-32 bg-white p-2 rounded flex items-center justify-center mb-2">
                         <QRCodeSVG
-                          value={`${window.location.origin}/verify/${transactionHash}`}
-                          size={150}
+                          value={`${window.location.origin}/auth/certificate/${bookingData.bookingId}`}
+                          size={120}
                           level="H"
                         />
                       </div>
-                      <p className="text-xs text-center text-gray-600">
+                      <p className="text-xs text-center text-gray-600 font-medium">
                         Quét để xác thực chứng nhận
-                      </p>
-                      <p className="text-xs text-center text-gray-500 mt-1">
-                        vaxchain.io/verify/{transactionHash.slice(0, 6)}
                       </p>
                     </div>
                   </div>
 
-                  {/* Blockchain Info */}
+                  {/* System Info */}
                   <div className="sm:w-2/3">
                     <div className="space-y-4">
                       <div>
-                        <p className="text-sm text-gray-500">
-                          Mã Xác Thực Blockchain
-                        </p>
+                        <p className="text-sm text-gray-500">Mã Đăng Ký</p>
                         <div className="flex items-center mt-1">
-                          <p className="font-mono text-sm text-blue-600 truncate">
-                            {data.appointmentHash}
+                          <p className="font-mono text-sm text-blue-600 font-semibold">
+                            #{bookingData.bookingId}
                           </p>
                           <button
                             className="ml-2 text-blue-500 hover:text-blue-700"
                             onClick={() =>
                               navigator.clipboard.writeText(
-                                data.appointmentHash
+                                bookingData.bookingId
                               )
                             }
                           >
@@ -131,36 +183,46 @@ const VaccineCertificate = ({ data, transactionHash }) => {
                         </div>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Thời Gian Tạo</p>
+                        <p className="text-sm text-gray-500">
+                          Thời Gian Đăng Ký
+                        </p>
                         <p className="font-medium">
-                          {dayjs(data.datetime).format('DD/MM/YYYY HH:mm')} UTC
+                          {dayjs(bookingData.createdAt).format(
+                            'DD/MM/YYYY HH:mm:ss'
+                          )}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-sm text-gray-500">Mã Giao Dịch</p>
-                        <div className="flex items-center mt-1">
-                          <p className="font-mono text-sm text-green-600 truncate">
-                            {data.paymentHash}
+                      {bookingData.blockchainTxHash && (
+                        <div>
+                          <p className="text-sm text-gray-500">
+                            Blockchain Transaction
                           </p>
-                          <button
-                            className="ml-2 text-green-500 hover:text-green-700"
-                            onClick={() =>
-                              navigator.clipboard.writeText(data.paymentHash)
-                            }
-                          >
-                            <i className="far fa-copy" />
-                          </button>
+                          <div className="flex items-center mt-1">
+                            <p className="font-mono text-xs text-green-600 truncate">
+                              {bookingData.blockchainTxHash}
+                            </p>
+                            <button
+                              className="ml-2 text-green-500 hover:text-green-700"
+                              onClick={() =>
+                                navigator.clipboard.writeText(
+                                  bookingData.blockchainTxHash
+                                )
+                              }
+                            >
+                              <i className="far fa-copy" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+                      )}
+                      <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
                         <div className="flex">
                           <div className="flex-shrink-0">
-                            <i className="fas fa-shield-alt text-blue-400" />
+                            <i className="fas fa-shield-alt text-blue-400 text-xl" />
                           </div>
                           <div className="ml-3">
                             <p className="text-sm text-blue-700">
-                              Chứng nhận này được ký điện tử và lưu trữ bất biến
-                              trên blockchain Ethereum.
+                              Chứng nhận này được lưu trữ an toàn trên hệ thống
+                              VaxChain. Mọi thông tin được mã hóa và bảo mật.
                             </p>
                           </div>
                         </div>
@@ -171,8 +233,8 @@ const VaccineCertificate = ({ data, transactionHash }) => {
               </div>
 
               {/* Security Badges */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="flex flex-wrap justify-center gap-4">
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <div className="flex flex-wrap justify-center gap-3">
                   <div className="flex items-center">
                     <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
                       <i className="fas fa-lock text-green-600" />
@@ -198,7 +260,7 @@ const VaccineCertificate = ({ data, transactionHash }) => {
             </div>
 
             {/* Certificate Footer */}
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center">
+            <div className="bg-gray-50 px-4 py-3 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center certificate-footer">
               <div className="flex items-center mb-3 sm:mb-0">
                 <i className="fas fa-shield-virus text-blue-600 mr-2" />
                 <span className="text-sm font-medium text-gray-600">

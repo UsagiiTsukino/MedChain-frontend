@@ -334,7 +334,7 @@ const HomePage = () => {
                 <Col xs={12} md={6} key={index}>
                   <Card
                     className="text-center h-full border-0 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                    bodyStyle={{ padding: '32px 24px' }}
+                    styles={{ body: { padding: '32px 24px' } }}
                   >
                     <div
                       className={`inline-flex items-center justify-center h-16 w-16 rounded-full ${colors.bg} mb-4`}
@@ -397,7 +397,7 @@ const HomePage = () => {
                   <Card
                     hoverable
                     className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-                    bodyStyle={{ padding: '32px' }}
+                    styles={{ body: { padding: '32px' } }}
                   >
                     <div
                       className={`inline-flex items-center justify-center h-20 w-20 rounded-2xl ${bgColor} mb-6`}
@@ -441,7 +441,9 @@ const HomePage = () => {
 
           {loadingVaccines ? (
             <div className="text-center py-12">
-              <Spin size="large" tip="Đang tải dữ liệu..." />
+              <Spin size="large" spinning tip="Đang tải dữ liệu...">
+                <div style={{ minHeight: 100 }} />
+              </Spin>
             </div>
           ) : featuredVaccines.length > 0 ? (
             <Row gutter={[24, 24]}>
@@ -450,7 +452,7 @@ const HomePage = () => {
                   <Card
                     hoverable
                     className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300"
-                    bodyStyle={{ padding: '24px' }}
+                    styles={{ body: { padding: '24px' } }}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
@@ -541,7 +543,10 @@ const HomePage = () => {
       {/* Recent Updates Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="border-0 shadow-xl" bodyStyle={{ padding: '40px' }}>
+          <Card
+            className="border-0 shadow-xl"
+            styles={{ body: { padding: '40px' } }}
+          >
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
