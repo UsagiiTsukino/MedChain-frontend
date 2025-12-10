@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { Card, Button, message } from 'antd';
 import {
   WalletOutlined,
@@ -7,18 +7,90 @@ import {
   DisconnectOutlined,
   LinkOutlined,
 } from '@ant-design/icons';
-import { useConnect, useDisconnect } from 'wagmi';
+import { useConnect, useDisconnect, useAccount } from 'wagmi';
 import { injected } from 'wagmi/connectors';
+import { useDispatch, useSelector } from 'react-redux';
+import { doUpdateUserInfoAction } from '../../../redux/slice/accountSlide';
+import { callLinkWallet } from '../../../config/api.auth';
 
 const WalletCard = ({ address, balance }) => {
   const { connect, isPending: isConnecting } = useConnect();
   const { disconnect } = useDisconnect();
+  const { address: connectedAddress, isConnected } = useAccount();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.account.user);
+
+  // Call backend API when wallet connects
+  useEffect(() => {
+    const linkWalletToBackend = async () => {
+      console.log('[WalletCard] useEffect triggered:', {
+        isConnected,
+        connectedAddress,
+        currentMetamaskWallet: user?.metamaskWallet,
+        currentAddress: address,
+      });
+
+      // Only call API if:
+      // 1. Wallet is connected
+      // 2. Has connected address
+      // 3. Connected address is different from user's current metamaskWallet in database
+      if (
+        isConnected &&
+        connectedAddress &&
+        connectedAddress !== user?.metamaskWallet
+      ) {
+        console.log(
+          '[WalletCard] Calling API to link wallet:',
+          connectedAddress
+        );
+        console.log(
+          '[WalletCard] Current metamaskWallet in DB:',
+          user?.metamaskWallet
+        );
+        try {
+          const res = await callLinkWallet(connectedAddress);
+          console.log('[WalletCard] API response:', res);
+          if (res?.data) {
+            // Update Redux store with new metamask wallet
+            dispatch(
+              doUpdateUserInfoAction({ metamaskWallet: connectedAddress })
+            );
+            message.success('Đã liên kết ví MetaMask thành công!');
+          }
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Link wallet error:', error);
+          if (error.response?.data?.message) {
+            message.error(error.response.data.message);
+          } else {
+            message.error('Không thể liên kết ví. Vui lòng thử lại.');
+          }
+          // Disconnect if linking failed
+          disconnect();
+        }
+      } else {
+        console.log('[WalletCard] Conditions not met for linking:', {
+          isConnected,
+          hasConnectedAddress: !!connectedAddress,
+          metamaskWalletMatch: connectedAddress === user?.metamaskWallet,
+        });
+      }
+    };
+
+    linkWalletToBackend();
+  }, [
+    isConnected,
+    connectedAddress,
+    user?.metamaskWallet,
+    dispatch,
+    disconnect,
+  ]);
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(address);
       message.success('Đã sao chép địa chỉ ví');
-    } catch (err) {
+    } catch {
       message.error('Không thể sao chép');
     }
   };
@@ -34,6 +106,7 @@ const WalletCard = ({ address, balance }) => {
 
       connect({ connector: injected() });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Connect wallet error:', error);
       message.error('Không thể kết nối ví. Vui lòng thử lại.');
     }

@@ -23,7 +23,7 @@ export const callCreateVaccine = (
   return axios.post('/vaccines', {
     name,
     description,
-    image,
+    imageUrl: image,
     manufacturer,
     country,
     disease,
@@ -38,7 +38,7 @@ export const callCreateVaccine = (
 };
 
 export const callUpdateVaccine = (
-  vaccnineId,
+  vaccineId,
   name,
   description,
   image,
@@ -53,10 +53,10 @@ export const callUpdateVaccine = (
   stockQuantity,
   requiredDoses
 ) => {
-  return axios.put(`/vaccines/${vaccnineId}`, {
+  return axios.put(`/vaccines/${vaccineId}`, {
     name,
     description,
-    image,
+    imageUrl: image,
     manufacturer,
     country,
     disease,
@@ -76,9 +76,8 @@ export const callFetchVaccine = (query) => {
 
 export const callFetchVaccineBySku = (sku) => {
   return axios.get(`/vaccines/${sku}`);
-}
+};
 
 export const callDeleteVaccine = (id) => {
   return axios.delete(`/vaccines/${id}`);
 };
-

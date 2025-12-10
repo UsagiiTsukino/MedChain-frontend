@@ -37,6 +37,10 @@ export const callMyBookings = () => {
   return axios.get('/bookings/my-history');
 };
 
+export const callLinkWallet = (walletAddress) => {
+  return axios.post('/auth/link-metamask', { metamaskWallet: walletAddress });
+};
+
 // export const callRefreshToken = () => {
 //   return axios.get('/auth/refresh');
 // };

@@ -9,6 +9,7 @@ import {
   InfoCircleOutlined,
   DownloadOutlined,
   SafetyCertificateOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
@@ -43,36 +44,55 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
 
   const columns = [
     {
-      title: 'Mã đặt lịch',
+      title: 'Mã',
       dataIndex: 'bookingId',
       key: 'bookingId',
-      width: 100,
-      render: (id) => <span className="font-mono text-blue-600">#{id}</span>,
+      width: 80,
+      fixed: 'left',
+      render: (id) => (
+        <span className="font-mono text-blue-600 font-semibold">#{id}</span>
+      ),
     },
     {
       title: 'Vaccine',
       key: 'vaccine',
+      width: 200,
+      ellipsis: true,
       render: (_, record) => (
-        <div>
-          <div className="flex items-center font-medium">
-            <MedicineBoxOutlined className="mr-2" />
-            {record.vaccine?.name || 'N/A'}
+        <div className="flex items-start gap-2">
+          <MedicineBoxOutlined className="text-blue-500 mt-1 flex-shrink-0" />
+          <div className="min-w-0">
+            <Tooltip title={record.vaccine?.name}>
+              <div className="font-medium text-gray-900 truncate">
+                {record.vaccine?.name || 'N/A'}
+              </div>
+            </Tooltip>
+            <div className="text-xs text-gray-500">
+              {record.totalDoses} liều
+            </div>
           </div>
-          <div className="text-xs text-gray-500">{record.totalDoses} liều</div>
         </div>
       ),
     },
     {
       title: 'Trung tâm',
       key: 'center',
+      width: 200,
+      ellipsis: true,
       render: (_, record) => (
-        <div className="flex items-center">
-          <EnvironmentOutlined className="mr-2" />
-          <div>
-            <div className="font-medium">{record.center?.name || 'N/A'}</div>
-            <div className="text-xs text-gray-500">
-              {record.center?.address}
-            </div>
+        <div className="flex items-start gap-2">
+          <EnvironmentOutlined className="text-red-500 mt-1 flex-shrink-0" />
+          <div className="min-w-0">
+            <Tooltip title={record.center?.name}>
+              <div className="font-medium text-gray-900 truncate">
+                {record.center?.name || 'N/A'}
+              </div>
+            </Tooltip>
+            <Tooltip title={record.center?.address}>
+              <div className="text-xs text-gray-500 truncate">
+                {record.center?.address || 'Hà Nội'}
+              </div>
+            </Tooltip>
           </div>
         </div>
       ),
@@ -80,14 +100,17 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
     {
       title: 'Lịch hẹn',
       key: 'appointment',
+      width: 140,
       render: (_, record) => (
-        <div>
-          <div className="flex items-center">
-            <CalendarOutlined className="mr-2" />
-            {dayjs(record.firstDoseDate).format('DD/MM/YYYY')}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-gray-900">
+            <CalendarOutlined className="text-orange-500" />
+            <span className="font-medium">
+              {dayjs(record.firstDoseDate).format('DD/MM/YYYY')}
+            </span>
           </div>
-          <div className="flex items-center text-xs text-gray-500">
-            <ClockCircleOutlined className="mr-2" />
+          <div className="flex items-center gap-2 text-gray-500 text-xs">
+            <ClockCircleOutlined />
             {record.firstDoseTime}
           </div>
         </div>
@@ -96,25 +119,43 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
     {
       title: 'Thanh toán',
       key: 'payment',
+      width: 150,
       render: (_, record) => {
-        const method = record.payment?.method;
+        const method = record.payment?.method || record.paymentMethod;
+        const amount = record.payment?.amount || record.totalAmount;
+        const currency = record.payment?.currency || 'VND';
+
         const methodMap = {
           CASH: { text: 'Tiền mặt', color: 'green' },
           PAYPAL: { text: 'PayPal', color: 'blue' },
           METAMASK: { text: 'MetaMask', color: 'purple' },
+          BANK_TRANSFER: { text: 'Chuyển khoản', color: 'cyan' },
         };
         const info = methodMap[method] || {
           text: method || 'N/A',
           color: 'default',
         };
+
+        // Format amount based on currency
+        let formattedAmount;
+        if (currency === 'VND') {
+          formattedAmount =
+            new Intl.NumberFormat('vi-VN').format(amount || 0) + 'đ';
+        } else if (currency === 'ETH') {
+          formattedAmount = `${(amount || 0).toFixed(4)} ETH`;
+        } else if (currency === 'USD') {
+          formattedAmount = `$${(amount || 0).toFixed(2)}`;
+        } else {
+          formattedAmount = `${amount || 0} ${currency}`;
+        }
+
         return (
-          <div>
-            <Tag color={info.color}>{info.text}</Tag>
-            <div className="text-xs text-gray-600 mt-1">
-              {new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND',
-              }).format(record.totalAmount || 0)}
+          <div className="space-y-1">
+            <Tag color={info.color} className="m-0">
+              {info.text}
+            </Tag>
+            <div className="text-xs text-gray-600 font-mono font-semibold">
+              {formattedAmount}
             </div>
           </div>
         );
@@ -124,59 +165,53 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
+      width: 120,
       render: (status) => (
-        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
+        <Tag color={getStatusColor(status)} className="m-0">
+          {getStatusText(status)}
+        </Tag>
       ),
     },
     {
       title: 'Blockchain',
       key: 'blockchain',
-      width: 150,
+      width: 140,
       render: (_, record) => (
-        <BlockchainVerifyBadge
-          bookingId={record.bookingId}
-          transactionHash={record.transactionHash}
-          blockchainStatus={record.blockchainStatus}
-        />
+        <div className="flex justify-center">
+          <BlockchainVerifyBadge
+            bookingId={record.bookingId}
+            transactionHash={record.transactionHash}
+            blockchainStatus={record.blockchainStatus}
+          />
+        </div>
       ),
     },
     {
       title: 'Thao tác',
       key: 'action',
+      width: 120,
+      fixed: 'right',
       render: (_, record) => (
-        <Space>
+        <Space direction="vertical" size="small" className="w-full">
           <Button
             type="link"
             size="small"
             icon={<InfoCircleOutlined />}
             onClick={() => navigate(`/certificate/${record.bookingId}`)}
+            className="w-full p-0 h-auto text-left"
           >
             Chi tiết
           </Button>
           {record.status === 'COMPLETED' && (
-            <>
-              <Button
-                type="primary"
-                size="small"
-                icon={<DownloadOutlined />}
-                onClick={() => navigate(`/certificate/${record.bookingId}`)}
-              >
-                Xem chứng nhận
-              </Button>
-              {record.transactionHash && (
-                <Tooltip title="Xác minh trên Blockchain">
-                  <Button
-                    size="small"
-                    icon={<SafetyCertificateOutlined />}
-                    onClick={() =>
-                      window.open(`/verify/${record.bookingId}`, '_blank')
-                    }
-                  >
-                    Xác minh
-                  </Button>
-                </Tooltip>
-              )}
-            </>
+            <Button
+              type="link"
+              size="small"
+              icon={<DownloadOutlined />}
+              onClick={() => navigate(`/certificate/${record.bookingId}`)}
+              className="w-full p-0 h-auto text-left text-green-600"
+            >
+              Chứng nhận
+            </Button>
           )}
         </Space>
       ),
@@ -185,7 +220,7 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
 
   return (
     <div className="space-y-6">
-      {appointments?.length && (
+      {appointments?.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
@@ -226,7 +261,7 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
             </Card>
           </div>
 
-          <Card title="Danh sách đăng ký">
+          <Card title="Danh sách đăng ký" className="shadow-sm">
             <LoadingTable
               columns={columns}
               dataSource={appointments}
@@ -238,9 +273,34 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
                 showTotal: (total) => `Tổng ${total} lịch hẹn`,
               }}
               rowKey="bookingId"
+              scroll={{ x: 1400 }}
+              size="middle"
             />
           </Card>
         </>
+      ) : (
+        <Card>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="mb-6 text-gray-300">
+              <CalendarOutlined style={{ fontSize: 80 }} />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              Bạn chưa có lịch tiêm chủng nào
+            </h3>
+            <p className="text-gray-400 mb-6 text-center max-w-md">
+              Đặt lịch ngay để bảo vệ sức khỏe của bạn và người thân. Hệ thống
+              sẽ lưu trữ lịch sử tiêm chủng trên blockchain để đảm bảo an toàn.
+            </p>
+            <Button
+              type="primary"
+              size="large"
+              icon={<PlusOutlined />}
+              onClick={() => (window.location.href = '/booking')}
+            >
+              Đặt lịch tiêm ngay
+            </Button>
+          </div>
+        </Card>
       )}
 
       {/* Ghi chú */}

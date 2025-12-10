@@ -19,7 +19,7 @@ export const callCreateCenter = (
     phoneNumber,
     capacity,
     workingHours,
-    image,
+    imageUrl: image,
   });
 };
 
@@ -38,7 +38,7 @@ export const callUpdateCenter = (
     phoneNumber,
     capacity,
     workingHours,
-    image,
+    imageUrl: image,
   });
 };
 

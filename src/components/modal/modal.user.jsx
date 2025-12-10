@@ -32,6 +32,47 @@ const ModalUser = (props) => {
   const [role, setRole] = useState();
 
   useEffect(() => {
+    console.log('[ModalUser] Props received:', { dataInit, openModal });
+
+    if (!openModal) {
+      // When modal closes, ensure form is reset
+      form.resetFields();
+      setRole(null);
+      return;
+    }
+
+    if (openModal && dataInit) {
+      console.log('[ModalUser] DataInit details:', {
+        walletAddress: dataInit.walletAddress,
+        fullName: dataInit.fullName,
+        email: dataInit.email,
+        role: dataInit.role,
+        centerName: dataInit.centerName,
+      });
+
+      // Set initial role
+      if (dataInit.role) {
+        setRole(dataInit.role);
+      }
+
+      // Reset and set form values when dataInit changes
+      form.setFieldsValue({
+        fullname: dataInit.fullName,
+        email: dataInit.email,
+        phoneNumber: dataInit.phoneNumber,
+        birthday: dataInit.birthday,
+        address: dataInit.address,
+        role: dataInit.role,
+        centerName: dataInit.centerName,
+      });
+    } else if (openModal && !dataInit) {
+      // Reset form when opening for new entry
+      form.resetFields();
+      setRole(null);
+    }
+  }, [dataInit, openModal, form]);
+
+  useEffect(() => {
     fetchCenter();
   }, []);
 
@@ -51,7 +92,7 @@ const ModalUser = (props) => {
         // Update user
         const res = await callUpdateUser(
           dataInit.walletAddress,
-          fullname,
+          fullname || dataInit.fullName,
           email,
           phoneNumber,
           birthday,
@@ -80,9 +121,11 @@ const ModalUser = (props) => {
   };
 
   const handleReset = async () => {
+    console.log('[ModalUser] handleReset called');
     form.resetFields();
-    setDataInit(null);
     setRole(null);
+    setDataInit(null);
+
     // Add animation when closing modal
     setAnimation('close');
     await new Promise((resolve) => setTimeout(resolve, 400));
@@ -130,7 +173,6 @@ const ModalUser = (props) => {
           preserve={false}
           form={form}
           onFinish={submitUser}
-          initialValues={dataInit}
           submitter={{
             render: (_, dom) => <FooterToolbar>{dom}</FooterToolbar>,
             submitButtonProps: {
@@ -232,27 +274,25 @@ const ModalUser = (props) => {
               />
             </Col>
             <Col span={12}>
-              {dataInit?.userId ? null : (
-                <ProFormSelect
-                  width="100%"
-                  onChange={(value) => setRole(value)}
-                  options={[
-                    { value: 'DOCTOR', label: 'Bác sĩ' },
-                    { value: 'PATIENT', label: 'Bệnh nhân' },
-                    { value: 'CASHIER', label: 'Thu ngân' },
-                  ]}
-                  name="role"
-                  label={
-                    <span className="font-semibold text-gray-700">Vai trò</span>
-                  }
-                  placeholder="Chọn vai trò..."
-                  rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
-                  fieldProps={{
-                    size: 'large',
-                    className: 'rounded-lg',
-                  }}
-                />
-              )}
+              <ProFormSelect
+                width="100%"
+                onChange={(value) => setRole(value)}
+                options={[
+                  { value: 'DOCTOR', label: 'Bác sĩ' },
+                  { value: 'PATIENT', label: 'Bệnh nhân' },
+                  { value: 'CASHIER', label: 'Thu ngân' },
+                ]}
+                name="role"
+                label={
+                  <span className="font-semibold text-gray-700">Vai trò</span>
+                }
+                placeholder="Chọn vai trò..."
+                rules={[{ required: true, message: 'Vui lòng chọn vai trò' }]}
+                fieldProps={{
+                  size: 'large',
+                  className: 'rounded-lg',
+                }}
+              />
             </Col>
             <Col span={12}>
               {role === 'DOCTOR' ||

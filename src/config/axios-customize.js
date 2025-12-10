@@ -59,6 +59,16 @@ instance.interceptors.response.use(
         error.config.headers['Authorization'] = `Bearer ${access_token}`;
         localStorage.setItem('access_token', access_token);
         return instance.request(error.config);
+      } else {
+        // Refresh token failed - auto logout
+        localStorage.removeItem('access_token');
+        notification.error({
+          message: 'Phiên đăng nhập hết hạn',
+          description: 'Vui lòng đăng nhập lại.',
+          duration: 3,
+        });
+        window.location.href = '/login';
+        return Promise.reject(error);
       }
     }
 

@@ -61,6 +61,13 @@ export const accountSlice = createSlice({
         address: '',
       };
     },
+    doUpdateUserInfoAction: (state, action) => {
+      // Partially update user info
+      state.user = {
+        ...state.user,
+        ...action.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAccount.pending, (state, action) => {
@@ -97,6 +104,7 @@ export const accountSlice = createSlice({
   },
 });
 
-export const { setUserLoginInfo, setLogoutAction } = accountSlice.actions;
+export const { setUserLoginInfo, setLogoutAction, doUpdateUserInfoAction } =
+  accountSlice.actions;
 
 export default accountSlice.reducer;

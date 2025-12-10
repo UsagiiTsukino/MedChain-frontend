@@ -82,6 +82,7 @@ const ModalVaccine = (props) => {
   const submitVaccine = async (valuesForm) => {
     const {
       name,
+      description,
       manufacturer,
       country,
       disease,
@@ -98,6 +99,7 @@ const ModalVaccine = (props) => {
       const res = await callUpdateVaccine(
         dataInit.vaccineId,
         name,
+        description,
         value,
         manufacturer,
         country,
@@ -123,6 +125,7 @@ const ModalVaccine = (props) => {
     } else {
       const res = await callCreateVaccine(
         name,
+        description,
         value,
         manufacturer,
         country,
@@ -417,9 +420,11 @@ const ModalVaccine = (props) => {
                   <ProFormTextArea
                     name="description"
                     placeholder="Nhập mô tả vaccine..."
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
                     rows={6}
+                    fieldProps={{
+                      size: 'large',
+                      className: 'rounded-lg',
+                    }}
                   />
                 </Col>
               </ProCard>

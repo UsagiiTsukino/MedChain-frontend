@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -12,6 +12,11 @@ import {
   CalendarOutlined,
   LoadingOutlined,
   PhoneOutlined,
+  WalletOutlined,
+  DollarOutlined,
+  PayCircleOutlined,
+  BankOutlined,
+  CreditCardOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -22,10 +27,18 @@ import {
   DatePicker,
   TimePicker,
   Select,
+  Radio,
+  Space,
+  Tag,
 } from 'antd';
 import dayjs from 'dayjs';
 import { callChatWithAI, callGetAIContext } from '../../config/api.ai-chatbot';
-import { callCreateBooking } from '../../config/api.appointment';
+import {
+  callCreateBooking,
+  updatePaymentMetaMask,
+} from '../../config/api.appointment';
+import { Web3 } from 'web3';
+import { useAccount } from 'wagmi';
 
 const { TextArea } = Input;
 
@@ -210,6 +223,15 @@ const AIBookingPage = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.account.user);
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
+  const { address: connectedWalletAddress, isConnected } = useAccount();
+
+  // Create Web3 instance only once using useMemo
+  const web3Instance = useMemo(() => {
+    if (window.ethereum) {
+      return new Web3(window.ethereum);
+    }
+    return null;
+  }, []);
 
   const [messages, setMessages] = useState([
     {
@@ -229,10 +251,12 @@ const AIBookingPage = () => {
   const [bookingForm, setBookingForm] = useState({
     vaccineId: null,
     vaccineName: null,
+    vaccinePrice: null,
     centerId: null,
     centerName: null,
     date: null,
     time: null,
+    paymentMethod: 'CASH',
   });
   const [availableCenters, setAvailableCenters] = useState([]);
   const [availableVaccines, setAvailableVaccines] = useState([]);
@@ -323,6 +347,7 @@ const AIBookingPage = () => {
           // Find vaccine ID by name if AI didn't return valid ID
           let actualVaccineId = suggestion.vaccineId;
           let actualVaccineName = suggestion.vaccineName;
+          let actualVaccinePrice = 0;
 
           if (availableVaccines.length > 0) {
             // First check if vaccineId is valid
@@ -332,6 +357,7 @@ const AIBookingPage = () => {
               );
               if (vaccineById) {
                 actualVaccineName = vaccineById.name;
+                actualVaccinePrice = vaccineById.price;
               } else {
                 // ID not found, try to find by name
                 actualVaccineId = null;
@@ -346,6 +372,7 @@ const AIBookingPage = () => {
               if (vaccineByName) {
                 actualVaccineId = vaccineByName.id;
                 actualVaccineName = vaccineByName.name;
+                actualVaccinePrice = vaccineByName.price;
               }
             }
           }
@@ -387,10 +414,12 @@ const AIBookingPage = () => {
           setBookingForm({
             vaccineId: actualVaccineId || null,
             vaccineName: actualVaccineName || null,
+            vaccinePrice: actualVaccinePrice || 0,
             centerId: actualCenterId || null,
             centerName: actualCenterName || suggestion.centerName || null,
             date: suggestion.date || null,
             time: suggestion.time || null,
+            paymentMethod: 'CASH',
           });
           setPendingBooking(suggestion);
           setShowBookingForm(true);
@@ -411,6 +440,92 @@ const AIBookingPage = () => {
     }
   };
 
+  // Hàm chuyển sang Ganache network
+  const switchToGanache = async () => {
+    const ganacheChainId = '0x539'; // 1337 in hex
+
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: ganacheChainId }],
+      });
+      return true;
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: ganacheChainId,
+                chainName: 'Ganache Local',
+                nativeCurrency: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+                rpcUrls: ['http://127.0.0.1:7545'],
+              },
+            ],
+          });
+          return true;
+        } catch (addError) {
+          console.error('Failed to add Ganache network:', addError);
+          return false;
+        }
+      }
+      console.error('Failed to switch network:', switchError);
+      return false;
+    }
+  };
+
+  const sendETH = async (amount) => {
+    try {
+      const treasuryWallet = '0xcC177e1F003856d9d5c6870cAFfA798B50431ea6';
+
+      if (!isConnected || !connectedWalletAddress) {
+        message.error('Vui lòng kết nối ví MetaMask trước khi thanh toán!');
+        return false;
+      }
+
+      const currentChainId = await web3Instance.eth.getChainId();
+      if (currentChainId !== 1337n && currentChainId !== 5777n) {
+        message.loading('Đang chuyển sang Ganache network...', 0);
+        const switched = await switchToGanache();
+        message.destroy();
+        if (!switched) {
+          message.error('Vui lòng chuyển sang Ganache network trong MetaMask!');
+          return false;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
+      const amountInWei = web3Instance.utils.toWei(amount.toString(), 'ether');
+
+      const tx = {
+        from: connectedWalletAddress,
+        to: treasuryWallet,
+        value: amountInWei,
+        gas: 21000,
+      };
+
+      const receipt = await web3Instance.eth.sendTransaction(tx);
+      return receipt.transactionHash;
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      if (error.code === 4001) {
+        message.error('Bạn đã từ chối giao dịch');
+      } else if (error.message?.includes('insufficient funds')) {
+        message.error(
+          'Không đủ ETH trong ví. Vui lòng kiểm tra bạn đang ở Ganache network!'
+        );
+      } else {
+        message.error('Giao dịch thất bại: ' + error.message);
+      }
+      return false;
+    }
+  };
+
   const handleConfirmBooking = async () => {
     // Check which fields are missing (handle both null and empty string)
     const missingFields = [];
@@ -420,6 +535,8 @@ const AIBookingPage = () => {
       missingFields.push('Trung tâm');
     if (!bookingForm.date) missingFields.push('Ngày tiêm');
     if (!bookingForm.time) missingFields.push('Giờ tiêm');
+    if (!bookingForm.paymentMethod)
+      missingFields.push('Phương thức thanh toán');
 
     if (missingFields.length > 0) {
       message.warning(`Vui lòng chọn: ${missingFields.join(', ')}`);
@@ -428,28 +545,68 @@ const AIBookingPage = () => {
 
     setIsCreatingBooking(true);
     try {
+      // Handle MetaMask payment first if selected
+      let txHash = null;
+      if (bookingForm.paymentMethod === 'METAMASK') {
+        if (!bookingForm.vaccinePrice) {
+          message.error('Không tìm thấy giá vaccine');
+          setIsCreatingBooking(false);
+          return;
+        }
+        const ethAmount = bookingForm.vaccinePrice / 10000; // Convert VND to ETH
+        message.info('Vui lòng xác nhận giao dịch trong MetaMask...');
+        txHash = await sendETH(ethAmount);
+        if (!txHash) {
+          setIsCreatingBooking(false);
+          return;
+        }
+        message.success('✅ Thanh toán MetaMask thành công!');
+      }
+
       const response = await callCreateBooking(
         bookingForm.vaccineId,
         bookingForm.centerId,
         bookingForm.time,
         bookingForm.date,
-        0, // amount - will be calculated by backend
+        bookingForm.vaccinePrice || 0, // Send actual vaccine price
         [], // doseSchedules
-        'CASH' // default payment method
+        bookingForm.paymentMethod
       );
 
       // Handle both nested and non-nested response
       const responseData = response?.data || response;
 
       if (responseData) {
+        // If MetaMask payment, update payment with transaction hash
+        if (bookingForm.paymentMethod === 'METAMASK' && txHash) {
+          try {
+            await updatePaymentMetaMask(txHash, responseData.bookingId);
+          } catch (error) {
+            console.error('Failed to update MetaMask payment:', error);
+          }
+        }
+
         message.success(
           '✅ Đặt lịch thành công! Vui lòng kiểm tra lịch sử đặt lịch.'
         );
 
+        const paymentMethodText = {
+          CASH: 'Tiền mặt',
+          METAMASK: 'MetaMask (Đã thanh toán)',
+          PAYPAL: 'PayPal',
+          BANK_TRANSFER: 'Chuyển khoản',
+        }[bookingForm.paymentMethod];
+
         const confirmMessage = {
           id: Date.now(),
           role: 'assistant',
-          content: `🎉 Tuyệt vời! Tôi đã đặt lịch tiêm chủng thành công cho bạn.\n\n📋 Thông tin đặt lịch:\n- Vaccine: ${bookingForm.vaccineName}\n- Trung tâm: ${bookingForm.centerName}\n- Ngày: ${bookingForm.date}\n- Giờ: ${bookingForm.time}\n\nVui lòng đến đúng giờ. Hẹn gặp lại bạn! 😊`,
+          content: `🎉 Tuyệt vời! Tôi đã đặt lịch tiêm chủng thành công cho bạn.\n\n📋 Thông tin đặt lịch:\n- Vaccine: ${
+            bookingForm.vaccineName
+          }\n- Trung tâm: ${bookingForm.centerName}\n- Ngày: ${
+            bookingForm.date
+          }\n- Giờ: ${bookingForm.time}\n- Thanh toán: ${paymentMethodText}${
+            txHash ? '\n- Mã giao dịch: ' + txHash.slice(0, 10) + '...' : ''
+          }\n\nVui lòng đến đúng giờ. Hẹn gặp lại bạn! 😊`,
           timestamp: new Date(),
           isSuccess: true,
         };
@@ -460,10 +617,12 @@ const AIBookingPage = () => {
         setBookingForm({
           vaccineId: null,
           vaccineName: null,
+          vaccinePrice: null,
           centerId: null,
           centerName: null,
           date: null,
           time: null,
+          paymentMethod: 'CASH',
         });
       }
     } catch {
@@ -490,10 +649,12 @@ const AIBookingPage = () => {
     setBookingForm({
       vaccineId: null,
       vaccineName: null,
+      vaccinePrice: null,
       centerId: null,
       centerName: null,
       date: null,
       time: null,
+      paymentMethod: 'CASH',
     });
     const cancelMessage = {
       id: Date.now(),
@@ -632,10 +793,16 @@ const AIBookingPage = () => {
                                     showSearch
                                     value={bookingForm.vaccineId}
                                     onChange={(value, option) => {
+                                      const selectedVaccine =
+                                        availableVaccines.find(
+                                          (v) => v.id === value
+                                        );
                                       setBookingForm({
                                         ...bookingForm,
                                         vaccineId: value,
                                         vaccineName: option.label,
+                                        vaccinePrice:
+                                          selectedVaccine?.price || 0,
                                       });
                                     }}
                                     placeholder="Chọn vaccine"
@@ -649,7 +816,12 @@ const AIBookingPage = () => {
                                     options={availableVaccines.map(
                                       (vaccine) => ({
                                         value: vaccine.id,
-                                        label: vaccine.name,
+                                        label: `${
+                                          vaccine.name
+                                        } - ${new Intl.NumberFormat('vi-VN', {
+                                          style: 'currency',
+                                          currency: 'VND',
+                                        }).format(vaccine.price)}`,
                                       })
                                     )}
                                   />
@@ -768,6 +940,160 @@ const AIBookingPage = () => {
                                   format="HH:mm"
                                   minuteStep={15}
                                 />
+                              </div>
+
+                              {/* Payment Method Selection */}
+                              <div>
+                                <label className="text-xs font-medium text-gray-600 mb-2 block">
+                                  <CreditCardOutlined className="mr-1 text-pink-600" />
+                                  Phương thức thanh toán
+                                </label>
+                                <Radio.Group
+                                  value={bookingForm.paymentMethod}
+                                  onChange={(e) => {
+                                    setBookingForm({
+                                      ...bookingForm,
+                                      paymentMethod: e.target.value,
+                                    });
+                                  }}
+                                  className="w-full"
+                                >
+                                  <Space
+                                    direction="vertical"
+                                    className="w-full"
+                                  >
+                                    <Radio
+                                      value="METAMASK"
+                                      className="w-full border rounded-lg p-3 hover:border-purple-400 transition-all"
+                                      style={{
+                                        borderColor:
+                                          bookingForm.paymentMethod ===
+                                          'METAMASK'
+                                            ? '#a855f7'
+                                            : '#e5e7eb',
+                                        backgroundColor:
+                                          bookingForm.paymentMethod ===
+                                          'METAMASK'
+                                            ? '#faf5ff'
+                                            : 'white',
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <WalletOutlined className="text-purple-600 text-lg" />
+                                        <div className="flex-1">
+                                          <div className="font-medium text-gray-900">
+                                            MetaMask
+                                          </div>
+                                          <div className="text-xs text-gray-500">
+                                            Thanh toán bằng ETH qua ví MetaMask
+                                          </div>
+                                          {bookingForm.vaccinePrice && (
+                                            <Tag
+                                              color="purple"
+                                              className="mt-1"
+                                            >
+                                              {(
+                                                bookingForm.vaccinePrice / 10000
+                                              ).toFixed(4)}{' '}
+                                              ETH
+                                            </Tag>
+                                          )}
+                                        </div>
+                                        {!isConnected && (
+                                          <Tag
+                                            color="orange"
+                                            className="text-xs"
+                                          >
+                                            Chưa kết nối
+                                          </Tag>
+                                        )}
+                                      </div>
+                                    </Radio>
+
+                                    <Radio
+                                      value="PAYPAL"
+                                      className="w-full border rounded-lg p-3 hover:border-blue-400 transition-all"
+                                      style={{
+                                        borderColor:
+                                          bookingForm.paymentMethod === 'PAYPAL'
+                                            ? '#3b82f6'
+                                            : '#e5e7eb',
+                                        backgroundColor:
+                                          bookingForm.paymentMethod === 'PAYPAL'
+                                            ? '#eff6ff'
+                                            : 'white',
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <PayCircleOutlined className="text-blue-600 text-lg" />
+                                        <div>
+                                          <div className="font-medium text-gray-900">
+                                            PayPal
+                                          </div>
+                                          <div className="text-xs text-gray-500">
+                                            Thanh toán qua tài khoản PayPal
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </Radio>
+
+                                    <Radio
+                                      value="BANK_TRANSFER"
+                                      className="w-full border rounded-lg p-3 hover:border-green-400 transition-all"
+                                      style={{
+                                        borderColor:
+                                          bookingForm.paymentMethod ===
+                                          'BANK_TRANSFER'
+                                            ? '#10b981'
+                                            : '#e5e7eb',
+                                        backgroundColor:
+                                          bookingForm.paymentMethod ===
+                                          'BANK_TRANSFER'
+                                            ? '#f0fdf4'
+                                            : 'white',
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <BankOutlined className="text-green-600 text-lg" />
+                                        <div>
+                                          <div className="font-medium text-gray-900">
+                                            Chuyển khoản
+                                          </div>
+                                          <div className="text-xs text-gray-500">
+                                            Chuyển khoản ngân hàng
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </Radio>
+
+                                    <Radio
+                                      value="CASH"
+                                      className="w-full border rounded-lg p-3 hover:border-orange-400 transition-all"
+                                      style={{
+                                        borderColor:
+                                          bookingForm.paymentMethod === 'CASH'
+                                            ? '#f97316'
+                                            : '#e5e7eb',
+                                        backgroundColor:
+                                          bookingForm.paymentMethod === 'CASH'
+                                            ? '#fff7ed'
+                                            : 'white',
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <DollarOutlined className="text-orange-600 text-lg" />
+                                        <div>
+                                          <div className="font-medium text-gray-900">
+                                            Tiền mặt
+                                          </div>
+                                          <div className="text-xs text-gray-500">
+                                            Thanh toán trực tiếp tại trung tâm
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </Radio>
+                                  </Space>
+                                </Radio.Group>
                               </div>
                             </div>
 

@@ -42,14 +42,21 @@ const UserPage = () => {
 
   const handleDeleteUser = async (id) => {
     if (id) {
-      const res = await callDeleteUser(id);
-      if (res && +res.statusCode === 200) {
-        message.success('Xóa người dùng thành công');
-        reloadTable();
-      } else {
+      try {
+        const res = await callDeleteUser(id);
+        if (res && res.statusCode === 200) {
+          message.success('Xóa người dùng thành công');
+          reloadTable();
+        } else {
+          notification.error({
+            message: 'Có lỗi xảy ra',
+            description: res.message || 'Không thể xóa người dùng',
+          });
+        }
+      } catch (error) {
         notification.error({
-          message: res.error,
-          description: res.message,
+          message: 'Có lỗi xảy ra',
+          description: error.message || 'Không thể xóa người dùng',
         });
       }
     }
@@ -136,6 +143,7 @@ const UserPage = () => {
               color: '#ffa500',
             }}
             onClick={() => {
+              console.log('[UserPage] Edit clicked, entity:', entity);
               setOpenModal(true);
               setDataInit(entity);
             }}
@@ -145,7 +153,7 @@ const UserPage = () => {
             placement="leftTop"
             title="Xác nhận xóa người dùng"
             description="Bạn có chắc chắn muốn xóa người dùng này?"
-            onConfirm={() => handleDeleteUser(entity.userId)}
+            onConfirm={() => handleDeleteUser(entity.walletAddress)}
             okText="Xác nhận"
             cancelText="Hủy"
           >
