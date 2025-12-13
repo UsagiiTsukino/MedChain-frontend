@@ -12,6 +12,7 @@ import {
   Typography,
   message,
   Select,
+  Progress,
 } from 'antd';
 import {
   EditOutlined,
@@ -61,6 +62,7 @@ const BookingsPage = () => {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [assigningDoctor, setAssigningDoctor] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
 
   const reloadTable = () => {
     tableRef?.current?.reload();
@@ -132,41 +134,38 @@ const BookingsPage = () => {
     setSelectedDoctor(null);
   };
 
-  const handleAssignDoctor = async () => {
+  const handleAssignDoctor = async (appointmentId) => {
     if (!selectedDoctor) {
       message.warning('Vui lòng chọn bác sĩ');
       return;
     }
 
-    // Find the first appointment of this booking to assign doctor
-    if (
-      !selectedBooking?.appointments ||
-      selectedBooking.appointments.length === 0
-    ) {
-      message.error('Booking này chưa có appointment');
+    if (!appointmentId) {
+      message.error('Không tìm thấy appointment để phân công');
       return;
     }
 
-    const firstAppointment = selectedBooking.appointments[0];
     // eslint-disable-next-line no-console
-    console.log(
-      '[handleAssignDoctor] appointmentId:',
-      firstAppointment.appointmentId
-    );
+    console.log('[handleAssignDoctor] appointmentId:', appointmentId);
     // eslint-disable-next-line no-console
     console.log('[handleAssignDoctor] selectedDoctor:', selectedDoctor);
 
     setAssigningDoctor(true);
     try {
-      const res = await callUpdateAppointment(
-        firstAppointment.appointmentId,
-        selectedDoctor
-      );
+      const res = await callUpdateAppointment(appointmentId, selectedDoctor);
       // eslint-disable-next-line no-console
       console.log('[handleAssignDoctor] response:', res);
       if (res) {
         message.success('Phân công bác sĩ thành công!');
-        closeDrawer();
+        setSelectedDoctor(null);
+        setSelectedAppointmentId(null);
+        // Reload booking details to show updated info
+        const updatedBooking = bookings.find(
+          (b) => b.bookingId === selectedBooking.bookingId
+        );
+        if (updatedBooking) {
+          setSelectedBooking({ ...selectedBooking, ...updatedBooking });
+        }
         reloadTable();
       } else {
         message.error('Không nhận được phản hồi từ server');
@@ -184,23 +183,24 @@ const BookingsPage = () => {
     }
   };
 
-  const handleUnassignDoctor = async () => {
-    if (
-      !selectedBooking?.appointments ||
-      selectedBooking.appointments.length === 0
-    ) {
-      message.error('Booking này chưa có appointment');
+  const handleUnassignDoctor = async (appointmentId) => {
+    if (!appointmentId) {
+      message.error('Không tìm thấy appointment để hủy phân công');
       return;
     }
 
-    const firstAppointment = selectedBooking.appointments[0];
-
     setAssigningDoctor(true);
     try {
-      const res = await callUnassignDoctor(firstAppointment.appointmentId);
+      const res = await callUnassignDoctor(appointmentId);
       if (res) {
-        message.success('Đã hủy phân công bác sĩ. Có thể phân công lại.');
-        closeDrawer();
+        message.success('Đã hủy phân công bác sĩ!');
+        // Reload booking details to show updated info
+        const updatedBooking = bookings.find(
+          (b) => b.bookingId === selectedBooking.bookingId
+        );
+        if (updatedBooking) {
+          setSelectedBooking({ ...selectedBooking, ...updatedBooking });
+        }
         reloadTable();
       }
     } catch (error) {
@@ -301,18 +301,23 @@ const BookingsPage = () => {
       width: 180,
       render: (_, record) => {
         const vaccineName = record.vaccine?.name || 'N/A';
+        const totalDoses =
+          record.progress?.totalDoses || record.totalDoses || 0;
         return (
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
               <MedicineBoxOutlined className="text-green-600" />
             </div>
-            <Tooltip title={vaccineName}>
-              <span className="font-medium text-gray-900">
-                {vaccineName?.length > 20
-                  ? vaccineName.slice(0, 20) + '...'
-                  : vaccineName}
-              </span>
-            </Tooltip>
+            <div>
+              <Tooltip title={vaccineName}>
+                <div className="font-medium text-gray-900">
+                  {vaccineName?.length > 20
+                    ? vaccineName.slice(0, 20) + '...'
+                    : vaccineName}
+                </div>
+              </Tooltip>
+              <div className="text-xs text-gray-500">{totalDoses} liều</div>
+            </div>
           </div>
         );
       },
@@ -368,6 +373,47 @@ const BookingsPage = () => {
           <div className="flex items-center gap-2">
             <Badge status="warning" />
             <span className="text-sm text-gray-500">Chưa phân công</span>
+          </div>
+        );
+      },
+    },
+    {
+      title: 'Tiến độ',
+      width: 150,
+      render: (_, record) => {
+        const completedDoses = record.progress?.completedDoses || 0;
+        const totalDoses =
+          record.progress?.totalDoses || record.totalDoses || 0;
+        const percent =
+          totalDoses > 0 ? Math.round((completedDoses / totalDoses) * 100) : 0;
+        const nextDose = record.progress?.nextDose;
+
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">
+                {completedDoses}/{totalDoses} mũi
+              </span>
+            </div>
+            <Progress
+              percent={percent}
+              size="small"
+              strokeColor={{
+                '0%': '#108ee9',
+                '100%': '#87d068',
+              }}
+            />
+            {nextDose && (
+              <Tooltip
+                title={`Mũi ${nextDose.doseNumber} - ${dayjs(
+                  nextDose.date
+                ).format('DD/MM/YYYY')}`}
+              >
+                <div className="text-xs text-blue-600">
+                  Mũi tiếp: {dayjs(nextDose.date).format('DD/MM')}
+                </div>
+              </Tooltip>
+            )}
           </div>
         );
       },
@@ -702,141 +748,170 @@ const BookingsPage = () => {
               </div>
             )}
 
-            {/* Doctor Assignment */}
+            {/* Doctor Assignment - Show all appointments */}
             <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6">
               <Title level={5} className="flex items-center gap-2 mb-4">
                 <UserOutlined className="text-purple-600" />
-                Phân công bác sĩ
+                Phân công bác sĩ cho từng mũi tiêm
               </Title>
 
-              {/* Show current doctor if assigned */}
               {selectedBooking.appointments &&
-              selectedBooking.appointments.length > 0 &&
-              selectedBooking.appointments[0].doctor ? (
+              selectedBooking.appointments.length > 0 ? (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Avatar
-                        size={48}
-                        className="bg-gradient-to-br from-purple-500 to-indigo-600"
-                      >
-                        {selectedBooking.appointments[0].doctor.fullName?.charAt(
-                          0
-                        )}
-                      </Avatar>
-                      <div>
-                        <div className="font-semibold text-gray-900">
-                          {selectedBooking.appointments[0].doctor.fullName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Bác sĩ phụ trách
-                        </div>
-                      </div>
-                    </div>
-                    <Tag color="success" className="px-3 py-1">
-                      Đã phân công
-                    </Tag>
-                  </div>
-
-                  {(() => {
-                    const status = selectedBooking.appointments[0].status;
+                  {selectedBooking.appointments.map((appointment, index) => {
+                    const hasDoctor = appointment.doctor != null;
                     const canUnassign =
-                      status === 'SCHEDULED' || status === 'CONFIRMED';
-                    const isCompleted = status === 'COMPLETED';
-                    const isInProgress = status === 'IN_PROGRESS';
+                      appointment.status === 'SCHEDULED' ||
+                      appointment.status === 'ASSIGNED';
+                    const isCompleted = appointment.status === 'COMPLETED';
+                    const isConfirmed = appointment.status === 'CONFIRMED';
 
                     return (
-                      <>
-                        <Tooltip
-                          title={
-                            !canUnassign
-                              ? isCompleted
-                                ? 'Bác sĩ đã hoàn thành ca tiêm này, không thể hủy phân công'
-                                : isInProgress
-                                ? 'Bác sĩ đã bắt đầu điều trị, không thể hủy phân công'
-                                : 'Không thể hủy phân công ở trạng thái hiện tại'
-                              : ''
-                          }
-                        >
-                          <Button
-                            danger
-                            size="large"
-                            block
-                            disabled={!canUnassign}
-                            loading={assigningDoctor}
-                            onClick={handleUnassignDoctor}
-                            className="h-10 font-semibold"
-                          >
-                            Hủy phân công (cho phép phân công lại)
-                          </Button>
-                        </Tooltip>
-                        {!canUnassign && (
-                          <div className="text-center text-sm text-gray-500 p-2 bg-gray-50 rounded">
-                            {isCompleted && '✓ Ca tiêm đã hoàn thành'}
-                            {isInProgress && '⏳ Đang trong quá trình điều trị'}
+                      <div
+                        key={appointment.appointmentId}
+                        className="border-2 border-purple-100 rounded-lg p-4 bg-white"
+                      >
+                        {/* Dose Header */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Tag color="purple" className="text-base px-3 py-1">
+                              Mũi {appointment.doseNumber}/
+                              {selectedBooking.totalDoses}
+                            </Tag>
+                            <Tag
+                              color={
+                                isCompleted
+                                  ? 'success'
+                                  : isConfirmed
+                                  ? 'processing'
+                                  : hasDoctor
+                                  ? 'warning'
+                                  : 'default'
+                              }
+                            >
+                              {isCompleted
+                                ? '✓ Đã hoàn thành'
+                                : isConfirmed
+                                ? '⏳ Đã xác nhận'
+                                : hasDoctor
+                                ? '👨‍⚕️ Đã phân công'
+                                : '📝 Chưa phân công'}
+                            </Tag>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {dayjs(appointment.appointmentDate).format(
+                              'DD/MM/YYYY'
+                            )}{' '}
+                            - {appointment.appointmentTime}
+                          </div>
+                        </div>
+
+                        {/* Doctor Info or Assignment Form */}
+                        {hasDoctor ? (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+                              <Avatar
+                                size={40}
+                                className="bg-gradient-to-br from-purple-500 to-indigo-600"
+                              >
+                                {appointment.doctor.fullName?.charAt(0)}
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="font-semibold text-gray-900">
+                                  {appointment.doctor.fullName}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Bác sĩ phụ trách
+                                </div>
+                              </div>
+                            </div>
+
+                            {canUnassign && (
+                              <Button
+                                danger
+                                size="small"
+                                block
+                                loading={assigningDoctor}
+                                onClick={() =>
+                                  handleUnassignDoctor(
+                                    appointment.appointmentId
+                                  )
+                                }
+                              >
+                                Hủy phân công (cho phép phân công lại)
+                              </Button>
+                            )}
+
+                            {!canUnassign && (
+                              <div className="text-center text-xs text-gray-500 p-2 bg-gray-50 rounded">
+                                {isCompleted &&
+                                  '✓ Ca tiêm đã hoàn thành - Không thể hủy'}
+                                {isConfirmed &&
+                                  '⏳ Bác sĩ đã xác nhận - Không thể hủy'}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <Select
+                              size="middle"
+                              placeholder="Chọn bác sĩ cho mũi này"
+                              style={{ width: '100%' }}
+                              value={
+                                selectedAppointmentId ===
+                                appointment.appointmentId
+                                  ? selectedDoctor
+                                  : null
+                              }
+                              onChange={(value) => {
+                                setSelectedDoctor(value);
+                                setSelectedAppointmentId(
+                                  appointment.appointmentId
+                                );
+                              }}
+                              loading={!doctors || doctors.length === 0}
+                              options={
+                                doctors && doctors.length > 0
+                                  ? doctors.map((doctor) => ({
+                                      label: (
+                                        <div className="flex items-center gap-2">
+                                          <Avatar
+                                            size={24}
+                                            className="bg-gradient-to-br from-purple-500 to-indigo-600"
+                                          >
+                                            {doctor.fullName?.charAt(0) || 'D'}
+                                          </Avatar>
+                                          <span>{doctor.fullName}</span>
+                                        </div>
+                                      ),
+                                      value: doctor.walletAddress,
+                                    }))
+                                  : []
+                              }
+                            />
+                            <Button
+                              type="primary"
+                              size="small"
+                              block
+                              loading={assigningDoctor}
+                              disabled={
+                                selectedAppointmentId !==
+                                  appointment.appointmentId || !selectedDoctor
+                              }
+                              onClick={() =>
+                                handleAssignDoctor(appointment.appointmentId)
+                              }
+                              className="bg-gradient-to-r from-purple-600 to-indigo-600 border-0"
+                            >
+                              <CheckCircleOutlined /> Phân công cho mũi này
+                            </Button>
                           </div>
                         )}
-                      </>
+                      </div>
                     );
-                  })()}
+                  })}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div>
-                    <Text className="font-semibold mb-2 block">
-                      Chọn bác sĩ:
-                    </Text>
-                    {/* eslint-disable-next-line no-console */}
-                    {console.log('[Drawer] doctors:', doctors)}
-                    {/* eslint-disable-next-line no-console */}
-                    {console.log('[Drawer] doctors.length:', doctors?.length)}
-                    <Select
-                      size="large"
-                      placeholder={
-                        doctors && doctors.length > 0
-                          ? 'Chọn bác sĩ phụ trách'
-                          : 'Đang tải danh sách bác sĩ...'
-                      }
-                      style={{ width: '100%' }}
-                      value={selectedDoctor}
-                      onChange={setSelectedDoctor}
-                      loading={!doctors || doctors.length === 0}
-                      options={
-                        doctors && doctors.length > 0
-                          ? doctors.map((doctor) => ({
-                              label: (
-                                <div className="flex items-center gap-2 py-1">
-                                  <Avatar
-                                    size={28}
-                                    className="bg-gradient-to-br from-purple-500 to-indigo-600"
-                                  >
-                                    {doctor.fullName?.charAt(0) || 'D'}
-                                  </Avatar>
-                                  <span>{doctor.fullName}</span>
-                                </div>
-                              ),
-                              value: doctor.walletAddress,
-                            }))
-                          : []
-                      }
-                    />
-                  </div>
-                  <Button
-                    type="primary"
-                    size="large"
-                    block
-                    loading={assigningDoctor}
-                    onClick={handleAssignDoctor}
-                    className="bg-gradient-to-r from-purple-600 to-indigo-600 border-0 h-12 font-semibold shadow-md hover:shadow-lg"
-                  >
-                    <CheckCircleOutlined /> Xác nhận phân công
-                  </Button>
-                </div>
-              )}
-
-              {/* Show message if no appointments */}
-              {(!selectedBooking.appointments ||
-                selectedBooking.appointments.length === 0) && (
                 <div className="text-center py-4 text-gray-500">
                   <Text>
                     Booking này chưa có appointment để phân công bác sĩ

@@ -141,16 +141,21 @@ const MySchedulePage = () => {
       ),
     },
     {
-      title: 'Liều',
-      dataIndex: 'doseNumber',
-      width: 80,
+      title: 'Mũi tiêm',
+      width: 100,
       align: 'center',
       search: false,
-      render: (dose) => (
-        <Tag color="purple" className="font-medium">
-          Liều {dose}
-        </Tag>
-      ),
+      render: (_, record) => {
+        // Get total doses from booking if available
+        const totalDoses = record.totalDoses || '?';
+        const doseNumber = record.doseNumber || 1;
+
+        return (
+          <Tag color="purple" className="font-medium">
+            Mũi {doseNumber}/{totalDoses}
+          </Tag>
+        );
+      },
     },
     {
       title: 'Ngày tiêm',

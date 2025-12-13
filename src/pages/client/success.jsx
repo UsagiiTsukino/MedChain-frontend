@@ -64,10 +64,10 @@ const SuccessPage = () => {
             centerName: data.center?.name || 'N/A',
             centerAddress: data.center?.address || 'N/A',
             centerPhone: data.center?.phoneNumber || 'N/A',
-            appointmentDate: data.appointmentDate
-              ? dayjs(data.appointmentDate).format('DD/MM/YYYY')
+            appointmentDate: data.firstDoseDate
+              ? dayjs(data.firstDoseDate).format('DD/MM/YYYY')
               : 'N/A',
-            appointmentTime: data.appointmentTime || 'N/A',
+            appointmentTime: data.firstDoseTime || 'N/A',
             totalDoses: data.totalDoses || 1,
             paymentMethod:
               data.payment?.method === 'CASH'

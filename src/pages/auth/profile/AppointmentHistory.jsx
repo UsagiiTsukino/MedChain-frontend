@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Tag, Space, Button, Statistic, Tooltip } from 'antd';
+import { Card, Tag, Space, Button, Statistic, Tooltip, Progress } from 'antd';
 import {
   MedicineBoxOutlined,
   CheckCircleOutlined,
@@ -163,6 +163,37 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
       },
     },
     {
+      title: 'Tiến độ',
+      key: 'progress',
+      width: 150,
+      render: (_, record) => {
+        const completedDoses = record.progress?.completedDoses || 0;
+        const totalDoses =
+          record.progress?.totalDoses || record.totalDoses || 0;
+        const percent =
+          totalDoses > 0 ? Math.round((completedDoses / totalDoses) * 100) : 0;
+
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">
+                {completedDoses}/{totalDoses} mũi
+              </span>
+            </div>
+            <Progress
+              percent={percent}
+              size="small"
+              strokeColor={{
+                '0%': '#108ee9',
+                '100%': '#87d068',
+              }}
+              showInfo={false}
+            />
+          </div>
+        );
+      },
+    },
+    {
       title: 'Trạng thái',
       dataIndex: 'overallStatus',
       key: 'overallStatus',
@@ -203,7 +234,7 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
           >
             Chi tiết
           </Button>
-          {record.overallStatus === 'COMPLETED' && (
+          {record.progress?.completedDoses === record.progress?.totalDoses && (
             <Button
               type="link"
               size="small"
