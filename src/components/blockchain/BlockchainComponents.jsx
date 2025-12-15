@@ -348,7 +348,7 @@ export const NFTCertificateCard = ({ certificate }) => {
           <SafetyCertificateOutlined className="text-white text-4xl" />
         </div>
 
-        <h3 className="font-semibold text-lg mb-2">VaxChain Certificate</h3>
+        <h3 className="font-semibold text-lg mb-2">MedChainAI Certificate</h3>
         <Text type="secondary">Token ID: #{certificate.tokenId}</Text>
 
         <div className="mt-4 space-y-2">

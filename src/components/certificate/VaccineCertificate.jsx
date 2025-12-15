@@ -44,7 +44,7 @@ const VaccineCertificate = ({ bookingData }) => {
                   <h1 className="text-2xl sm:text-3xl font-bold">
                     Chứng Nhận Tiêm Chủng Số
                   </h1>
-                  <p className="mt-1">Được cấp qua Hệ Thống VaxChain</p>
+                  <p className="mt-1">Được cấp qua Hệ Thống MedChainAI</p>
                   <p className="text-sm mt-1 opacity-90">
                     Certificate ID: #{bookingData.bookingId}
                   </p>
@@ -222,7 +222,7 @@ const VaccineCertificate = ({ bookingData }) => {
                           <div className="ml-3">
                             <p className="text-sm text-blue-700">
                               Chứng nhận này được lưu trữ an toàn trên hệ thống
-                              VaxChain. Mọi thông tin được mã hóa và bảo mật.
+                              MedChainAI. Mọi thông tin được mã hóa và bảo mật.
                             </p>
                           </div>
                         </div>
@@ -264,7 +264,7 @@ const VaccineCertificate = ({ bookingData }) => {
               <div className="flex items-center mb-3 sm:mb-0">
                 <i className="fas fa-shield-virus text-blue-600 mr-2" />
                 <span className="text-sm font-medium text-gray-600">
-                  VaxChain © 2025
+                  MedChainAI © 2025
                 </span>
               </div>
               <div className="flex space-x-3">
@@ -297,7 +297,9 @@ const VaccineCertificate = ({ bookingData }) => {
                 <li>
                   Quét mã QR bằng bất kỳ ứng dụng quét QR hoặc camera điện thoại
                 </li>
-                <li>Truy cập cổng xác thực VaxChain tại vaxchain.io/verify</li>
+                <li>
+                  Truy cập cổng xác thực MedChainAI tại medchain.ai/verify
+                </li>
                 <li>Nhập mã hash chứng nhận hoặc ID giao dịch</li>
                 <li>
                   So sánh thông tin trên blockchain với chi tiết chứng nhận này

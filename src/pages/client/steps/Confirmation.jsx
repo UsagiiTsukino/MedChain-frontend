@@ -11,9 +11,15 @@ import {
   Col,
   Typography,
   Alert,
-  Divider,
+  Badge,
 } from 'antd';
-import { EnvironmentOutlined, CalendarOutlined } from '@ant-design/icons';
+import {
+  EnvironmentOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  MedicineBoxOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import { fetchCenter as fetchCenterAction } from '../../../redux/slice/centerSlice';
 import queryString from 'query-string';
@@ -22,11 +28,12 @@ import 'leaflet/dist/leaflet.css';
 import dayjs from 'dayjs';
 
 const { Group: RadioGroup } = Radio;
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 const Confirmation = ({ form, bookingSummary }) => {
   const [doseForms, setDoseForms] = useState([]);
   const [firstDoseDate, setFirstDoseDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const [mapCenter, setMapCenter] = useState([16.047079, 108.20623]);
@@ -111,6 +118,7 @@ const Confirmation = ({ form, bookingSummary }) => {
       });
     }
   }, [firstDoseDate, bookingSummary, form, timeSlots]);
+
   const handleDoseDateChange = (index, value) => {
     // Update local state
     const updatedForms = [...doseForms];
@@ -224,7 +232,7 @@ const Confirmation = ({ form, bookingSummary }) => {
           `
           )
           .on('click', () => {
-            form.setFieldsValue({ centerId: center.centerId });
+            form.setFieldsValues({ centerId: center.centerId });
             form.setFieldValue('centerInfo', center);
             setMapCenter([center.latitude, center.longitude]);
           });
@@ -275,205 +283,371 @@ const Confirmation = ({ form, bookingSummary }) => {
   };
 
   return (
-    <Card title="Chọn thời gian và địa điểm" className="mb-8">
+    <div className="space-y-6">
+      {/* Modern Header with Gradient Icon */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
+              <CalendarOutlined className="text-white text-2xl" />
+            </div>
+          </div>
+          <div className="flex-1">
+            <Title level={4} className="!mb-2 !text-gray-800">
+              Chọn thời gian và địa điểm
+            </Title>
+            {bookingSummary?.vaccine && (
+              <div className="flex items-center gap-3 flex-wrap">
+                <Badge
+                  count={
+                    <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                      {bookingSummary.vaccine.name}
+                    </span>
+                  }
+                />
+                <Text className="text-gray-600 text-sm">
+                  <MedicineBoxOutlined className="mr-1" />
+                  {bookingSummary.vaccine.dosage} mũi tiêm
+                </Text>
+                <Text className="text-gray-600 text-sm">
+                  <ClockCircleOutlined className="mr-1" />
+                  Cách nhau {bookingSummary.vaccine.duration} ngày
+                </Text>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Hidden field to store center info */}
       <Form.Item name="centerInfo" hidden>
         <input type="hidden" />
       </Form.Item>
 
       <Row gutter={24}>
-        <Col span={12}>
-          {/* Hiển thị thông tin vaccine */}
-          {bookingSummary?.vaccine && (
-            <div className="mb-4 p-3 bg-blue-50 rounded-md">
-              <Text strong>{bookingSummary.vaccine.name}</Text>
-              <div className="mt-1">
-                <Text type="secondary">
-                  Số mũi: {bookingSummary.vaccine.dosage} | Khoảng cách:{' '}
-                  {bookingSummary.vaccine.duration} ngày/mũi
+        {/* Left Column: Date & Time Selection */}
+        <Col xs={24} lg={12}>
+          <div className="space-y-6">
+            {/* First Dose Card */}
+            <Card
+              className="shadow-sm rounded-xl border-blue-100 hover:shadow-md transition-shadow"
+              bordered
+            >
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+                    <span className="text-white text-sm font-bold">1</span>
+                  </div>
+                  <Text strong className="text-lg">
+                    Mũi tiêm đầu tiên
+                  </Text>
+                </div>
+
+                <Form.Item
+                  label={
+                    <span className="text-gray-700 font-medium">
+                      <CalendarOutlined className="mr-2" />
+                      Chọn ngày tiêm
+                    </span>
+                  }
+                  name="firstDoseDate"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng chọn ngày cho mũi tiêm đầu tiên',
+                    },
+                  ]}
+                >
+                  <DatePicker
+                    className="w-full h-11 rounded-lg hover:border-blue-400 focus:border-blue-500"
+                    locale={locale}
+                    format="DD/MM/YYYY"
+                    placeholder="Chọn ngày tiêm"
+                    disabledDate={disabledDate}
+                    onChange={handleFirstDoseDateChange}
+                    suffixIcon={<CalendarOutlined className="text-blue-500" />}
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label={
+                    <span className="text-gray-700 font-medium">
+                      <ClockCircleOutlined className="mr-2" />
+                      Chọn giờ tiêm
+                    </span>
+                  }
+                  name="time"
+                  rules={[{ required: true, message: 'Vui lòng chọn giờ' }]}
+                >
+                  <RadioGroup
+                    className="w-full"
+                    onChange={(e) => setSelectedTime(e.target.value)}
+                  >
+                    <Row gutter={[12, 12]}>
+                      {timeSlots.map((time) => (
+                        <Col span={8} key={time}>
+                          <Radio.Button
+                            value={time}
+                            className="w-full text-center h-11 rounded-lg flex items-center justify-center font-medium hover:scale-105 transition-transform"
+                            style={{
+                              background:
+                                selectedTime === time
+                                  ? 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)'
+                                  : 'white',
+                              color:
+                                selectedTime === time ? 'white' : '#374151',
+                              border:
+                                selectedTime === time
+                                  ? 'none'
+                                  : '1px solid #e5e7eb',
+                            }}
+                          >
+                            <ClockCircleOutlined className="mr-1" />
+                            {time}
+                          </Radio.Button>
+                        </Col>
+                      ))}
+                    </Row>
+                  </RadioGroup>
+                </Form.Item>
+              </div>
+            </Card>
+
+            {/* Multi-Dose Timeline */}
+            {doseForms.length > 0 &&
+              form.getFieldValue('doseSchedules')?.length > 0 && (
+                <Card
+                  className="shadow-sm rounded-xl border-indigo-100 hover:shadow-md transition-shadow"
+                  bordered
+                >
+                  <div className="mb-4 flex items-center gap-2">
+                    <CheckCircleOutlined className="text-green-500 text-xl" />
+                    <Text strong className="text-lg">
+                      Lịch tiêm các mũi tiếp theo
+                    </Text>
+                  </div>
+
+                  <Alert
+                    message="Lịch trình được tối ưu hóa"
+                    description="Các mũi tiêm được tự động lên lịch theo khoảng cách khuyến nghị. Bạn có thể điều chỉnh nếu cần."
+                    type="info"
+                    className="mb-6 rounded-lg"
+                    showIcon
+                    icon={<MedicineBoxOutlined />}
+                  />
+
+                  <Form.List name="doseSchedules">
+                    {(fields) => (
+                      <div className="relative">
+                        {/* Timeline Connector */}
+                        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-indigo-300 to-purple-300" />
+
+                        <div className="space-y-6">
+                          {fields.map(({ key, name }, index) => {
+                            // Safety check for doseForms array
+                            if (!doseForms[index]) return null;
+
+                            return (
+                              <div key={key} className="relative pl-12">
+                                {/* Timeline Dot */}
+                                <div className="absolute left-0 top-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg z-10">
+                                  <span className="text-white text-sm font-bold">
+                                    {doseForms[index].doseNumber}
+                                  </span>
+                                </div>
+
+                                <Card
+                                  className="shadow-sm rounded-lg border border-gray-200 hover:shadow-md hover:border-indigo-300 transition-all bg-gradient-to-br from-white to-gray-50"
+                                  size="small"
+                                >
+                                  <div className="mb-3">
+                                    <Text strong className="text-base">
+                                      Mũi tiêm thứ {doseForms[index].doseNumber}
+                                    </Text>
+                                  </div>
+
+                                  <Row gutter={12}>
+                                    <Col span={12}>
+                                      <Form.Item
+                                        label={
+                                          <span className="text-gray-700 text-sm">
+                                            <CalendarOutlined className="mr-1" />
+                                            Ngày tiêm
+                                          </span>
+                                        }
+                                        name={[name, 'date']}
+                                        getValueProps={(value) => ({
+                                          value:
+                                            value &&
+                                            dayjs.isDayjs(value) &&
+                                            value.isValid()
+                                              ? value
+                                              : undefined,
+                                        })}
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: 'Vui lòng chọn ngày',
+                                          },
+                                        ]}
+                                        className="mb-0"
+                                      >
+                                        <DatePicker
+                                          className="w-full h-10 rounded-lg hover:border-indigo-400"
+                                          locale={locale}
+                                          format="DD/MM/YYYY"
+                                          placeholder="Chọn ngày"
+                                          disabledDate={disabledWeekendDate}
+                                          onChange={(value) =>
+                                            handleDoseDateChange(index, value)
+                                          }
+                                        />
+                                      </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                      <Form.Item
+                                        label={
+                                          <span className="text-gray-700 text-sm">
+                                            <ClockCircleOutlined className="mr-1" />
+                                            Giờ tiêm
+                                          </span>
+                                        }
+                                        name={[name, 'time']}
+                                        rules={[
+                                          {
+                                            required: true,
+                                            message: 'Vui lòng chọn giờ',
+                                          },
+                                        ]}
+                                        className="mb-0"
+                                      >
+                                        <Select
+                                          className="w-full"
+                                          placeholder="Chọn giờ"
+                                          options={timeSlots.map((time) => ({
+                                            value: time,
+                                            label: (
+                                              <span>
+                                                <ClockCircleOutlined className="mr-1" />
+                                                {time}
+                                              </span>
+                                            ),
+                                          }))}
+                                          onChange={(value) =>
+                                            handleDoseTimeChange(index, value)
+                                          }
+                                          size="large"
+                                        />
+                                      </Form.Item>
+                                    </Col>
+                                  </Row>
+                                </Card>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </Form.List>
+                </Card>
+              )}
+
+            {/* Helper Message */}
+            {!firstDoseDate && (
+              <Alert
+                message="Bắt đầu đặt lịch"
+                description="Chọn ngày cho mũi tiêm đầu tiên để hệ thống tự động đề xuất lịch trình tối ưu cho các mũi tiếp theo."
+                type="info"
+                showIcon
+                icon={<CalendarOutlined />}
+                className="rounded-lg border-blue-200 bg-blue-50"
+              />
+            )}
+          </div>
+        </Col>
+
+        {/* Right Column: Location & Map */}
+        <Col xs={24} lg={12}>
+          <div className="space-y-6">
+            {/* Location Selection Card */}
+            <Card
+              className="shadow-sm rounded-xl border-green-100 hover:shadow-md transition-shadow"
+              bordered
+            >
+              <div className="mb-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm">
+                    <EnvironmentOutlined className="text-white text-xl" />
+                  </div>
+                  <Text strong className="text-lg">
+                    Địa điểm tiêm chủng
+                  </Text>
+                </div>
+
+                <Form.Item
+                  label={
+                    <span className="text-gray-700 font-medium">
+                      <EnvironmentOutlined className="mr-2" />
+                      Chọn cơ sở y tế
+                    </span>
+                  }
+                  name="centerId"
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng chọn cơ sở tiêm chủng',
+                    },
+                  ]}
+                >
+                  <Select
+                    className="w-full"
+                    size="large"
+                    options={centers?.map((center) => ({
+                      label: center.name || 'Không có tên',
+                      value: center.centerId,
+                      disabled: !center.centerId,
+                    }))}
+                    placeholder="Chọn cơ sở tiêm chủng"
+                    suffixIcon={
+                      <EnvironmentOutlined className="text-green-500" />
+                    }
+                    onChange={handleCenterChange}
+                    notFoundContent={
+                      centers?.length === 0 ? 'Không có cơ sở nào' : null
+                    }
+                    loading={isFetchingCenters}
+                  />
+                </Form.Item>
+              </div>
+            </Card>
+
+            {/* Interactive Map Card */}
+            <Card
+              className="shadow-sm rounded-xl border-gray-200 overflow-hidden"
+              bordered
+              bodyStyle={{ padding: 0 }}
+            >
+              <div className="p-4 bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <EnvironmentOutlined className="text-blue-500 text-lg" />
+                  <Text strong className="text-base">
+                    Vị trí trên bản đồ
+                  </Text>
+                </div>
+                <Text className="text-xs text-gray-500 mt-1 block">
+                  Nhấp vào marker để xem thông tin chi tiết
                 </Text>
               </div>
-            </div>
-          )}
-
-          <Form.Item
-            label="Chọn ngày cho mũi tiêm đầu tiên"
-            name="firstDoseDate"
-            rules={[
-              {
-                required: true,
-                message: 'Vui lòng chọn ngày cho mũi tiêm đầu tiên',
-              },
-            ]}
-          >
-            <DatePicker
-              className="w-full"
-              locale={locale}
-              format="DD/MM/YYYY"
-              placeholder="Chọn ngày tiêm"
-              disabledDate={disabledDate}
-              onChange={handleFirstDoseDateChange}
-              suffixIcon={<CalendarOutlined />}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Chọn giờ"
-            name="time"
-            rules={[{ required: true, message: 'Vui lòng chọn giờ' }]}
-          >
-            <RadioGroup>
-              <Row gutter={[8, 8]}>
-                {timeSlots.map((time) => (
-                  <Col span={8} key={time}>
-                    <Radio.Button value={time} className="w-full text-center">
-                      {time}
-                    </Radio.Button>
-                  </Col>
-                ))}
-              </Row>
-            </RadioGroup>
-          </Form.Item>
-
-          {/* Form cho các mũi tiêm tiếp theo */}
-          {doseForms.length > 0 &&
-            form.getFieldValue('doseSchedules')?.length > 0 && (
-              <div className="mt-6">
-                <Divider orientation="left">
-                  Lịch tiêm các mũi tiếp theo
-                </Divider>
-                <Alert
-                  message="Các mũi tiêm tiếp theo được đề xuất dựa trên khoảng cách giữa các mũi. Bạn có thể điều chỉnh nếu cần."
-                  type="info"
-                  className="mb-4"
-                  showIcon
-                />
-
-                <Form.List name="doseSchedules">
-                  {(fields) => (
-                    <>
-                      {fields.map(({ key, name }, index) => {
-                        // Safety check for doseForms array
-                        if (!doseForms[index]) return null;
-
-                        return (
-                          <Card
-                            key={key}
-                            size="small"
-                            title={`Mũi tiêm thứ ${doseForms[index].doseNumber}`}
-                            className="mb-4"
-                          >
-                            <Row gutter={16}>
-                              <Col span={12}>
-                                <Form.Item
-                                  label="Ngày tiêm"
-                                  name={[name, 'date']}
-                                  getValueProps={(value) => ({
-                                    value:
-                                      value &&
-                                      dayjs.isDayjs(value) &&
-                                      value.isValid()
-                                        ? value
-                                        : undefined,
-                                  })}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: 'Vui lòng chọn ngày',
-                                    },
-                                  ]}
-                                >
-                                  <DatePicker
-                                    className="w-full"
-                                    locale={locale}
-                                    format="DD/MM/YYYY"
-                                    placeholder="Chọn ngày tiêm"
-                                    disabledDate={disabledWeekendDate}
-                                    onChange={(value) =>
-                                      handleDoseDateChange(index, value)
-                                    }
-                                  />
-                                </Form.Item>
-                              </Col>
-                              <Col span={12}>
-                                <Form.Item
-                                  label="Giờ tiêm"
-                                  name={[name, 'time']}
-                                  rules={[
-                                    {
-                                      required: true,
-                                      message: 'Vui lòng chọn giờ',
-                                    },
-                                  ]}
-                                >
-                                  <Select
-                                    placeholder="Chọn giờ tiêm"
-                                    options={timeSlots.map((time) => ({
-                                      value: time,
-                                      label: time,
-                                    }))}
-                                    onChange={(value) =>
-                                      handleDoseTimeChange(index, value)
-                                    }
-                                  />
-                                </Form.Item>
-                              </Col>
-                            </Row>
-                          </Card>
-                        );
-                      })}
-                    </>
-                  )}
-                </Form.List>
-              </div>
-            )}
-        </Col>
-
-        <Col span={12}>
-          <Form.Item
-            label="Chọn cơ sở tiêm chủng"
-            name="centerId"
-            rules={[
-              { required: true, message: 'Vui lòng chọn cơ sở tiêm chủng' },
-            ]}
-          >
-            <Select
-              options={centers?.map((center) => ({
-                label: center.name || 'Không có tên',
-                value: center.centerId,
-                disabled: !center.centerId,
-              }))}
-              placeholder="Chọn cơ sở tiêm chủng"
-              suffixIcon={<EnvironmentOutlined />}
-              onChange={handleCenterChange}
-              notFoundContent={
-                centers?.length === 0 ? 'Không có cơ sở nào' : null
-              }
-              loading={isFetchingCenters}
-            />
-          </Form.Item>
-
-          <div className="mt-4">
-            <div
-              ref={mapRef}
-              className="h-48 w-full rounded-lg shadow-sm"
-              style={{ zIndex: 1 }}
-            />
+              <div
+                ref={mapRef}
+                className="w-full"
+                style={{ height: '400px', zIndex: 1 }}
+              />
+            </Card>
           </div>
-
-          {/* Thông báo hướng dẫn */}
-          {!firstDoseDate && (
-            <Alert
-              message="Hướng dẫn"
-              description="Vui lòng chọn ngày cho mũi tiêm đầu tiên, hệ thống sẽ tự động đề xuất lịch cho các mũi tiếp theo."
-              type="info"
-              className="mt-4"
-              showIcon
-            />
-          )}
         </Col>
       </Row>
-    </Card>
+    </div>
   );
 };
 

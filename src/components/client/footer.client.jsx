@@ -39,7 +39,7 @@ const Footer = () => {
               </div>
               <div>
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-300 to-indigo-300 bg-clip-text text-transparent">
-                  VaxChain
+                  MedChainAI
                 </span>
                 <div className="text-xs text-blue-300">
                   Blockchain Healthcare
@@ -213,7 +213,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 text-sm text-gray-400">
-            <span>© {currentYear} VaxChain.</span>
+            <span>© {currentYear} MedChainAI.</span>
             <span className="hidden sm:inline">Được phát triển với</span>
             <HeartFilled className="text-red-500 text-xs animate-pulse" />
             <span className="hidden sm:inline">tại Việt Nam</span>

@@ -136,7 +136,7 @@ const LayoutStaff = () => {
               <SafetyCertificateOutlined className="text-2xl text-white" />
             </div>
             {!collapsed && (
-              <span className="text-xl font-bold text-white">VaxChain</span>
+              <span className="text-xl font-bold text-white">MedChainAI</span>
             )}
           </div>
         </div>

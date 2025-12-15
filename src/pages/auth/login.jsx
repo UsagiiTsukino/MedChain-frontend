@@ -4,12 +4,20 @@ import {
   callLoginWithGoogle,
 } from '../../config/api.auth';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Form, Input, message, Divider } from 'antd';
+import { Button, Form, Input, message, Divider, Card } from 'antd';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { setUserLoginInfo } from '../../redux/slice/accountSlide';
 import { useEffect, useState } from 'react';
-import { LockOutlined, GoogleOutlined, MailOutlined } from '@ant-design/icons';
+import {
+  LockOutlined,
+  GoogleOutlined,
+  MailOutlined,
+  SafetyOutlined,
+  MedicineBoxOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 import './form.css';
+import './auth.css';
 import { triggerGoogleLogin, decodeGoogleToken } from '../../utils/googleAuth';
 
 const LoginPage = () => {
@@ -140,112 +148,202 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-blue-600 py-6 px-8 text-white">
-          <div className="flex items-center justify-center mb-2">
-            <i className="fas fa-shield-virus text-3xl mr-3" />
-            <h1 className="text-2xl font-bold">VaxChain</h1>
+    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden">
+      {/* Left Side - Branding & Features */}
+      <div
+        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-12 flex-col justify-between relative overflow-hidden transition-all duration-700 ease-in-out"
+        style={{
+          animation: 'slideInFromLeft 0.7s ease-out',
+        }}
+      >
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full -mr-48 -mt-48" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-white opacity-5 rounded-full -ml-40 -mb-40" />
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-xl">
+              <SafetyOutlined className="text-3xl text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">MedChainAI</h1>
+              <p className="text-blue-100 text-sm">Nền tảng Y tế Blockchain</p>
+            </div>
           </div>
-          <p className="text-center text-blue-100">
-            Secure Vaccine Tracking System
-          </p>
-        </div>
 
-        <div className="p-8">
-          <div>
-            {/* Main Login Form */}
-            <Form
-              form={form}
-              name="password_login"
-              onFinish={handlePasswordLogin}
-              layout="vertical"
-              size="large"
-            >
-              <Form.Item
-                name="email"
-                rules={[
-                  { required: true, message: 'Vui lòng nhập email!' },
-                  { type: 'email', message: 'Email không hợp lệ!' },
-                ]}
-              >
-                <Input
-                  prefix={<MailOutlined />}
-                  placeholder="Email"
-                  autoComplete="email"
-                />
-              </Form.Item>
+          <div className="space-y-8 mt-16">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <SafetyOutlined className="text-2xl text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  An toàn & Minh bạch
+                </h3>
+                <p className="text-blue-100">
+                  Công nghệ Blockchain đảm bảo hồ sơ tiêm chủng của bạn được bảo
+                  mật, không thể thay đổi và có thể xác minh
+                </p>
+              </div>
+            </div>
 
-              <Form.Item
-                name="password"
-                rules={[
-                  {
-                    required: true,
-                    message: 'Vui lòng nhập mật khẩu!',
-                  },
-                ]}
-              >
-                <Input.Password
-                  prefix={<LockOutlined />}
-                  placeholder="Mật khẩu"
-                  autoComplete="current-password"
-                />
-              </Form.Item>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <MedicineBoxOutlined className="text-2xl text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Theo dõi Toàn diện
+                </h3>
+                <p className="text-blue-100">
+                  Theo dõi tất cả lịch hẹn tiêm chủng, các mũi tiêm và chứng
+                  nhận vaccine của bạn tại một nơi
+                </p>
+              </div>
+            </div>
 
-              <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  className="w-full"
-                  size="large"
-                >
-                  Đăng nhập
-                </Button>
-              </Form.Item>
-
-              <p className="text-center">
-                Chưa có tài khoản đăng ký{' '}
-                <Link to="/register" className="text-blue-400">
-                  tại đây
-                </Link>
-              </p>
-            </Form>
-
-            {/* Divider */}
-            <Divider className="my-6">
-              <span className="text-gray-400 text-sm">Hoặc đăng nhập bằng</span>
-            </Divider>
-
-            <div className="alternative-login-methods">
-              <Button
-                type="primary"
-                size="large"
-                loading={googleLoading}
-                onClick={handleGoogleLogin}
-                className="w-full google-login-btn"
-                style={{
-                  backgroundColor: '#4285f4',
-                  borderColor: '#4285f4',
-                  color: 'white',
-                  height: '40px',
-                  fontWeight: '500',
-                  borderRadius: '6px',
-                }}
-              >
-                <GoogleOutlined style={{ marginRight: '8px' }} />
-                Đăng nhập với Google
-              </Button>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <CheckCircleOutlined className="text-2xl text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  Mạng lưới Tin cậy
+                </h3>
+                <p className="text-blue-100">
+                  Kết nối với các nhà cung cấp dịch vụ y tế và trung tâm tiêm
+                  chủng trên toàn quốc
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 px-8 py-4 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">
-            © 2025 VaxChain. All rights reserved.
-            <i className="fas fa-link text-blue-500 ml-1" />
+        <div className="relative z-10">
+          <p className="text-blue-100 text-sm">
+            © 2025 MedChainAI. Được hỗ trợ bởi Công nghệ Blockchain
           </p>
         </div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div
+        className="flex-1 flex items-center justify-center p-8"
+        style={{
+          animation: 'slideInFromRight 0.7s ease-out',
+        }}
+      >
+        <Card
+          className="w-full max-w-md shadow-2xl"
+          style={{
+            borderRadius: '20px',
+            border: 'none',
+          }}
+        >
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl mb-4 shadow-lg">
+              <SafetyOutlined className="text-3xl text-white" />
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+              Chào mừng trở lại
+            </h2>
+            <p className="text-gray-500">
+              Đăng nhập để truy cập hồ sơ tiêm chủng của bạn
+            </p>
+          </div>
+
+          <Form
+            form={form}
+            name="password_login"
+            onFinish={handlePasswordLogin}
+            layout="vertical"
+            size="large"
+          >
+            <Form.Item
+              name="email"
+              rules={[
+                { required: true, message: 'Vui lòng nhập email!' },
+                { type: 'email', message: 'Email không hợp lệ!' },
+              ]}
+            >
+              <Input
+                prefix={<MailOutlined className="text-gray-400 text-lg mr-2" />}
+                placeholder="Email address"
+                autoComplete="email"
+                className="h-12 rounded-lg"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="password"
+              rules={[
+                {
+                  required: true,
+                  message: 'Vui lòng nhập mật khẩu!',
+                },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined className="text-gray-400 text-lg mr-2" />}
+                placeholder="Password"
+                autoComplete="current-password"
+                className="h-12 rounded-lg"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="w-full h-12 text-base font-semibold rounded-lg shadow-lg"
+                style={{
+                  background:
+                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: 'none',
+                }}
+              >
+                Sign In
+              </Button>
+            </Form.Item>
+          </Form>
+
+          <Divider className="my-6">
+            <span className="text-gray-400 text-sm">Or continue with</span>
+          </Divider>
+
+          <Button
+            size="large"
+            loading={googleLoading}
+            onClick={handleGoogleLogin}
+            className="w-full h-12 rounded-lg font-medium"
+            style={{
+              borderColor: '#e5e7eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <GoogleOutlined
+              style={{
+                fontSize: '20px',
+                color: '#4285f4',
+                marginRight: '12px',
+              }}
+            />
+            <span className="text-gray-700">Sign in with Google</span>
+          </Button>
+
+          <div className="text-center mt-6">
+            <span className="text-gray-500">Don't have an account? </span>
+            <Link
+              to="/register"
+              className="text-blue-600 font-semibold hover:text-blue-700"
+            >
+              Sign up
+            </Link>
+          </div>
+        </Card>
       </div>
     </div>
   );

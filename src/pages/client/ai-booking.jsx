@@ -238,7 +238,7 @@ const AIBookingPage = () => {
       id: 1,
       role: 'assistant',
       content:
-        '👋 Xin chào! Tôi là trợ lý AI của VaxChain. Tôi có thể giúp bạn:\n\n🔹 Tư vấn về các loại vaccine\n🔹 Đề xuất trung tâm tiêm chủng\n🔹 Đặt lịch tiêm chủng tự động\n\nBạn cần tôi giúp gì?',
+        '👋 Xin chào! Tôi là trợ lý AI của MedChainAI. Tôi có thể giúp bạn:\n\n🔹 Tư vấn về các loại vaccine\n🔹 Đề xuất trung tâm tiêm chủng\n🔹 Đặt lịch tiêm chủng tự động\n\nBạn cần tôi giúp gì?',
       timestamp: new Date(),
     },
   ]);

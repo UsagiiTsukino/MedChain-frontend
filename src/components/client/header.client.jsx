@@ -150,7 +150,7 @@ const Navbar = () => {
               </div>
               <div className="hidden md:block">
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  VaxChain
+                  MedChainAI
                 </span>
               </div>
             </div>
@@ -370,7 +370,7 @@ const Navbar = () => {
               <SafetyCertificateOutlined className="text-white text-xl" />
             </div>
             <div>
-              <div className="font-bold text-gray-900">VaxChain</div>
+              <div className="font-bold text-gray-900">MedChainAI</div>
               <div className="text-xs text-gray-500">Blockchain Healthcare</div>
             </div>
           </div>

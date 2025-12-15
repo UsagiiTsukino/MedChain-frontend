@@ -338,7 +338,7 @@ const SuccessPage = () => {
                       </span>
                       <span className="flex items-center">
                         <MailOutlined className="mr-2" />
-                        support@vaxchain.io
+                        support@medchain.ai
                       </span>
                     </div>
                   </div>

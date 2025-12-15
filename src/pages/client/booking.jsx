@@ -197,42 +197,36 @@ const BookingPage = () => {
     const ethEquivalent = bookingSummary.vaccine.price / 10000;
 
     return (
-      <Card className="mb-4" size="small">
-        <Descriptions
-          title="Thông tin đặt lịch"
-          column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}
-        >
-          <Descriptions.Item label="Vaccine">
-            <Tag color="blue">{bookingSummary.vaccine.name}</Tag>
-          </Descriptions.Item>
-          <Descriptions.Item label="Giá">
-            {new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND',
-            }).format(bookingSummary.vaccine.price)}{' '}
-            <Tag color="blue">{ethEquivalent} ETH</Tag>
-          </Descriptions.Item>
-          {bookingSummary.date && bookingSummary.time && (
-            <Descriptions.Item label="Thời gian">
-              <Tag icon={<CalendarOutlined />} color="green">
-                {dayjs(bookingSummary.date).format('DD/MM/YYYY')} -{' '}
-                {bookingSummary.time}
+      <Card
+        className="mb-8 shadow-lg border-0 rounded-2xl overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        }}
+      >
+        <div className="flex items-center gap-6 text-white p-2">
+          <div className="w-20 h-20 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+            <MedicineBoxOutlined className="text-4xl text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-2xl font-bold mb-1">
+              {bookingSummary.vaccine.name}
+            </h3>
+            <p className="text-purple-100 mb-2">
+              {bookingSummary.vaccine.manufacturer}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Tag className="bg-white/90 text-gray-900 font-semibold px-3 py-1 rounded-lg border-0">
+                {bookingSummary.vaccine.dosage} mũi tiêm
               </Tag>
-            </Descriptions.Item>
-          )}
-          {bookingSummary.center && (
-            <Descriptions.Item label="Cơ sở tiêm chủng">
-              <Tag color="purple">{bookingSummary.center.name}</Tag>
-            </Descriptions.Item>
-          )}
-          {bookingSummary.payment && (
-            <Descriptions.Item label="Phương thức thanh toán">
-              <Tag icon={<CreditCardOutlined />} color="orange">
-                {bookingSummary.payment}
+              <Tag className="bg-white/90 text-gray-900 font-semibold px-3 py-1 rounded-lg border-0">
+                {bookingSummary.vaccine.price?.toLocaleString()} VNĐ
               </Tag>
-            </Descriptions.Item>
-          )}
-        </Descriptions>
+              <Tag className="bg-white/90 text-gray-900 font-semibold px-3 py-1 rounded-lg border-0">
+                {ethEquivalent} ETH
+              </Tag>
+            </div>
+          </div>
+        </div>
       </Card>
     );
   };
@@ -604,57 +598,126 @@ const BookingPage = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Đặt lịch tiêm chủng
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Chọn vaccine, phương thức thanh toán và thời gian tiêm phù hợp
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl mb-4 shadow-lg">
+            <CalendarOutlined className="text-3xl text-white" />
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+            Đặt lịch tiêm chủng
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Quy trình đặt lịch nhanh chóng và an toàn với MedChainAI
+          </p>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="mb-10">
+          <Steps
+            current={current}
+            items={steps.map((item, index) => ({
+              key: item.title,
+              title: item.title,
+              icon:
+                index === 0 ? (
+                  <MedicineBoxOutlined />
+                ) : index === 1 ? (
+                  <CalendarOutlined />
+                ) : (
+                  <CreditCardOutlined />
+                ),
+            }))}
+            className="custom-steps"
+            style={{
+              '--ant-color-primary': '#2563eb',
+              '--ant-color-primary-hover': '#1d4ed8',
+            }}
+          />
+        </div>
+
+        {/* Summary Card (if vaccine selected) */}
+        {renderSummary()}
+
+        {/* Main Content Card */}
+        <Form form={form} layout="vertical">
+          <Card
+            className="shadow-xl border-0 rounded-2xl overflow-hidden mb-8"
+            bodyStyle={{ padding: '2rem' }}
+            style={{
+              background:
+                'linear-gradient(to bottom right, rgba(255,255,255,0.9), rgba(255,255,255,0.8))',
+              backdropFilter: 'blur(20px)',
+            }}
+          >
+            {renderStepContent(steps[current].content)}
+          </Card>
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between items-center gap-4">
+            {current > 0 && (
+              <Button
+                size="large"
+                onClick={prev}
+                disabled={loading}
+                className="h-12 px-8 rounded-xl text-base font-medium hover:scale-105 transition-transform"
+              >
+                ← Quay lại
+              </Button>
+            )}
+            <div className="flex-1" />
+            {current < steps.length - 1 && (
+              <Button
+                type="primary"
+                size="large"
+                onClick={next}
+                disabled={loading}
+                className="h-12 px-8 rounded-xl text-base font-semibold shadow-lg hover:scale-105 transition-transform"
+                style={{
+                  background:
+                    'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)',
+                  border: 'none',
+                }}
+              >
+                Tiếp tục →
+              </Button>
+            )}
+            {current === steps.length - 1 && (
+              <Button
+                type="primary"
+                size="large"
+                onClick={handleFinish}
+                loading={loading}
+                className="h-12 px-8 rounded-xl text-base font-semibold shadow-lg hover:scale-105 transition-transform"
+                style={{
+                  background:
+                    'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  border: 'none',
+                }}
+              >
+                <CheckCircleOutlined /> Hoàn tất đặt lịch
+              </Button>
+            )}
+          </div>
+        </Form>
       </div>
 
-      {renderSummary()}
-
-      <Steps
-        current={current}
-        items={steps.map((item) => ({ key: item.title, title: item.title }))}
-        className="mb-8"
-      />
-
-      <Form form={form} layout="vertical">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          {renderStepContent(steps[current].content)}
-        </div>
-
-        <div className="flex justify-between">
-          {current > 0 && (
-            <Button size="large" onClick={prev} disabled={loading}>
-              Quay lại
-            </Button>
-          )}
-          {current < steps.length - 1 && (
-            <Button
-              type="primary"
-              size="large"
-              onClick={next}
-              disabled={loading}
-            >
-              Tiếp tục
-            </Button>
-          )}
-          {current === steps.length - 1 && (
-            <Button
-              type="primary"
-              size="large"
-              onClick={handleFinish}
-              loading={loading}
-            >
-              Hoàn tất đặt lịch
-            </Button>
-          )}
-        </div>
-      </Form>
+      {/* Custom CSS for Steps */}
+      <style jsx>{`
+        .custom-steps :global(.ant-steps-item-process .ant-steps-item-icon) {
+          background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+          border-color: #3b82f6;
+        }
+        .custom-steps :global(.ant-steps-item-finish .ant-steps-item-icon) {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          border-color: #10b981;
+        }
+        .custom-steps
+          :global(.ant-steps-item-finish .ant-steps-item-tail::after) {
+          background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+        }
+      `}</style>
     </div>
   );
 };
