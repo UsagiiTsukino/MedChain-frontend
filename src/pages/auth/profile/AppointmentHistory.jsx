@@ -1,5 +1,14 @@
-import React from 'react';
-import { Card, Tag, Space, Button, Statistic, Tooltip, Progress } from 'antd';
+import React, { useState } from 'react';
+import {
+  Card,
+  Tag,
+  Space,
+  Button,
+  Statistic,
+  Tooltip,
+  Progress,
+  Avatar,
+} from 'antd';
 import {
   MedicineBoxOutlined,
   CheckCircleOutlined,
@@ -9,7 +18,9 @@ import {
   InfoCircleOutlined,
   SafetyCertificateOutlined,
   PlusOutlined,
+  MessageOutlined,
 } from '@ant-design/icons';
+import ChatModal from '../../../components/chat/ChatModal';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import LoadingTable from '../../../components/share/LoadingTable';
@@ -18,8 +29,36 @@ import { BlockchainVerifyBadge } from '../../../components/blockchain/Blockchain
 /**
  * Component hiển thị lịch sử đăng ký tiêm chủng
  */
-const AppointmentHistory = ({ appointments, loadingAppointments }) => {
+const AppointmentHistory = ({ user, appointments, loadingAppointments }) => {
   const navigate = useNavigate();
+
+  // State for chat modal
+  const [chatVisible, setChatVisible] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+
+  // Function to open chat modal
+  const handleOpenChat = (record, appointment) => {
+    console.log('[AppointmentHistory] handleOpenChat called');
+    console.log('[AppointmentHistory] record:', record);
+    console.log('[AppointmentHistory] appointment:', appointment);
+    console.log('[AppointmentHistory] user:', user);
+
+    // Open modal first for instant UI feedback
+    setChatVisible(true);
+
+    // Set data after modal is visible
+    setTimeout(() => {
+      setSelectedAppointment({
+        appointmentId: appointment.appointmentId,
+        doseNumber: appointment.doseNumber,
+        appointmentDate: appointment.appointmentDate,
+        appointmentTime: appointment.appointmentTime,
+        vaccine: record.vaccine,
+      });
+      setSelectedDoctor(appointment.doctor);
+    }, 0);
+  };
 
   const getStatusColor = (status) => {
     const statusMap = {
@@ -194,6 +233,64 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
       },
     },
     {
+      title: 'Bác sĩ phụ trách',
+      key: 'doctor',
+      width: 200,
+      render: (_, record) => {
+        // Lấy appointments từ record
+        const appointments = record.appointments || [];
+        const appointmentsWithDoctor = appointments.filter((a) => a.doctor);
+
+        if (appointmentsWithDoctor.length === 0) {
+          return (
+            <div className="text-center text-gray-400 text-sm">
+              Chưa phân công
+            </div>
+          );
+        }
+
+        return (
+          <div className="space-y-2">
+            {appointmentsWithDoctor.map((appointment) => (
+              <div
+                key={appointment.appointmentId}
+                className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg"
+              >
+                <Avatar
+                  size={32}
+                  className="bg-gradient-to-br from-purple-500 to-indigo-600 flex-shrink-0"
+                >
+                  {appointment.doctor?.fullName?.charAt(0) || 'D'}
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <Tooltip title={appointment.doctor?.fullName}>
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {appointment.doctor?.fullName || 'N/A'}
+                    </div>
+                  </Tooltip>
+                  <div className="text-xs text-gray-500">
+                    Mũi {appointment.doseNumber}/{record.totalDoses}
+                  </div>
+                </div>
+                {appointment.status !== 'COMPLETED' &&
+                  appointment.status !== 'CANCELLED' && (
+                    <Tooltip title="Chat với bác sĩ">
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<MessageOutlined className="text-blue-500" />}
+                        onClick={() => handleOpenChat(record, appointment)}
+                        className="flex-shrink-0"
+                      />
+                    </Tooltip>
+                  )}
+              </div>
+            ))}
+          </div>
+        );
+      },
+    },
+    {
       title: 'Trạng thái',
       dataIndex: 'overallStatus',
       key: 'overallStatus',
@@ -305,7 +402,7 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
                 showTotal: (total) => `Tổng ${total} lịch hẹn`,
               }}
               rowKey="bookingId"
-              scroll={{ x: 1400 }}
+              scroll={{ x: 1600 }}
               size="middle"
             />
           </Card>
@@ -351,6 +448,23 @@ const AppointmentHistory = ({ appointments, loadingAppointments }) => {
           </div>
         </div>
       </div>
+
+      {/* Chat Modal */}
+      <ChatModal
+        visible={chatVisible}
+        onClose={() => {
+          setChatVisible(false);
+          setSelectedAppointment(null);
+          setSelectedDoctor(null);
+        }}
+        appointment={selectedAppointment}
+        currentUser={{
+          walletAddress: user?.walletAddress || user?.email,
+          fullName: user?.fullName,
+          role: 'PATIENT',
+        }}
+        otherUser={selectedDoctor}
+      />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Badge,
   Button,
@@ -15,7 +16,9 @@ import {
   CloseOutlined,
   EyeOutlined,
   CalendarOutlined,
+  MessageOutlined,
 } from '@ant-design/icons';
+import ChatModal from '../../components/chat/ChatModal';
 import { ProTable } from '@ant-design/pro-components';
 import {
   callCompleteAppointment,
@@ -26,13 +29,12 @@ import dayjs from 'dayjs';
 
 const MySchedulePage = () => {
   const actionRef = useRef();
+  const user = useSelector((state) => state.account.user);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const reloadTable = () => {
-    actionRef?.current?.reload();
-  };
+  const [chatVisible, setChatVisible] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   const handleViewDetail = (record) => {
     setSelectedAppointment(record);
@@ -82,6 +84,29 @@ const MySchedulePage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOpenChat = (record) => {
+    console.log('[MySchedule] handleOpenChat called with record:', record);
+
+    // Open modal first for instant UI feedback
+    setChatVisible(true);
+
+    // Set data after modal is visible
+    setTimeout(() => {
+      setSelectedPatient({
+        walletAddress: record.patientAddress,
+        fullName: record.patientName,
+        role: 'PATIENT',
+      });
+      setSelectedAppointment({
+        appointmentId: record.appointmentId,
+        doseNumber: record.doseNumber || 1,
+        appointmentDate: record.scheduledDate,
+        appointmentTime: record.scheduledTime,
+        vaccine: { name: record.vaccineName },
+      });
+    }, 0);
   };
 
   const getStatusConfig = (status) => {
@@ -220,6 +245,16 @@ const MySchedulePage = () => {
           >
             Chi tiết
           </Button>
+          {record.status !== 'COMPLETED' && record.status !== 'CANCELLED' && (
+            <Button
+              icon={<MessageOutlined />}
+              onClick={() => handleOpenChat(record)}
+              size="small"
+              className="text-blue-600 border-blue-400 hover:bg-blue-50"
+            >
+              Chat
+            </Button>
+          )}
           {(record.status === 'CONFIRMED' ||
             record.status === 'IN_PROGRESS') && (
             <Popconfirm
@@ -350,10 +385,12 @@ const MySchedulePage = () => {
                   bordered
                   column={1}
                   size="small"
-                  labelStyle={{
-                    fontWeight: 600,
-                    backgroundColor: '#f9fafb',
-                    width: '200px',
+                  styles={{
+                    label: {
+                      fontWeight: 600,
+                      backgroundColor: '#f9fafb',
+                      width: '200px',
+                    },
                   }}
                 >
                   <Descriptions.Item label="Mã ca tiêm">
@@ -429,6 +466,34 @@ const MySchedulePage = () => {
                 </Descriptions>
               </div>
 
+              {/* Patient Contact Section */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <MessageOutlined className="text-blue-600" />
+                    Liên hệ bệnh nhân
+                  </h3>
+                  {selectedAppointment.status !== 'COMPLETED' &&
+                    selectedAppointment.status !== 'CANCELLED' && (
+                      <Button
+                        type="primary"
+                        icon={<MessageOutlined />}
+                        onClick={() => handleOpenChat(selectedAppointment)}
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 border-0"
+                      >
+                        Nhắn tin tư vấn
+                      </Button>
+                    )}
+                </div>
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-600">
+                    💡 Sử dụng tính năng chat để tư vấn cho bệnh nhân trước khi
+                    tiêm chủng. Bạn có thể hỏi về tình trạng sức khỏe, dị ứng,
+                    hoặc giải đáp thắc mắc.
+                  </p>
+                </div>
+              </div>
+
               <div className="flex gap-3 pt-4 border-t">
                 {selectedAppointment.status === 'ASSIGNED' && (
                   <Button
@@ -473,6 +538,22 @@ const MySchedulePage = () => {
             </>
           )}
         </Drawer>
+
+        {/* Chat Modal */}
+        <ChatModal
+          visible={chatVisible}
+          onClose={() => {
+            setChatVisible(false);
+            setSelectedPatient(null);
+          }}
+          appointment={selectedAppointment}
+          currentUser={{
+            walletAddress: user?.walletAddress || user?.email,
+            fullName: user?.fullName,
+            role: 'DOCTOR',
+          }}
+          otherUser={selectedPatient}
+        />
       </div>
     </div>
   );

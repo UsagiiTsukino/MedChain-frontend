@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Tabs, notification, Card } from 'antd';
-import { CalendarOutlined, WalletOutlined } from '@ant-design/icons';
+import {
+  CalendarOutlined,
+  WalletOutlined,
+  MessageOutlined,
+} from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAccount, useBalance } from 'wagmi';
 import ModalProfile from '../../components/modal/modal.profile';
@@ -11,6 +15,7 @@ import { callCancelAppointment } from '../../config/api.appointment';
 import UserInfoCard from './profile/UserInfoCard';
 import WalletCard from './profile/WalletCard';
 import AppointmentHistory from './profile/AppointmentHistory';
+import ConversationsList from '../../components/chat/ConversationsList';
 import Web3 from 'web3';
 import TransactionHistory from './profile/TransactionHistory';
 import useLoadingData from '../../utils/withLoadingData';
@@ -233,9 +238,29 @@ const ProfilePage = () => {
                     key="2"
                   >
                     <AppointmentHistory
+                      user={user}
                       appointments={appointments}
                       loadingAppointments={loadingAppointments}
                       handleCancel={handleCancel}
+                    />
+                  </TabPane>
+                )}
+                {(user?.role === 'PATIENT' || user?.role === 'DOCTOR') && (
+                  <TabPane
+                    tab={
+                      <span className="flex items-center gap-2">
+                        <MessageOutlined />
+                        <span className="font-medium">Tin nhắn</span>
+                      </span>
+                    }
+                    key="4"
+                  >
+                    <ConversationsList
+                      currentUser={{
+                        walletAddress: user?.walletAddress,
+                        fullName: user?.fullName,
+                        role: user?.role,
+                      }}
                     />
                   </TabPane>
                 )}

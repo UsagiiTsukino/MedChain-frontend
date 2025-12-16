@@ -18,6 +18,7 @@ import { useDisconnect } from 'wagmi';
 import { Avatar, Badge, Dropdown, message, Menu, Layout } from 'antd';
 import { setLogoutAction } from '../../redux/slice/accountSlide';
 import { callLogout } from '../../config/api.auth';
+import { useGlobalSocket } from '../../hooks/useGlobalSocket';
 
 const { Header, Sider, Content } = Layout;
 
@@ -26,6 +27,9 @@ const LayoutStaff = () => {
   const { disconnect } = useDisconnect();
   const navigate = useNavigate();
   const user = useSelector((state) => state.account.user);
+
+  // Connect to global socket for notifications
+  useGlobalSocket(user);
 
   const location = useLocation();
   const [activeMenu, setActiveMenu] = useState('');
