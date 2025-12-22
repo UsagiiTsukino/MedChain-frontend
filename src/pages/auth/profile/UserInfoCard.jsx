@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Avatar, Badge, Button } from 'antd';
 import {
   UserOutlined,
@@ -7,14 +7,20 @@ import {
   PhoneOutlined,
   EnvironmentOutlined,
   CalendarOutlined,
+  CameraOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
-const UserInfoCard = ({ user, onEdit, getRole }) => {
+const UserInfoCard = ({ user, onEdit, getRole, onAvatarClick }) => {
+  const [showEditIcon, setShowEditIcon] = useState(false);
+  const [avatarKey, setAvatarKey] = useState(Date.now());
+
   // Debug: log when user prop changes
   useEffect(() => {
     console.log('[UserInfoCard] User prop updated:', user);
-  }, [user]);
+    // Update avatar key to force reload when user avatar changes
+    setAvatarKey(Date.now());
+  }, [user?.avatar]);
 
   // Format birthday for display
   const formatBirthday = (birthday) => {
@@ -37,14 +43,33 @@ const UserInfoCard = ({ user, onEdit, getRole }) => {
           status={user?.isVerified ? 'success' : 'default'}
           offset={[-5, 90]}
         >
-          <div className="relative">
+          <div
+            className="relative cursor-pointer"
+            onMouseEnter={() => setShowEditIcon(true)}
+            onMouseLeave={() => setShowEditIcon(false)}
+            onClick={onAvatarClick}
+          >
             <Avatar
               size={96}
               icon={<UserOutlined />}
-              src={user?.avatar}
-              className="bg-white border-4 border-white shadow-lg"
+              src={
+                user?.avatar
+                  ? `${user.avatar.split('?')[0]}?t=${avatarKey}`
+                  : user?.avatar
+              }
+              className="bg-white border-4 border-white shadow-lg transition-all duration-300"
+              style={{
+                filter: showEditIcon ? 'brightness(0.7)' : 'brightness(1)',
+              }}
             />
-            {user?.isVerified && (
+            {showEditIcon && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shadow-lg animate-pulse">
+                  <CameraOutlined className="text-white text-xl" />
+                </div>
+              </div>
+            )}
+            {user?.isVerified && !showEditIcon && (
               <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-green-500 border-2 border-white flex items-center justify-center">
                 <span className="text-white text-xs">✓</span>
               </div>

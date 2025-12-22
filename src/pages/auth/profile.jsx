@@ -8,6 +8,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { useAccount, useBalance } from 'wagmi';
 import ModalProfile from '../../components/modal/modal.profile';
+import ModalAvatar from '../../components/modal/modal.avatar';
 import { fetchAccount } from '../../redux/slice/accountSlide';
 import { callMyBookings } from '../../config/api.auth';
 import { callCancelAppointment } from '../../config/api.appointment';
@@ -32,6 +33,7 @@ const ProfilePage = () => {
   console.log('[ProfilePage] Wallet address from wagmi:', address);
 
   const [openModal, setOpenModal] = useState(false);
+  const [openAvatarModal, setOpenAvatarModal] = useState(false);
   const { data } = useBalance({ address });
   const formattedValue = data?.formatted ? Number(data.formatted) : 0;
 
@@ -216,9 +218,13 @@ const ProfilePage = () => {
             <UserInfoCard
               user={user}
               onEdit={() => setOpenModal(true)}
+              onAvatarClick={() => setOpenAvatarModal(true)}
               getRole={getRole}
             />
-            <WalletCard address={address} balance={formattedValue} />
+            <WalletCard
+              address={user?.metamaskWallet}
+              balance={formattedValue}
+            />
           </div>
 
           {/* Right Column */}
@@ -290,6 +296,15 @@ const ProfilePage = () => {
         setOpenModal={setOpenModal}
         reloadData={reloadData}
         user={user}
+      />
+
+      <ModalAvatar
+        open={openAvatarModal}
+        setOpen={setOpenAvatarModal}
+        onSuccess={(avatarUrl) => {
+          // Reload user data to get updated avatar
+          reloadData();
+        }}
       />
     </div>
   );

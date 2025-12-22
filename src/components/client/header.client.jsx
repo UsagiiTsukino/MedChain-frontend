@@ -33,6 +33,7 @@ const Navbar = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
   const [searchVisible, setSearchVisible] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -51,6 +52,11 @@ const Navbar = () => {
     setMobileMenuVisible(false);
   };
 
+  const handleMenuItemClick = (path) => {
+    setDropdownOpen(false);
+    navigate(path);
+  };
+
   const handleSearch = () => {
     if (searchValue.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchValue)}`);
@@ -65,17 +71,17 @@ const Navbar = () => {
       icon: <HomeOutlined />,
       label: 'Trang chủ',
     },
-    {
-      key: 'market-menu',
-      icon: <ShoppingOutlined />,
-      label: 'Vaccine',
-      children: [
-        {
-          key: '/market',
-          label: 'Danh sách vaccine',
-        },
-      ],
-    },
+    // {
+    //   key: 'market-menu',
+    //   icon: <ShoppingOutlined />,
+    //   label: 'Vaccine',
+    //   children: [
+    //     {
+    //       key: '/market',
+    //       label: 'Danh sách vaccine',
+    //     },
+    //   ],
+    // },
     {
       key: 'booking-menu',
       icon: <CalendarOutlined />,
@@ -165,20 +171,84 @@ const Navbar = () => {
                   return (
                     <Dropdown
                       key={item.key}
+                      open={dropdownOpen}
+                      onOpenChange={(open) => {
+                        // Only allow closing from onOpenChange, not opening
+                        if (!open) {
+                          setDropdownOpen(false);
+                        }
+                      }}
                       menu={{
-                        items: item.children.map((child) => ({
+                        items: item.children.map((child, index) => ({
                           key: child.key,
-                          label: child.label,
-                          onClick: () => navigate(child.key),
+                          label: (
+                            <div className="flex flex-col py-1">
+                              <span className="font-semibold text-gray-800 text-sm">
+                                {child.label}
+                              </span>
+                              <span className="text-xs text-gray-500 mt-0.5">
+                                {child.key === '/booking'
+                                  ? 'Đặt lịch tiêm chủng mới'
+                                  : 'Xem lịch sử đặt lịch'}
+                              </span>
+                            </div>
+                          ),
+                          icon: (
+                            <div
+                              className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                                child.key === '/booking'
+                                  ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                                  : 'bg-gradient-to-br from-green-500 to-green-600'
+                              }`}
+                            >
+                              {child.key === '/booking' ? (
+                                <CalendarOutlined className="text-white text-lg" />
+                              ) : (
+                                <DashboardOutlined className="text-white text-lg" />
+                              )}
+                            </div>
+                          ),
+                          onClick: () => handleMenuItemClick(child.key),
                         })),
                       }}
                       placement="bottomLeft"
-                      trigger={['hover']}
+                      trigger={[]}
+                      overlayClassName="modern-dropdown"
+                      destroyPopupOnHide={true}
+                      dropdownRender={(menu) => (
+                        <div
+                          className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden min-w-[280px]"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
+                            <h3 className="text-white font-bold text-sm flex items-center gap-2">
+                              <CalendarOutlined />
+                              Đặt lịch tiêm chủng
+                            </h3>
+                          </div>
+                          <div className="p-2">{menu}</div>
+                        </div>
+                      )}
                     >
-                      <button className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 flex items-center gap-2">
-                        {item.icon}
-                        <span>{item.label}</span>
-                      </button>
+                      <div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setDropdownOpen((prev) => !prev);
+                          }}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 flex items-center gap-2 group shadow-sm hover:shadow-md"
+                        >
+                          <span className="group-hover:scale-110 transition-transform duration-300">
+                            {item.icon}
+                          </span>
+                          <span>{item.label}</span>
+                          <span className="text-xs opacity-60 group-hover:opacity-100 transition-all duration-300 group-hover:rotate-180">
+                            ▼
+                          </span>
+                        </button>
+                      </div>
                     </Dropdown>
                   );
                 }
@@ -233,7 +303,7 @@ const Navbar = () => {
               </button>
             </div>
 
-            <Badge count={itemCount} size="small" offset={[-5, 5]}>
+            {/* <Badge count={itemCount} size="small" offset={[-5, 5]}>
               <button
                 onClick={() => navigate('/cart')}
                 className="p-2.5 rounded-xl text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
@@ -241,7 +311,7 @@ const Navbar = () => {
               >
                 <ShoppingCartOutlined className="text-lg" />
               </button>
-            </Badge>
+            </Badge> */}
 
             {/* Nút tìm kiếm cho mobile */}
             <button
@@ -275,7 +345,11 @@ const Navbar = () => {
                 >
                   <button className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-gray-50 transition-all duration-200 group">
                     <Avatar
-                      src={user?.avatar}
+                      src={
+                        user?.avatar
+                          ? `${user.avatar.split('?')[0]}?t=${Date.now()}`
+                          : user?.avatar
+                      }
                       icon={<UserOutlined />}
                       className="border-2 border-gray-200 group-hover:border-blue-500 transition-all"
                       size={36}
@@ -391,7 +465,11 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <Avatar
-                  src={user?.avatar}
+                  src={
+                    user?.avatar
+                      ? `${user.avatar.split('?')[0]}?t=${Date.now()}`
+                      : user?.avatar
+                  }
                   icon={<UserOutlined />}
                   size={56}
                   className="border-4 border-white shadow-lg"
@@ -563,7 +641,7 @@ const Navbar = () => {
                   NEW
                 </span>
               </button>
-              <button
+              {/* <button
                 onClick={() => {
                   navigate('/cart');
                   setMobileMenuVisible(false);
@@ -577,7 +655,7 @@ const Navbar = () => {
                     {itemCount}
                   </span>
                 )}
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
@@ -587,3 +665,68 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+// Modern dropdown styling
+const style = document.createElement('style');
+style.textContent = `
+  .modern-dropdown .ant-dropdown-menu {
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+  
+  .modern-dropdown .ant-dropdown-menu-item {
+    padding: 12px 16px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border-radius: 12px !important;
+    margin: 4px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-height: 70px !important;
+    background: white !important;
+    border: 2px solid transparent !important;
+  }
+  
+  .modern-dropdown .ant-dropdown-menu-item:hover {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%) !important;
+    border-color: #3B82F6 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+  }
+  
+  .modern-dropdown .ant-dropdown-menu-item-icon {
+    margin-right: 0 !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .modern-dropdown .ant-dropdown-menu-item:hover .ant-dropdown-menu-item-icon > div {
+    transform: scale(1.1) rotate(5deg) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .modern-dropdown .ant-dropdown-menu-title-content {
+    flex: 1 !important;
+  }
+  
+  .modern-dropdown .ant-dropdown-menu-item:active {
+    transform: translateY(0px) scale(0.98) !important;
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .modern-dropdown {
+    animation: slideDown 0.3s ease !important;
+  }
+`;
+document.head.appendChild(style);

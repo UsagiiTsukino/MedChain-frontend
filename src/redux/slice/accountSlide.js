@@ -25,6 +25,7 @@ const initialState = {
     phoneNumber: '',
     birthday: '',
     address: '',
+    avatar: '',
   },
 };
 
@@ -45,6 +46,7 @@ export const accountSlice = createSlice({
       state.user.phoneNumber = action.payload.phoneNumber;
       state.user.birthday = action.payload.birthday;
       state.user.address = action.payload.address;
+      state.user.avatar = action.payload.avatar;
     },
     setLogoutAction: (state) => {
       state.isAuthenticated = false;
@@ -59,6 +61,7 @@ export const accountSlice = createSlice({
         phoneNumber: '',
         birthday: '',
         address: '',
+        avatar: '',
       };
     },
     doUpdateUserInfoAction: (state, action) => {
@@ -91,6 +94,8 @@ export const accountSlice = createSlice({
         state.user.phoneNumber = action.payload.phoneNumber;
         state.user.birthday = action.payload.birthday;
         state.user.address = action.payload.address;
+        state.user.avatar = action.payload.avatar;
+        state.user.metamaskWallet = action.payload.metamaskWallet;
         console.log('[AccountSlice] User state updated:', state.user);
       }
     });

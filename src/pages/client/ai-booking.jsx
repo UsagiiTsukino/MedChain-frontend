@@ -52,6 +52,8 @@ const AIMessageContent = ({ content }) => {
     let currentList = [];
     let listType = null; // 'numbered' or 'bullet'
     let centerBlockContent = [];
+    let tableRows = [];
+    let isInTable = false;
 
     const flushList = () => {
       if (currentList.length > 0) {
@@ -84,6 +86,57 @@ const AIMessageContent = ({ content }) => {
       }
     };
 
+    const flushTable = () => {
+      if (tableRows.length > 0) {
+        // First row is header, rest are data rows
+        const headerRow = tableRows[0];
+        const dataRows = tableRows.slice(2); // Skip header and separator row
+
+        elements.push(
+          <div
+            key={`table-${elements.length}`}
+            className="my-4 overflow-x-auto"
+          >
+            <table className="min-w-full border-collapse bg-white rounded-lg shadow-sm overflow-hidden">
+              <thead className="bg-gradient-to-r from-blue-500 to-indigo-600">
+                <tr>
+                  {headerRow.map((header, i) => (
+                    <th
+                      key={i}
+                      className="px-4 py-3 text-left text-sm font-semibold text-white border-r border-blue-400 last:border-r-0"
+                    >
+                      {header.trim()}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {dataRows.map((row, rowIndex) => (
+                  <tr
+                    key={rowIndex}
+                    className={`${
+                      rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                    } hover:bg-blue-50 transition-colors`}
+                  >
+                    {row.map((cell, cellIndex) => (
+                      <td
+                        key={cellIndex}
+                        className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 border-r border-gray-200 last:border-r-0"
+                      >
+                        {formatInlineText(cell.trim())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+        tableRows = [];
+        isInTable = false;
+      }
+    };
+
     const formatInlineText = (text) => {
       // Handle bold text **text**
       const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -102,10 +155,30 @@ const AIMessageContent = ({ content }) => {
     lines.forEach((line, index) => {
       const trimmedLine = line.trim();
 
+      // Check for markdown table row (contains |)
+      if (trimmedLine.includes('|') && trimmedLine.length > 2) {
+        flushList();
+        flushCenterBlock();
+        isInTable = true;
+        // Parse table cells
+        const cells = trimmedLine
+          .split('|')
+          .map((cell) => cell.trim())
+          .filter((cell) => cell); // Remove empty cells from start/end
+        tableRows.push(cells);
+        return;
+      }
+
+      // If we were in a table and now hit a non-table line, flush it
+      if (isInTable && !trimmedLine.includes('|')) {
+        flushTable();
+      }
+
       // Skip empty lines but add spacing
       if (!trimmedLine) {
         flushList();
         flushCenterBlock();
+        flushTable();
         if (elements.length > 0) {
           elements.push(<div key={`space-${index}`} className="h-2" />);
         }
@@ -212,6 +285,7 @@ const AIMessageContent = ({ content }) => {
     // Flush any remaining items
     flushList();
     flushCenterBlock();
+    flushTable();
 
     return elements;
   };

@@ -4,9 +4,11 @@ import { useSelector } from 'react-redux';
 import {
   Badge,
   Button,
+  Checkbox,
   Descriptions,
   Drawer,
   message,
+  Select,
   Space,
   Tag,
   Popconfirm,
@@ -35,6 +37,8 @@ const MySchedulePage = () => {
   const [loading, setLoading] = useState(false);
   const [chatVisible, setChatVisible] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [showTodayOnly, setShowTodayOnly] = useState(false);
 
   const handleViewDetail = (record) => {
     setSelectedAppointment(record);
@@ -309,15 +313,38 @@ const MySchedulePage = () => {
 
               try {
                 const res = await callMySchedule(query);
-                console.log('[MySchedule] Response:', res);
-                console.log('[MySchedule] Response result:', res?.result);
-                console.log('[MySchedule] Response meta:', res?.meta);
+
+                // Filter based on status dropdown
+                let processedData = res?.result || [];
+                if (statusFilter !== 'ALL') {
+                  processedData = processedData.filter(
+                    (item) => item.status === statusFilter
+                  );
+                }
+
+                // Filter by today's date if checkbox is checked
+                if (showTodayOnly) {
+                  const today = dayjs().format('YYYY-MM-DD');
+                  processedData = processedData.filter(
+                    (item) => item.scheduledDate === today
+                  );
+                }
+
+                // Sort by date (newest first)
+                const sortedData = processedData.sort((a, b) => {
+                  const dateA = dayjs(`${a.scheduledDate} ${a.scheduledTime}`);
+                  const dateB = dayjs(`${b.scheduledDate} ${b.scheduledTime}`);
+                  return dateB.diff(dateA); // Descending order (newest first)
+                });
 
                 // axios interceptor returns res.data directly
                 return {
-                  data: res?.result || [],
+                  data: sortedData,
                   success: true,
-                  total: res?.meta?.total || 0,
+                  total:
+                    statusFilter !== 'ALL'
+                      ? sortedData.length
+                      : res?.meta?.total || 0,
                 };
               } catch (error) {
                 console.error('[MySchedule] API Error:', error);
@@ -355,6 +382,43 @@ const MySchedulePage = () => {
             dateFormatter="string"
             toolbar={{
               multipleLine: true,
+              filter: (
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-700 font-medium">
+                      Trạng thái:
+                    </span>
+                    <Select
+                      value={statusFilter}
+                      onChange={(value) => {
+                        setStatusFilter(value);
+                        actionRef.current?.reload();
+                      }}
+                      style={{ width: 200 }}
+                      options={[
+                        { label: '🔍 Tất cả', value: 'ALL' },
+                        { label: '⏳ Chờ xác nhận', value: 'PENDING' },
+                        { label: '✅ Đã xác nhận', value: 'CONFIRMED' },
+                        { label: '✔️ Hoàn thành', value: 'COMPLETED' },
+                        { label: '❌ Đã hủy', value: 'CANCELLED' },
+                      ]}
+                    />
+                  </div>
+                  <div className="flex items-center">
+                    <Checkbox
+                      checked={showTodayOnly}
+                      onChange={(e) => {
+                        setShowTodayOnly(e.target.checked);
+                        actionRef.current?.reload();
+                      }}
+                    >
+                      <span className="text-gray-700 font-medium">
+                        📅 Chỉ hiển thị lịch hôm nay
+                      </span>
+                    </Checkbox>
+                  </div>
+                </div>
+              ),
             }}
             options={{
               reload: true,
