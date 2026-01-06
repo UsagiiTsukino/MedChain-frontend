@@ -32,6 +32,7 @@ import BookingPage from './pages/client/booking';
 import CertificatePage from './pages/auth/certificate/[id]';
 import AIBookingPage from './pages/client/ai-booking';
 import VerifyPage from './pages/client/verify';
+import VerifyCertificate from './pages/auth/VerifyCertificate';
 
 // Staff pages
 import LayoutStaff from './components/staff/layout.staff';
@@ -194,6 +195,10 @@ const App = () => {
     {
       path: '/verify/:bookingId',
       element: <VerifyPage />,
+    },
+    {
+      path: '/verify-certificate',
+      element: <VerifyCertificate />,
     },
     {
       path: '/login',

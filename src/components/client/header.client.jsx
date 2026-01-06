@@ -291,6 +291,15 @@ const Navbar = () => {
             {/* Các nút action */}
             <div className="hidden md:flex items-center gap-2">
               <button
+                onClick={() => navigate('/verify-certificate')}
+                className="relative flex items-center gap-2 px-3 py-2.5 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
+                title="Xác minh chứng chỉ"
+              >
+                <SafetyCertificateOutlined className="text-lg" />
+                <span className="text-sm font-medium">Xác minh</span>
+              </button>
+
+              <button
                 onClick={() => navigate('/ai-booking')}
                 className="relative flex items-center gap-2 px-3 py-2.5 rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 hover:text-purple-700 transition-all duration-200"
                 title="Tư vấn AI"
@@ -627,6 +636,18 @@ const Navbar = () => {
           {/* Additional Mobile Actions */}
           <div className="border-t border-gray-200 p-4 bg-gray-50">
             <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => {
+                  navigate('/verify-certificate');
+                  setMobileMenuVisible(false);
+                }}
+                title="Xác minh chứng chỉ"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
+              >
+                <SafetyCertificateOutlined className="text-xl" />
+                <span className="text-sm font-medium">Xác minh</span>
+              </button>
+
               <button
                 onClick={() => {
                   navigate('/ai-booking');
